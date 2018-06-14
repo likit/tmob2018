@@ -7,7 +7,7 @@ services:
       - ./pg_data:/var/lib/postgresql/data/
   web:
     build: .
-    command: python talentda/manage.py runserver 0.0.0.0:8000
+    command: python tm/manage.py runserver 0.0.0.0:8000
     volumes:
       - ./code:/code
     ports:
