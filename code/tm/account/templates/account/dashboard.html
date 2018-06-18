@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="title">Profile</h1>
+  <div class="columns">
+    <div class="column is-one-third">
+      <div class="box">
+        <article class="media">
+          <div class="media-left">
+            <figure class="image is64-64">
+              <img src="{{ picture_url }}" width=64 height=64>
+            </figure>
+          </div>
+          <div class="media-content">
+            <div class="content">
+              <p>
+                <strong>{{ name }}</strong>
+                <br>
+                <strong>มหาวิทยาลัยมหิดล</strong>
+                <br>
+                <span class="icon">
+                  <i class="fas fa-envelope"></i>
+                </span> {{ email }}
+              </p>
+            </div>
+          </div>
+        </article>
+      </div>
+      <div class="card">
+        <header class="card-header">
+          <p class="card-header-title">
+            ข้อมูลนักเรียนทุนรัฐบาล
+            <a>
+              แก้ไข
+              <span class="icon">
+                <i class="fas fa-pencil-alt" aria-hidden="true"></i>
+              </span>
+            </a>
+          </p>
+        </header>
+        <div class="card-content">
+          <div class="content">
+            <p>
+              ประเทศที่จบการศึกษา: <strong>{{ country }}</strong>
+            </p>
+            <p>
+              ความเชี่ยวชาญ: <strong>{{ specialty }}</strong>
+            </p>
+            <p>
+              สาขาที่เรียน: <strong>{{ fos|title }}</strong>
+            </p>
+            <p>
+              ปริญญา: <strong>{{ degree }}</strong>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="column">
+      <div class="box">
+        <article class="media">
+          <div class="media-left">
+            <span class="icon">
+              <i class="far fa-thumbs-up"></i>
+            </span>
+          </div>
+          <div class="media-content">
+            <span class="tag">Bioinformatics</span>
+            <span class="tag">Microbiology</span>
+            <span class="tag">Computer</span>
+            <span class="tag">Python</span>
+          </div>
+        </article>
+      </div>
+      <div class="box">
+        <article class="media">
+          <div class="media-content">
+            <ul>
+              <li><h2>ผลงานวิจัยในเชิงพานิชย์</h2></li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+      <div class="box">
+        <article class="media">
+          <div class="media-content">
+            <ul>
+              <li><h2>ผลงานวิชาการ</h2></li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
