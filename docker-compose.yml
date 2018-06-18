@@ -1,6 +1,13 @@
 version: '3'
 
 services:
+  neo4j_db:
+    image: neo4j
+    volumes:
+      - ./neo_data:/data
+    ports:
+      - "7474:7474"
+      - "7687:7687"
   postgres_db:
     image: postgres
     volumes:
