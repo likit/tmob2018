@@ -1,43 +1,71 @@
 {% extends "blog/base.html" %}
 
-{% load wagtailcore_tags blogapp_tags el_pagination_tags %}
+{% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags %}
 
 {% block content %}
 <section class="section">
     <div class="container">
-    {% if blog_page.search_term %}
-    <h3 class="subtitle">Posts
-        {% if blog_page.search_type == "tag" %}
-        with {{ blog_page.search_term|title }} Tag
-        {% elif blog_page.search_type == "category" %}
-        in {{ blog_page.search_term }} Category
-        {% endif %}
-    </h3>
-    {% else %}
-    <h3 class="subtitle">All Posts</h3>
-    {% endif %}
-    <h4 class="subtitle">Total {{ posts|length }} posts.</h4>
-    {% paginate 10 posts %}
-    {% get_pages %}
-    {% for post in posts %}
-        <h3 class="title"><a href="{% post_date_url post blog_page %}">{{ post.title }}</a></h3>
-        <h6 class="text-muted">Posted by Likit Preeyanon on {{ post.date }}</h6>
-        {{ post.body|truncatewords_html:50|richtext }}
-        <a href="{% post_date_url post blog_page %}">Read more</span></a>
-        <hr>
-    {% endfor %}
-    {% if pages.paginated %}
-    <ul class="pagination pagination-primary">
-        Page&nbsp;&nbsp;
-        {% for page in pages %}
-            {% if page.is_current %}
-                <li class="page-item active"><a class="page-link" href="{{page.path}}">{{ page.label }}</a></li>
-            {% else %}
-                <li class="page-item"><a class="page-link" href="{{page.path}}">{{ page.label }}</a></li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-    {% endif %}
+        <div class="row">
+            <div class="col-sm-8">
+                {% if blog_page.search_term %}
+                <h3 class="subtitle">Posts
+                    {% if blog_page.search_type == "tag" %}
+                    with {{ blog_page.search_term|title }} Tag
+                    {% elif blog_page.search_type == "category" %}
+                    in {{ blog_page.search_term }} Category
+                    {% elif blog_page.search_type == "search" %}
+                    contains {{ blog_page.search_term }}
+                    {% endif %}
+                </h3>
+                {% else %}
+                <h3 class="subtitle">All Posts</h3>
+                {% endif %}
+                <h4 class="subtitle">Total {{ posts|length }} posts.</h4>
+                {% paginate 10 posts %}
+                {% get_pages %}
+                {% for post in posts %}
+                    <h3 class="title"><a href="{% post_date_url post blog_page %}">{{ post.title }}</a></h3>
+                    <h6 class="text-muted">Posted on {{ post.date }}</h6>
+                    {{ post.body|truncatewords_html:50|richtext }}
+                    <a href="{% post_date_url post blog_page %}">Read more</span></a>
+                    <hr>
+                {% endfor %}
+                {% if pages.paginated %}
+                <ul class="pagination pagination-primary">
+                    Page&nbsp;&nbsp;
+                    {% for page in pages %}
+                        {% if page.is_current %}
+                            <li class="page-item active"><a class="page-link" href="{{page.path}}">{{ page.label }}</a></li>
+                        {% else %}
+                            <li class="page-item"><a class="page-link" href="{{page.path}}">{{ page.label }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                {% endif %}
+            </div>
+            <div class="col-sm-4">
+                <h4 class="subtitle">Search Posts</h4>
+                <form role="search" method="get"
+                    class="form-search" action="{% routablepageurl blog_page 'post_search' %}" method="get">
+                    <div class="input-group">
+                        <input type="text" class="form-control" name="q" placeholder="Search&hellip;" title="Search for: "/>
+                        <span class="input-group-addon">
+                                <i class="fa fa-search"></i>
+                        </span>
+                    </div>
+                </form>
+                <h4 class="subtitle">Categories</h4>
+                <ul>
+                    {% for cat in categories %}
+                        <li>
+                            <a href="{% routablepageurl blog_page "post_by_category" cat.slug %}">
+                                {{ cat.name }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
     </div>
 </section>
 {% endblock %}

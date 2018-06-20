@@ -51,12 +51,23 @@ class BlogPage(RoutablePageMixin, Page):
         context = super(BlogPage, self).get_context(request, *args, **kwargs)
         context['posts'] = self.posts
         context['blog_page'] = self
+        context['categories'] = BlogCategory.objects.all()
         context['search_type'] = getattr(self, 'search_type', "")
         context['search_term'] = getattr(self, 'search_term', "")
         return context
 
     def get_posts(self):
         return PostPage.objects.descendant_of(self).live()
+
+    @route(r'^search/$')
+    def post_search(self, request, *args, **kwargs):
+        search_query = request.GET.get('q', None)
+        self.posts = self.get_posts()
+        if search_query:
+            self.posts = self.posts.filter(body__contains=search_query)
+            self.search_term = search_query
+            self.search_type = 'search'
+        return Page.serve(self, request, *args, **kwargs)
 
     @route(r'^(\d{4})/$')
     @route(r'^(\d{4})/(\d{2})/$')

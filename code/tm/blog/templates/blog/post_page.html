@@ -15,15 +15,19 @@
     <div class="card">
         <div class="card-body">
         <h3 class="card-title text-center"><strong>{{ page.title }}</strong></h3>
-        <h6 class="card-subtitle text-muted text-center">Posted by Likit Preeyanon on {{ page.date }}</h6>
+        <h6 class="card-subtitle text-muted text-center">Posted on {{ page.date }}</h6>
         <hr>
             {{ page.body|richtext }}
             {% if page.tags.all.count %}
                 <div>
                     <strong>Tags</strong>
-                    {% for tag in page.tags.all %}
-                        <a class="badge badge-info" href="{% routablepageurl blog_page "post_by_tag" tag.slug %}">{{ tag }}</a>
-                    {% endfor %}
+                    <ul>
+                        {% for tag in page.tags.all %}
+                        <li style="display: inline">
+                            <a class="badge badge-info" href="{% routablepageurl blog_page "post_by_tag" tag.slug %}">{{ tag }}</a>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
             {% endif %}
             {% with categories=page.categories.all %}
@@ -32,7 +36,7 @@
                     <ul>
                         {% for category in categories %}
                             <li style="display: inline">
-                                <a href="{% routablepageurl blog_page "post_by_category" category.slug %}">
+                                <a class="badge badge-primary" href="{% routablepageurl blog_page "post_by_category" category.slug %}">
                                 {{ category.name }}</a>
                             </li>
                         {% endfor %}
