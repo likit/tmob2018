@@ -1,6 +1,6 @@
 {% extends "blog/base.html" %}
 
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags blogapp_tags %}
 
 {% block content %}
 <section class="section">
@@ -18,10 +18,11 @@
     {% endif %}
     <h4 class="subtitle">Total {{ posts|length }} posts.</h4>
     {% for post in posts %}
-        <h3 class="title"><a href="{% pageurl post %}">{{ post.title }}</a></h3>
+        <h3 class="title"><a href="{% post_date_url post blog_page %}">{{ post.title }}</a></h3>
         <h6 class="text-muted">Posted by Likit Preeyanon on {{ post.date }}</h6>
         {{ post.body|truncatewords_html:50|richtext }}
-        <a href="{% pageurl post %}">อ่านต่อ</a>
+        <a href="{% post_date_url post blog_page %}">Read more</span></a>
+        <hr>
     {% endfor %}
     </div>
 </section>
