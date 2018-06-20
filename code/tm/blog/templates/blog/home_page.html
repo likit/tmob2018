@@ -1,12 +1,27 @@
 {% extends "blog/landing_page.html" %}
-{% load wagtailcore_tags wagtailroutablepage_tags %}
+{% load wagtailcore_tags wagtailroutablepage_tags el_pagination_tags %}
 
 {% block content %}
     <h3 class="subtitle">Recent Posts</h3>
+    {% paginate 5 posts %}
+    {% get_pages %}
     {% for post in posts %}
         <h3 class="title"><a href="{% pageurl post %}">{{ post.title }}</a></h3>
         <h6 class="text-muted">Posted at {{ post.date }}</h6>
         {{ post.body|truncatewords_html:50|richtext }}
-        <a href="{% pageurl post %}">อ่านต่อ</a>
+        <a href="{% pageurl post %}">Read more</a>
     {% endfor %}
+    {% if pages.paginated %}
+    <hr>
+    <ul class="pagination pagination-primary">
+        Page&nbsp;&nbsp;
+        {% for page in pages %}
+            {% if page.is_current %}
+                <li class="page-item active"><a class="page-link" href="{{page.path}}">{{ page.label }}</a></li>
+            {% else %}
+                <li class="page-item"><a class="page-link" href="{{page.path}}">{{ page.label }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+    {% endif %}
 {% endblock %}
