@@ -1,16 +1,28 @@
-{% extends "blog/landing_page.html" %}
+{% extends "blog/base.html" %}
 
 {% load wagtailcore_tags %}
 
 {% block content %}
-    {% if request.user.is_authenticated %}
-        <p>You have been authenticated as {{ user.username }}.</p>
+<section class="section">
+    <div class="container">
+    {% if blog_page.search_term %}
+    <h3 class="subtitle">Posts
+        {% if blog_page.search_type == "tag" %}
+        with {{ blog_page.search_term|title }} Tag
+        {% elif blog_page.search_type == "category" %}
+        in {{ blog_page.search_term }} Category
+        {% endif %}
+    </h3>
+    {% else %}
+    <h3 class="subtitle">All Posts</h3>
     {% endif %}
-    <h3 class="subtitle">Recent Posts</h3>
+    <h4 class="subtitle">Total {{ posts|length }} posts.</h4>
     {% for post in posts %}
         <h3 class="title"><a href="{% pageurl post %}">{{ post.title }}</a></h3>
         <h6 class="text-muted">Posted by Likit Preeyanon on {{ post.date }}</h6>
         {{ post.body|truncatewords_html:50|richtext }}
         <a href="{% pageurl post %}">อ่านต่อ</a>
     {% endfor %}
+    </div>
+</section>
 {% endblock %}

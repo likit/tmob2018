@@ -1,0 +1,12 @@
+{% extends "blog/landing_page.html" %}
+{% load wagtailcore_tags wagtailroutablepage_tags %}
+
+{% block content %}
+    <h3 class="subtitle">Recent Posts</h3>
+    {% for post in posts %}
+        <h3 class="title"><a href="{% pageurl post %}">{{ post.title }}</a></h3>
+        <h6 class="text-muted">Posted at {{ post.date }}</h6>
+        {{ post.body|truncatewords_html:50|richtext }}
+        <a href="{% pageurl post %}">อ่านต่อ</a>
+    {% endfor %}
+{% endblock %}

@@ -23,6 +23,20 @@ class Tag(TaggitTag):
     class Meta:
         proxy = True
 
+class HomePage(Page):
+    description = models.CharField(max_length=255, blank=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel('description')
+    ]
+
+    def get_context(self, request, *args, **kwargs):
+        context = super(HomePage, self).get_context(request, *args, **kwargs)
+        context['posts'] = self.get_posts()
+        return context
+
+    def get_posts(self):
+        return PostPage.objects.all().live()
 
 class BlogPage(RoutablePageMixin, Page):
     description = models.CharField(max_length=255, blank=True)

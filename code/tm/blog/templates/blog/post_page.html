@@ -1,5 +1,5 @@
 {% extends "blog/base.html" %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags wagtailroutablepage_tags %}
 
 {% block content %}
 <section>
@@ -22,7 +22,7 @@
                 <div>
                     <strong>Tags</strong>
                     {% for tag in page.tags.all %}
-                        <span class="badge badge-info">{{ tag }}</span>
+                        <a class="badge badge-info" href="{% routablepageurl blog_page "post_by_tag" tag.slug %}">{{ tag }}</a>
                     {% endfor %}
                 </div>
             {% endif %}
@@ -31,7 +31,10 @@
                     <strong>Categories</strong>
                     <ul>
                         {% for category in categories %}
-                            <li style="display: inline">{{ category.name }}</li>
+                            <li style="display: inline">
+                                <a href="{% routablepageurl blog_page "post_by_category" category.slug %}">
+                                {{ category.name }}</a>
+                            </li>
                         {% endfor %}
                     </ul>
                 {% endif %}
