@@ -3,14 +3,14 @@
 {% load wagtailcore_tags %}
 
 {% block content %}
-    <h1 class="title">{{ page.title }}</h1>
-    <p>{{ page.description }}</p>
     {% if request.user.is_authenticated %}
         <p>You have been authenticated as {{ user.username }}.</p>
     {% endif %}
-    {% for post in page.get_children %}
+    <h3 class="subtitle">Recent Posts</h3>
+    {% for post in posts %}
         <h3 class="title"><a href="{% pageurl post %}">{{ post.title }}</a></h3>
-        {{ post.body }}
+        <h6 class="text-muted">Posted by Likit Preeyanon on {{ post.date }}</h6>
+        {{ post.body|truncatewords_html:50|richtext }}
         <a href="{% pageurl post %}">อ่านต่อ</a>
     {% endfor %}
 {% endblock %}

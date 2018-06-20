@@ -2,9 +2,45 @@
 {% load wagtailcore_tags %}
 
 {% block content %}
+<section>
 <div class="container">
-    <h1 class="title">{{ page.title }}</h1>
-    {{ page.body|richtext }}
-    <p><a href="{{ page.get_parent.url }}">Return to main.</a></p>
+    <h1 class="title">Post Page</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="#">Home</a></li>
+            <li class="breadcrumb-item"><a href="#">Posts</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Post</li>
+        </ol>
+    </nav>
+    <div class="card">
+        <div class="card-body">
+        <h3 class="card-title text-center"><strong>{{ page.title }}</strong></h3>
+        <h6 class="card-subtitle text-muted text-center">Posted by Likit Preeyanon on {{ page.date }}</h6>
+        <hr>
+            {{ page.body|richtext }}
+            {% if page.tags.all.count %}
+                <div>
+                    <strong>Tags</strong>
+                    {% for tag in page.tags.all %}
+                        <span class="badge badge-info">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            {% with categories=page.categories.all %}
+                {% if categories %}
+                    <strong>Categories</strong>
+                    <ul>
+                        {% for category in categories %}
+                            <li style="display: inline">{{ category.name }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            {% endwith %}
+        </div>
+        <div class="card-footer">
+            <p><a class="btn btn-round btn-primary" href="{{ page.get_parent.url }}">Return to main.</a></p>
+        </div>
+    </div>
 </div>
+</section>
 {% endblock %}
