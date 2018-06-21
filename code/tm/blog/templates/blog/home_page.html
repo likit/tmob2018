@@ -2,7 +2,7 @@
 {% load wagtailcore_tags wagtailroutablepage_tags el_pagination_tags %}
 
 {% block content %}
-    <h3 class="subtitle">Recent Posts</h3>
+    <h2 class="title">Recent Posts</h2>
     {% paginate 5 posts %}
     {% get_pages %}
     {% for post in posts %}
