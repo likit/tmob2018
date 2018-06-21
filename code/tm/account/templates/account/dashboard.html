@@ -1,105 +1,90 @@
-{% extends "base.html" %}
+{% extends "blog/base.html" %}
+{% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
 
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
 <div class="container">
   <h1 class="title">Profile</h1>
-  <div class="columns">
-    <div class="column is-one-third">
-      <div class="box">
-        <article class="media">
-          <div class="media-left">
-            <figure class="image is64-64">
-              <img src="{{ picture_url }}" width=64 height=64>
-            </figure>
-          </div>
-          <div class="media-content">
-            <div class="content">
-              <p>
-                <strong>{{ name }}</strong>
-                <br>
-                <strong>มหาวิทยาลัยมหิดล</strong>
-                <br>
-                <span class="icon">
-                  <i class="fas fa-envelope"></i>
-                </span> {{ email }}
-              </p>
-            </div>
-          </div>
-        </article>
-      </div>
-      <div class="card">
-        <header class="card-header">
-          <p class="card-header-title">
-            ข้อมูลนักเรียนทุนรัฐบาล
-            <a>
-              แก้ไข
+  <div class="row justify-content-center">
+    <div class="container">
+      <div class="content text-center">
+            <img src="{{ picture_url }}" class="rounded-circle" width=120>
+            <p>
+              <strong>{{ name }}</strong>
+              <br>
+              <strong>มหาวิทยาลัยมหิดล</strong>
+              <br>
               <span class="icon">
-                <i class="fas fa-pencil-alt" aria-hidden="true"></i>
-              </span>
-            </a>
+                <i class="fa fa-envelope"></i>
+              </span> {{ email }}
+            </p>
+            <hr>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card card-plain">
+        <div class="card-body">
+          <h6 class="subtitle">Scholarship Student Info</h6>
+          <p>
+            Country <strong>{{ country }}</strong>
           </p>
-        </header>
-        <div class="card-content">
-          <div class="content">
-            <p>
-              ประเทศที่จบการศึกษา: <strong>{{ country }}</strong>
-            </p>
-            <p>
-              ความเชี่ยวชาญ: <strong>{{ specialty }}</strong>
-            </p>
-            <p>
-              สาขาที่เรียน: <strong>{{ fos|title }}</strong>
-            </p>
-            <p>
-              ปริญญา: <strong>{{ degree }}</strong>
-            </p>
+          <p>
+            Expertise: <strong>{{ specialty }}</strong>
+          </p>
+          <p>
+            Field of study: <strong>{{ fos|title }}</strong>
+          </p>
+          <p>
+            Degree: <strong>{{ degree }}</strong>
+          </p>
+          <br>
+          <h6 class="subtitle">Scopus-indexed Publications</h6>
+          <p>Total 3 articles</p>
+          <ul>
+            <li>Biochemistry 1</li>
+            <li>Computer science 2</li>
+          </ul>
+          <p>Keywords</p>
+          <div>
+            <span class="badge badge-primary">Graphene</span>
+            <span class="badge badge-primary">Machine learning</span>
+            <span class="badge badge-primary">Data mining</span>
+            <span class="badge badge-primary">QSAR</span>
           </div>
         </div>
       </div>
     </div>
-    <div class="column">
-      <div class="box">
-        <article class="media">
-          <div class="media-left">
-            <span class="icon">
-              <i class="far fa-thumbs-up"></i>
-            </span>
+    <div class="col-md-8">
+      <div class="card card-plain">
+        <div class="card-body">
+          <h4 class="title">About</h4>
+          <div>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt</p>
           </div>
-          <div class="media-content">
-            <span class="tag">Bioinformatics</span>
-            <span class="tag">Microbiology</span>
-            <span class="tag">Computer</span>
-            <span class="tag">Python</span>
+          <div>
+            <span class="badge badge-info">Bioinformatics</span>
+            <span class="badge badge-info">Microbiology</span>
+            <span class="badge badge-info">Computer</span>
+            <span class="badge badge-info">Python</span>
           </div>
-        </article>
-      </div>
-      <div class="box">
-        <article class="media">
-          <div class="media-content">
-            <ul>
-              <li><h2>ผลงานวิจัยในเชิงพานิชย์</h2></li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-            </ul>
-          </div>
-        </article>
-      </div>
-      <div class="box">
-        <article class="media">
-          <div class="media-content">
-            <ul>
-              <li><h2>ผลงานวิชาการ</h2></li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-              <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-            </ul>
-          </div>
-        </article>
+          <h4 class="subtitle">Commercial Research</h4>
+          <ul>
+            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+          </ul>
+          <h4 class="subtitle">Publications</h4>
+          <ul>
+            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+          </ul>
+        </div>
       </div>
     </div>
   </div>

@@ -54,6 +54,7 @@ class BlogPage(RoutablePageMixin, Page):
         context['categories'] = BlogCategory.objects.all()
         context['search_type'] = getattr(self, 'search_type', "")
         context['search_term'] = getattr(self, 'search_term', "")
+        context['menuitems'] = self.get_children().filter(live=True, show_in_menus=True)
         return context
 
     def get_posts(self):
@@ -153,3 +154,10 @@ class BlogCategory(models.Model):
     class Meta:
         verbose_name = 'Category'
         verbose_name_plural = 'Categories'
+
+
+class AboutPage(Page):
+    body = RichTextField(blank=True)
+    content_panels = Page.content_panels + [
+        FieldPanel('body', classname='full'),
+    ]

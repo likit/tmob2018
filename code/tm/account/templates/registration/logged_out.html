@@ -1,8 +1,15 @@
-{% extends "base.html" %}
+{% extends "blog/base.html" %}
+{% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
 
 {% block title %}Logged out{% endblock %}
 
 {% block content %}
-  <h1>Logged out</h1>
-  <p>You have been successfully logged out. You can <a href="{% url 'login' %}">log in again</a></p>
+<section class="section">
+  <div class="container">
+    <div class="content text-center">
+      <h1 class="title">Logged out</h1>
+      <p>You have been successfully logged out. You can <a href="{% url 'login' %}">log in again</a></p>
+    </div>
+  </div>
+</section>
 {% endblock %}
