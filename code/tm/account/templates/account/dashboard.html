@@ -1,9 +1,10 @@
-{% extends "blog/base.html" %}
+{% extends "base.html" %}
 {% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
 
 {% block title %}Dashboard{% endblock %}
 
 {% block content %}
+<section class="section">
 <div class="container">
   <h1 class="title">Profile</h1>
   <div class="row justify-content-center">
@@ -27,6 +28,7 @@
     <div class="col-md-4">
       <div class="card card-plain">
         <div class="card-body">
+          {% if is_scholar_student %}
           <h6 class="subtitle">Scholarship Student Info</h6>
           <p>
             Country <strong>{{ country }}</strong>
@@ -41,6 +43,7 @@
             Degree: <strong>{{ degree }}</strong>
           </p>
           <br>
+          {% endif %}
           <h6 class="subtitle">Scopus-indexed Publications</h6>
           <p>Total 3 articles</p>
           <ul>
@@ -89,4 +92,5 @@
     </div>
   </div>
 </div>
+</section>
 {% endblock %}

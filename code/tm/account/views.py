@@ -60,16 +60,26 @@ def dashboard(request):
         social_user = request.user.social_auth.filter(
             provider='google-oauth2',
         ).first()
-        google_token = social_user.extra_data['access_token']
-        url = 'https://www.googleapis.com/oauth2/v1/userinfo'.format(social_user.uid)
-        res = requests.get(url, {'access_token': google_token, 'alt': 'json'}).json()
-        return render(request,
-                  'account/dashboard.html',
-                  {'section': 'dashboard',
-                   'picture_url': res.get('picture'),
-                   'name': res.get('name'),
-                   'email': res.get('email', None),
-                   })
+        if social_user:
+            google_token = social_user.extra_data['access_token']
+            url = 'https://www.googleapis.com/oauth2/v1/userinfo'.format(social_user.uid)
+            res = requests.get(url, {'access_token': google_token, 'alt': 'json'}).json()
+            return render(request,
+                    'account/dashboard.html',
+                    {'section': 'dashboard',
+                    'picture_url': res.get('picture'),
+                    'name': res.get('name'),
+                    'email': res.get('email', None),
+                    })
+        else:
+            is_scholar_student = False
+            return render(request,
+                    'account/dashboard.html',
+                    {'section': 'dashboard',
+                    'name': u'{} {}'.format(request.user.first_name, request.user.last_name),
+                    'email': request.user.email,
+                    'is_scholar_student': False
+                    })
     return render(request,
                 'account/dashboard.html',
                 {'section': 'dashboard'})
