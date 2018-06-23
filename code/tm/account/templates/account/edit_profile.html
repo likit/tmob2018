@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% load form_tags %}
+
+{% block title %}Edit you account{% endblock %}
+
+{% block content %}
+<section class="section">
+<div class="container">
+    <h1 class="title">Edit Account</h1>
+    <hr>
+    <br>
+    <h6 class="subtitle text-center">General Information</h6>
+    <br>
+    <form action="." method="post" enctype="multipart/form-data">
+            <div class="form-group input-lg row">
+                <label for="id_title" class="col-sm-2 col-form-label"><strong>คำนำหน้า</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.title|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_first_name" class="col-sm-2 col-form-label"><strong>ชื่อภาษาอังกฤษ</strong></label>
+                <div class="col-sm-4">
+                    {{ user_form.first_name|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_last_name" class="col-sm-2 col-form-label"><strong>ชื่อนามสกุลภาษาอังกฤษ</strong></label>
+                <div class="col-sm-4">
+                    {{ user_form.last_name|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_first_name_th" class="col-sm-2 col-form-label"><strong>ชื่อ</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.first_name_th|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_last_name_th" class="col-sm-2 col-form-label"><strong>ชื่อนามสกุล</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.last_name_th|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_photo" class="col-sm-2 col-form-label"><strong>รูปโพรไฟล์</strong></label>
+                <div class="col-sm-6">
+                    {{ profile_form.photo|add_css:"form-control-file" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_email" class="col-sm-2 col-form-label"><strong>E-mail</strong></label>
+                <div class="col-sm-4">
+                    {{ user_form.email|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_current_position" class="col-sm-2 col-form-label"><strong>ตำแหน่งปัจจุบัน</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.current_position|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_current_affiliation" class="col-sm-2 col-form-label"><strong>ต้นสังกัดปัจจุบัน</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.current_affiliation|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_about" class="col-sm-2 col-form-label"><strong>เกี่ยวกับท่าน</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.about|add_css:"form-control" }}
+                </div>
+            </div>
+            <hr>
+            <br>
+            <h6 class="subtitle text-center">Scholarship Information</h6>
+            <br>
+            <div class="form-check">
+                {{ profile_form.scholarship|add_css:"form-check-input" }}
+                <label for="id_scholarship" class="form-check-label"><strong>ท่านเป็นนักเรียนทุนรัฐบาล</strong></label>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_field_of_study" class="col-sm-2 col-form-label"><strong>สาขาที่เรียน</strong></label>
+                <div class="col-sm-6">
+                    {{ profile_form.field_of_study|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_college" class="col-sm-2 col-form-label"><strong>มหาวิทยาลัยที่เรียน</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.college|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_country" class="col-sm-2 col-form-label"><strong>ประเทศ</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.country|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_degree" class="col-sm-2 col-form-label"><strong>ระดับการศึกษาสูงสุด</strong></label>
+                <div class="col-sm-2">
+                    {{ profile_form.degree|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_graduated_at" class="col-sm-2 col-form-label"><strong>จบการศึกษาเมื่อ</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.graduated_at|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_designated_affiliation" class="col-sm-2 col-form-label"><strong>ต้นสังกัดหลังจบการศึกษา</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.designated_affiliation|add_css:"form-control" }}
+                </div>
+            </div>
+            <div class="form-group input-lg row">
+                <label for="id_specialty" class="col-sm-2 col-form-label"><strong>ความเชี่ยวชาญ</strong></label>
+                <div class="col-sm-4">
+                    {{ profile_form.specialty|add_css:"form-control" }}
+                </div>
+            </div>
+            <p><input class="btn btn-primary btn-round" type="submit" value="Save changes"></p>
+            {% csrf_token %}
+        </form>
+    </div>
+</section>
+{% endblock %}

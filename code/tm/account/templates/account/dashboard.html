@@ -7,19 +7,25 @@
 <section class="section">
 <div class="container">
   <h1 class="title">Profile</h1>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Account Profile</li>
+    </ol>
+  </nav>
   <div class="row justify-content-center">
     <div class="container">
       <div class="content text-center">
             <img src="{{ picture_url }}" class="rounded-circle" width=120>
             <p>
-              <strong>{{ name }}</strong>
-              <br>
-              <strong>มหาวิทยาลัยมหิดล</strong>
-              <br>
-              <span class="icon">
-                <i class="fa fa-envelope"></i>
-              </span> {{ email }}
+              <h5 class="title">{{ profile.title }}&nbsp;{{ name_th }}</h5>
+              <h6 class="subtitle text-muted">{{ name_en }}</h6>
             </p>
+            {% if user.is_authenticated %}
+              <a href="/account/edit">
+                <i class="fa fa-pencil"></i>&nbsp;Edit Profile
+              </a>
+            {% endif %}
             <hr>
       </div>
     </div>
@@ -28,23 +34,19 @@
     <div class="col-md-4">
       <div class="card card-plain">
         <div class="card-body">
-          {% if is_scholar_student %}
-          <h6 class="subtitle">Scholarship Student Info</h6>
+          {% if profile.scholarship %}
+          <h6 class="title">Scholarship Student Info</h6>
           <p>
-            Country <strong>{{ country }}</strong>
-          </p>
-          <p>
-            Expertise: <strong>{{ specialty }}</strong>
-          </p>
-          <p>
-            Field of study: <strong>{{ fos|title }}</strong>
-          </p>
-          <p>
-            Degree: <strong>{{ degree }}</strong>
+            ประเทศที่เรียน {{ profile.country|title }}<br>
+            สถาบัน {{ profile.college|title }}<br>
+            สาขาที่เรียน {{ profile.field_of_study|title }}<br>
+            ความเชี่ยวชาญ {{ profile.specialty|title }}<br>
+            ระดับ {{ degree }}<br>
+            จบการศึกษาเมื่อ {{ profile.graduated_at }}
           </p>
           <br>
           {% endif %}
-          <h6 class="subtitle">Scopus-indexed Publications</h6>
+          <h6 class="title">Scopus-indexed Publications</h6>
           <p>Total 3 articles</p>
           <ul>
             <li>Biochemistry 1</li>
@@ -65,7 +67,18 @@
         <div class="card-body">
           <h4 class="title">About</h4>
           <div>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt</p>
+            <p>{{ profile.about }}</p>
+          </div>
+          <div>
+            <div class="row">
+              <div class="col">
+                <p><h6 class="title">Position</h6> {{ profile.current_position }}</p>
+                <p><h6 class="title">Affiliation</h6> {{ profile.current_affiliation }}</p>
+              </div>
+              <div class="col">
+                <p><h6 class="title">E-mail</h6>  {{ user.email }}</p>
+              </div>
+            </div>
           </div>
           <div>
             <span class="badge badge-info">Bioinformatics</span>

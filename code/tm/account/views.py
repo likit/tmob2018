@@ -1,10 +1,12 @@
+# -*- coding: utf-8 -*-
 import requests
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
-from .forms import LoginForm, UserRegistrationForm
+from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
 from py2neo import Graph
+from .models import Profile
 
 graph = Graph(host='neo4j_db', password='_genius01_', scheme='bolt')
 
@@ -32,57 +34,47 @@ def user_login(request):
 
 @login_required
 def dashboard(request):
+    degrees = {1: u'ปริญญาตรี', 2: 'ปริญญาโท', 3: 'ปริญญาเอก'}
     social_user = request.user.social_auth.filter(
         provider='facebook',
     ).first()
-    if social_user: # try facebook login
+    profile = Profile.objects.filter(user=request.user).first()
+    if profile is None:
+        Profile.objects.create(user=request.user)
+        profile = Profile.objects.filter(user=request.user).first()
+
+    if social_user: # use facebook login
+        name_th = u'{} {}'.format(profile.first_name_th, profile.last_name_th)
+        name_en = u'{} {}'.format(request.user.first_name, request.user.last_name)
         url = 'https://graph.facebook.com/{0}/'.format(social_user.uid)
-        res = requests.get(url, {'fields':'email,picture,name,id,location', 'access_token':social_user.extra_data['access_token']}).json()
-        query = 'match (p:Person)-[:STUDIED]-(info:StudyInfo) where p.firstname_en="%s" and p.lastname_en="%s" return info'
-        query = query % (request.user.first_name.lower(), request.user.last_name.lower())
-        studyinfo = list(graph.run(query))[0].get('info')
-        country = studyinfo.get('country','')
-        specialty = studyinfo.get('specialty','')
-        fos = studyinfo.get('field_of_study','')
-        degree = studyinfo.get('degree_title', '')
-        return render(request,
-                  'account/dashboard.html',
-                  {'section': 'dashboard',
-                   'picture_url': res['picture']['data']['url'],
-                   'name': res['name'],
-                   'email': res.get('email', None),
-                   'country': country,
-                   'specialty': specialty,
-                   'fos': fos,
-                   'degree': degree,
-                   })
-    else: # try google login
+        res = requests.get(url, {'fields': 'picture.type(large)', 'access_token':social_user.extra_data['access_token']}).json()
+        picture_url = res['picture']['data']['url']
+    else: # use google login
         social_user = request.user.social_auth.filter(
             provider='google-oauth2',
         ).first()
         if social_user:
+            profile = Profile.objects.filter(user=request.user).first()
+            name_th = u'{} {}'.format(profile.first_name_th, profile.last_name_th)
+            name_en = u'{} {}'.format(request.user.first_name, request.user.last_name)
             google_token = social_user.extra_data['access_token']
             url = 'https://www.googleapis.com/oauth2/v1/userinfo'.format(social_user.uid)
             res = requests.get(url, {'access_token': google_token, 'alt': 'json'}).json()
-            return render(request,
-                    'account/dashboard.html',
-                    {'section': 'dashboard',
-                    'picture_url': res.get('picture'),
-                    'name': res.get('name'),
-                    'email': res.get('email', None),
-                    })
-        else:
-            is_scholar_student = False
-            return render(request,
-                    'account/dashboard.html',
-                    {'section': 'dashboard',
-                    'name': u'{} {}'.format(request.user.first_name, request.user.last_name),
-                    'email': request.user.email,
-                    'is_scholar_student': False
-                    })
+            picture_url = res.get('picture')
+        else:  # use username login
+            profile = Profile.objects.filter(user=request.user).first()
+            name_th = u'{} {}'.format(profile.first_name_th, profile.last_name_th)
+            name_en = u'{} {}'.format(request.user.first_name, request.user.last_name)
+            picture_url = None
     return render(request,
-                'account/dashboard.html',
-                {'section': 'dashboard'})
+            'account/dashboard.html',
+            {'section': 'dashboard',
+            'name_th': name_th,
+            'name_en': name_en,
+            'picture_url': picture_url,
+            'profile': profile,
+            'degree': degrees.get(profile.degree, ''),
+            })
 
 
 def register(request):
@@ -94,6 +86,7 @@ def register(request):
                 user_form.cleaned_data['password']
             )
             new_user.save()
+            Profile.objects.create(user=new_user)
             return render(request,
                           'account/register_done.html',
                           {'new_user': new_user})
@@ -102,3 +95,19 @@ def register(request):
     return render(request,
                   'account/register.html',
                   {'user_form': user_form})
+
+
+@login_required
+def edit_profile(request):
+    if request.method == 'POST':
+        user_form = UserEditForm(instance=request.user, data=request.POST)
+        profile_form = ProfileEditForm(instance=request.user.profile,
+                            data=request.POST, files=request.FILES)
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+    else:
+        user_form = UserEditForm(instance=request.user)
+        profile_form = ProfileEditForm(instance=request.user.profile)
+    return render(request, 'account/edit_profile.html',
+                    {'user_form': user_form, 'profile_form': profile_form})
