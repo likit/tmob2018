@@ -123,6 +123,12 @@ for n, pub in enumerate(pub_session.query(Pub)):
         elif isinstance(affiliation, list):
             for af in affiliation:
                 add_affiliation(af)
+    print(data['authkeywords'])
+    nounchunks = []
+    if data.get('authkeywords'):
+        for ak in data.get('authkeywords'):
+            nounchunks.append(ak['$'].lower())
+
     subj_areas = []
     if 'subject-areas' in data:
         if 'subject-area' in data['subject-areas']:
@@ -166,7 +172,6 @@ for n, pub in enumerate(pub_session.query(Pub)):
             kw_session.add(subj)
         kw_session.commit()
         keywords = []
-        nounchunks = []
         for text in [title_en, abstract_en]:
             doc = nlp(text)
             for token in doc:
@@ -174,7 +179,7 @@ for n, pub in enumerate(pub_session.query(Pub)):
                 if word not in STOP_WORDS and word.isalpha() and len(word) > 1:
                     keywords.append(word)
             for nc in list(doc.noun_chunks):
-                nounchunks.append(str(nc))
+                nounchunks.append(str(nc).lower())
     if 'authors' in data:
         author_list = []
         affil_id_list = []
