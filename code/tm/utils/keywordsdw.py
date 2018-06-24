@@ -17,7 +17,7 @@ class NounChunk(Base):
     __tablename__ = 'noun_chunks'
     id = Column(Integer(), primary_key=True, autoincrement=True)
     chunk_en = Column(String(255), nullable=False)
-    chuck_th = Column(String(255), nullable=False)
+    chunk_th = Column(String(255), nullable=False)
     abstract_id = Column(Integer(), ForeignKey('abstracts.id'))
     abstract = relationship('Abstract', backref=backref('nounchunks'))
     keywords = relationship('Keyword', secondary=nounchunk_has_keyword,
@@ -33,7 +33,8 @@ class Keyword(Base):
     first_name = Column(String(64), nullable=False, index=True)
     last_name = Column(String(64), nullable=False, index=True)
     count = Column(Integer())
-    scopus_id = Column(String(64))
+    author_scopus_id = Column(String(64))
+    affil_scopus_id = Column(String(32))
     from_keyword = Column(Boolean(), default=False)
     abstract = relationship('Abstract', backref=backref('keywords'))
 
