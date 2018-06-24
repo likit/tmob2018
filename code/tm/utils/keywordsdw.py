@@ -25,8 +25,10 @@ class Keyword(Base):
 class Abstract(Base):
     __tablename__ = 'abstracts'
     id = Column(Integer(), primary_key=True, autoincrement=True)
-    title = Column(Text())
-    abstract = Column(Text())
+    title_en = Column(Text())
+    abstract_en = Column(Text())
+    title_th = Column(Text())
+    abstract_th = Column(Text())
     scopus_id = Column(String(32), nullable=False, unique=True)
     cited = Column(Integer())
     pub_date = Column(Date())
