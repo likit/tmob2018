@@ -33,13 +33,18 @@ class Keyword(Base):
     first_name = Column(String(64), nullable=False, index=True)
     last_name = Column(String(64), nullable=False, index=True)
     count = Column(Integer())
+    scopus_id = Column(String(64))
     from_keyword = Column(Boolean(), default=False)
     abstract = relationship('Abstract', backref=backref('keywords'))
+
+    def __str__(self):
+        return self.word_en
 
 
 class Abstract(Base):
     __tablename__ = 'abstracts'
     id = Column(Integer(), primary_key=True, autoincrement=True)
+    doi = Column(String(255))
     title_en = Column(Text())
     abstract_en = Column(Text())
     title_th = Column(Text())
@@ -55,6 +60,7 @@ class Affiliation(Base):
     scopus_id = Column(String(64))
     name = Column(String())
     country = Column(String())
+    city = Column(String())
 
 
 class AffiliationHistory(Base):
@@ -63,7 +69,7 @@ class AffiliationHistory(Base):
     year = Column(Integer())
     affiliation_id = Column(Integer(), ForeignKey('affils.id'))
     author_id = Column(Integer(), ForeignKey('authors.id'))
-    affilation = relationship('Affiliation', backref=backref('history'))
+    affiliation = relationship('Affiliation', backref=backref('history'))
     author = relationship('Author', backref=backref('affilations'))
 
 
@@ -72,6 +78,7 @@ class Author(Base):
     id = Column(Integer(), primary_key=True, autoincrement=True)
     first_name = Column(String(255))
     last_name = Column(String(255))
+    scopus_id = Column(String(64))
 
 
 if __name__ == '__main__':
