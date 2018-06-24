@@ -8,6 +8,21 @@ Base = declarative_base()
 kw_engine = create_engine('postgresql+psycopg2://likit:password@localhost/keywordsdw')
 session = Session(kw_engine)
 
+nounchunk_has_keyword = Table('nounchunk_has_keyword', Base.metadata,
+    Column('noun_chunk_id', Integer, ForeignKey('noun_chunks.id')),
+    Column('keyword_id', Integer, ForeignKey('keywords.id'))
+)
+
+class NounChunk(Base):
+    __tablename__ = 'noun_chunks'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    chunk_en = Column(String(255), nullable=False)
+    chuck_th = Column(String(255), nullable=False)
+    abstract_id = Column(Integer(), ForeignKey('abstracts.id'))
+    abstract = relationship('Abstract', backref=backref('nounchunks'))
+    keywords = relationship('Keyword', secondary=nounchunk_has_keyword,
+                                backref='noun_chunks')
+
 
 class Keyword(Base):
     __tablename__ = 'keywords'
