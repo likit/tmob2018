@@ -1,9 +1,8 @@
-import datetime
-from datetime import date
+from datetime import date, datetime
 from django import forms
 from django.http import Http404, HttpResponse
 from django.db import models
-
+from django.conf import settings
 from django.utils.dateformat import DateFormat
 from django.utils.formats import date_format
 from wagtail.core.models import Page
@@ -12,7 +11,7 @@ from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, MultiFieldPanel
 from wagtail.snippets.models import register_snippet
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 from taggit.models import TaggedItemBase, Tag as TaggitTag
-from modelcluster.fields import ParentalKey, ParentalManyToManyField
+from modelcluster.fields import ParentalKey, ParentalManyToManyField, ForeignKey
 from modelcluster.tags import ClusterTaggableManager
 # Create your models here.
 
@@ -91,6 +90,14 @@ class BlogPage(RoutablePageMixin, Page):
         post_page = self.get_posts().filter(slug=slug).first()
         if not post_page:
             raise Http404
+        if request.method == 'POST':
+            form = PostCommentForm(request.POST)
+            if form.is_valid():
+                PostComment.objects.create(
+                    user=request.user,
+                    comment=form.cleaned_data['comment'],
+                    post=post_page
+                )
         return Page.serve(post_page, request, *args, **kwargs)
 
     @route(r'^tag/(?P<tag>[-\w]+)/$')
@@ -112,10 +119,46 @@ class BlogPage(RoutablePageMixin, Page):
         self.posts = self.get_posts()
         return Page.serve(self, request, *args, **kwargs)
 
+@register_snippet
+class PostComment(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                                on_delete=models.SET_NULL, null=True)
+    comment = models.TextField(blank=False)
+    commented_at = models.DateTimeField(default=datetime.now,
+                                            null=False, blank=False)
+    # use parental key to temporarily associate comments to a post page.
+    # ForeignKey would replace ParentalKey for one-to-one relationship
+    post = ParentalKey('PostPage', on_delete=models.SET_NULL,
+                        null=True, related_name='comments')
+    content_panels = Page.content_panels + [
+        FieldPanel('comment', classname='full'),
+    ]
 
-class PostPage(Page):
+    settings_panels = Page.settings_panels + [
+        FieldPanel('commented_at'),
+    ]
+
+    def __str__(self):
+        return self.comment
+
+    class Meta:
+        verbose_name = 'Comment'
+        verbose_name_plural = 'Comments'
+        ordering = ['-commented_at',]
+
+
+class PostCommentForm(forms.ModelForm):
+    class Meta:
+        model = PostComment
+        fields = ('comment',)
+        widgets = {
+            'comment': forms.Textarea(attrs={'placeholder': 'Leave you comment here..'})
+        }
+
+
+class PostPage(RoutablePageMixin, Page):
     body = RichTextField(blank=True)
-    date = models.DateTimeField(verbose_name="Post date", default=datetime.datetime.today)
+    date = models.DateTimeField(verbose_name="Post date", default=datetime.today)
     categories = ParentalManyToManyField('blog.BlogCategory', blank=True)
     tags = ClusterTaggableManager(through='blog.BlogPageTag', blank=True)
     content_panels = Page.content_panels + [
@@ -135,7 +178,9 @@ class PostPage(Page):
     def get_context(self, request, *args, **kwargs):
         context = super(PostPage, self).get_context(request, *args, **kwargs)
         context['blog_page'] = self.blog_page
+        context['comment_form'] = PostCommentForm()
         return context
+
 
 
 @register_snippet

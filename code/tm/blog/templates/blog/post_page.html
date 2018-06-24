@@ -1,5 +1,5 @@
 {% extends "blog/base.html" %}
-{% load menu_tags wagtailcore_tags wagtailroutablepage_tags %}
+{% load menu_tags wagtailcore_tags blogapp_tags wagtailroutablepage_tags form_tags %}
 
 {% block navbar %}
 {% main_menu template="menus/main/level_1.html"%}
@@ -11,8 +11,8 @@
     <h1 class="title">Post</h1>
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item"><a href="#">Posts</a></li>
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/blog/">Posts</a></li>
             <li class="breadcrumb-item active" aria-current="page">Post</li>
         </ol>
     </nav>
@@ -28,6 +28,19 @@
             {{ page.body|richtext }}
             <div>
                 <h3 class="subtitle">Comment</h3>
+                <form action="{% post_date_url page blog_page %}" method="post">
+                    {{ comment_form.comment|add_css:"form-control" }}
+                    {% csrf_token %}
+                    <button class="btn btn-primary" type="submit" value="submit">Submit</button>
+                </form>
+                <br>
+                {% for comment in page.comments.all %}
+                <blockquote class="blockquote">
+                    <p class="mb-0">{{ comment.comment }}</p>
+                    <footer class="blockquote-footer">
+                        <cite title="by">{{ comment.user.first_name }}</cite> at {{ comment.commented_at }}</footer>
+                </blockquote>
+                {% endfor %}
             </div>
         </div>
         <div class="col-sm-2">

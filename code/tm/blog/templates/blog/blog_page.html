@@ -26,6 +26,11 @@
                     <h3 class="title"><a href="{% post_date_url post blog_page %}">{{ post.title }}</a></h3>
                     <h6 class="text-muted">Posted on {{ post.date }}</h6>
                     {{ post.body|truncatewords_html:50|richtext }}
+                    <p><strong>Recent Comments</strong></p>
+                    {% for comment in post.comments.all|slice:":2" %}
+                        <p class="text-muted">{{ comment.user.first_name }} said "{{ comment.comment|truncatewords_html:10 }}" {{ comment.commented_at }}</p>
+                    {% endfor %}
+                    <p>Total <strong>{{ post.comments.all|length }}</strong> comment(s).</p>
                     <a href="{% post_date_url post blog_page %}">Read more</span></a>
                     <hr>
                 {% endfor %}

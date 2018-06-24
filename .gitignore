@@ -1,3 +1,6 @@
 .idea
-.pyc
+*.pyc
+*.DS_Store
+__pycache__
 pg_data
+neo_data

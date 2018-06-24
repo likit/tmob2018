@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.conf import settings
+from datetime import datetime
 
 # Create your models here.
 class Profile(models.Model):
@@ -27,6 +28,6 @@ class Profile(models.Model):
     about = models.TextField(blank=True)
 
 
-
     def __str__(self):
         return 'Profile for user {}'.format(self.user.username)
+
