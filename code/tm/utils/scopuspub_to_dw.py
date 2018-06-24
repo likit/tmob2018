@@ -49,8 +49,7 @@ def add_author(au, pubyear):
         affil_ = kw_session.query(Affiliation).filter(Affiliation.scopus_id==affil_id).first()
     else:
         affil_id = None
-    author_ = kw_session.query(Author).filter(Author.first_name==first_name,
-                                Author.last_name==last_name).first()
+    author_ = kw_session.query(Author).filter(Author.scopus_id==scopus_id).first()
     if author_:
         print('Author exists!')
         return author_
@@ -68,11 +67,13 @@ def add_author(au, pubyear):
         kw_session.add(new_affil_history)
         kw_session.commit()
         print('New author!', first_name, last_name)
-        return new_author
+        return new_author, affil_id
 
 
 for pub in pub_session.query(Pub).limit(5):
+    print('Pub ID: {}'.format(pub.scopus_id))
     if 'abstracts-retrieval-response' not in pub.data:
+        print('\tNo abstract data found..')
         continue
     else:
         data = pub.data['abstracts-retrieval-response']
@@ -85,8 +86,6 @@ for pub in pub_session.query(Pub).limit(5):
                 add_affiliation(af)
     if 'coredata' in data:
         coredata = data['coredata']
-        print(coredata.keys())
-        break
         if 'prism:coverDate' in coredata:
             pubdate = coredata['prism:coverDate']
             pubyear = int(pubdate.split('-')[0])
@@ -100,7 +99,10 @@ for pub in pub_session.query(Pub).limit(5):
         cited = int(coredata.get('citedby_count', 0))
         scopus_id = coredata.get('dc:identifier').lstrip('SCOPUS_ID:')
         abstract_ = kw_session.query(Abstract).filter(Abstract.scopus_id==scopus_id).first()
-        if abstract_ is None:
+        if abstract_ is not None:
+            print('\tPublication #SCOPUS_ID={} exists!'.format(abstract_.scopus_id))
+            continue
+        else:
             new_abstract = Abstract(
                                     doi=doi,
                                     scopus_id=scopus_id,
@@ -123,40 +125,64 @@ for pub in pub_session.query(Pub).limit(5):
                 if word not in STOP_WORDS and word.isalpha() and len(word) > 1:
                     keywords.append(word)
             for nc in list(doc.noun_chunks):
-                nounchunks.append(nc)
+                nounchunks.append(str(nc))
     if 'authors' in data:
         author_list = []
+        affil_id_list = []
         authors = data['authors']
         if 'author' in authors:
             for au in authors['author']:
-                author_list.append(add_author(au, pubyear))
+                a, f = add_author(au, pubyear)
+                author_list.append(a)
+                affil_id_list.append(f)
 
     for kw in keywords:
         kw_ = kw_session.query(Keyword).filter(Keyword.word_en==kw).first()
         if kw_:
-            for au in author_list:
+            for i in range(len(author_list)):
+                au = author_list[i]
+                afid = affil_id_list[i]
                 wordobj = kw_session.query(Keyword)\
                             .filter(Keyword.word_en==kw,
                                     Keyword.first_name==au.first_name,
                                     Keyword.last_name==au.last_name,
-                                    Keyword.scopus_id==au.scopus_id).first()
+                                    Keyword.author_scopus_id==au.scopus_id,
+                                    Keyword.affil_scopus_id==afid).first()
                 if wordobj:
                     wordobj.count += 1
                     kw_session.add(wordobj)
                     kw_session.commit()
         else:
             kw_th = translator.translate(kw, dest='th').text
-            for au in author_list:
+            for i in range(len(author_list)):
+                au = author_list[i]
+                afid = affil_id_list[i]
                 new_keyword = Keyword(
                     word_en=kw,
                     word_th=kw_th,
                     count=1,
                     first_name=au.first_name,
                     last_name=au.last_name,
-                    scopus_id=au.scopus_id,
+                    author_scopus_id=au.scopus_id,
+                    affil_scopus_id=afid,
                     from_keyword=False,
                     abstract=abstract_,
                 )
                 kw_session.add(new_keyword)
+            kw_session.commit()
+    for nc in nounchunks:
+        nc_ = kw_session.query(NounChunk).filter(NounChunk.chunk_en==nc).first()
+        if nc_ is None:
+            nc_th = translator.translate(nc, dest='th').text
+            new_nc = NounChunk(chunk_en=nc,
+                                chunk_th=nc_th,
+                                abstract=abstract_,
+                                keywords=[],
+                                )
+            doc = nlp(nc)
+            for token in doc:
+                token = str(token).lower()
+                new_nc.keywords += kw_session.query(Keyword).filter(Keyword.word_en==token).all()
+            kw_session.add(new_nc)
             kw_session.commit()
 # title_th = translator.translate(title, dest='th').text
