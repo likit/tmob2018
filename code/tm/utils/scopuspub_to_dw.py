@@ -10,7 +10,6 @@ from sqlalchemy.orm import Session
 from keywordsdw import session as kw_session
 from keywordsdw import Keyword, Abstract, Author, NounChunk, Affiliation, AffiliationHistory, ResearchField
 
-translator = Translator()
 nlp = spacy.load('en_core_web_sm')
 
 PubBase = automap_base()
@@ -28,7 +27,7 @@ def add_affiliation(affiliation):
     country = affiliation['affiliation-country']
     affil_ = kw_session.query(Affiliation).filter(Affiliation.scopus_id==affil_id).first()
     if affil_:
-        print(name, affil_id, 'exists..')
+        print('\t\t', name, affil_id, 'exists..skipped.')
     else:
         new_affil = Affiliation(
                         city=city,
@@ -37,22 +36,42 @@ def add_affiliation(affiliation):
                         scopus_id=affil_id)
         kw_session.add(new_affil)
         kw_session.commit()
-        print(city, country, name, affil_id, 'added to the db..')
+        print('\t\t', city, country, name, affil_id, 'added to the db..skipped.')
 
 
 def add_author(au, pubyear):
     first_name = au.get('ce:given-name')
     last_name = au.get('ce:surname')
     auid = au.get('@auid')
+    affil_list = []
     if 'affiliation' in au:
-        affil_id = au['affiliation'].get('@id', None)
-        affil_ = kw_session.query(Affiliation).filter(Affiliation.scopus_id==affil_id).first()
-    else:
-        affil_id = None
+        if isinstance(au['affiliation'], dict):
+            affil_id = au['affiliation'].get('@id', None)
+            affil_ = kw_session.query(Affiliation).filter(Affiliation.scopus_id==affil_id).first()
+            affil_list.append(affil_)
+        elif isinstance(au['affiliation'], list):
+            for f in au['affiliation']:
+                affil_id = f.get('@id', None)
+                affil_ = kw_session.query(Affiliation).filter(Affiliation.scopus_id==affil_id).first()
+                affil_list.append(affil_)
+
     author_ = kw_session.query(Author).filter(Author.scopus_id==scopus_id).first()
     if author_:
-        print('Author exists!')
-        return author_
+        print('\t\tAuthor exists!')
+        for a in affil_list:
+            history_ = kw_session.query(AffiliationHistory).filter(
+                                            affiliation=a,
+                                            author=author_,
+                                        ).first()
+            if history_ is None:
+                new_history = AffiliationHistory(
+                    year=pubyear,
+                    affiliation=a,
+                    author=author_
+                )
+                kw_session.add(new_history)
+                kw_session.commit()
+        return author_, affil_list
     else:
         new_author = Author(
             first_name=first_name,
@@ -60,14 +79,15 @@ def add_author(au, pubyear):
             scopus_id=auid,
         )
         kw_session.add(new_author)
-        new_affil_history = AffiliationHistory(
+        for a in affil_list:
+            new_affil_history = AffiliationHistory(
                                     year=pubyear,
-                                    affiliation=affil_,
+                                    affiliation=a,
                                     author=new_author)
-        kw_session.add(new_affil_history)
+            kw_session.add(new_affil_history)
         kw_session.commit()
-        print('New author!', first_name, last_name)
-        return new_author, affil_id
+        print('\t\tNew author!', first_name, last_name)
+        return new_author, affil_list
 
 
 def add_subject_area(subj):
@@ -89,10 +109,10 @@ def add_subject_area(subj):
         return new_field
 
 
-for pub in pub_session.query(Pub).limit(5):
-    print('Pub ID: {}'.format(pub.scopus_id))
+for n, pub in enumerate(pub_session.query(Pub)):
+    print('Pub #{}, ID={}'.format(n, pub.scopus_id))
     if 'abstracts-retrieval-response' not in pub.data:
-        print('\tNo abstract data found..')
+        print('\t\tNo abstract data found..skipped.')
         continue
     else:
         data = pub.data['abstracts-retrieval-response']
@@ -117,15 +137,15 @@ for pub in pub_session.query(Pub).limit(5):
         else:
             pubyear = None
         title_en = coredata.get('dc:title')
-        title_th = translator.translate(title_en, dest='th').text
+        title_th = ''
         abstract_en = coredata.get('dc:description')
-        abstract_th = translator.translate(abstract_en, dest='th').text
+        abstract_th = ''
         doi = coredata.get('prism:doi')
         cited = int(coredata.get('citedby_count', 0))
         scopus_id = coredata.get('dc:identifier').lstrip('SCOPUS_ID:')
         abstract_ = kw_session.query(Abstract).filter(Abstract.scopus_id==scopus_id).first()
         if abstract_ is not None:
-            print('\tPublication #SCOPUS_ID={} exists!'.format(abstract_.scopus_id))
+            print('\t\ttPublication #SCOPUS_ID={} exists!'.format(abstract_.scopus_id))
             continue
         else:
             new_abstract = Abstract(
@@ -170,34 +190,34 @@ for pub in pub_session.query(Pub).limit(5):
         if kw_:
             for i in range(len(author_list)):
                 au = author_list[i]
-                afid = affil_id_list[i]
-                wordobj = kw_session.query(Keyword)\
-                            .filter(Keyword.word_en==kw,
+                for afid in affil_id_list[i]:
+                    wordobj = kw_session.query(Keyword)\
+                                .filter(Keyword.word_en==kw,
                                     Keyword.first_name==au.first_name,
                                     Keyword.last_name==au.last_name,
                                     Keyword.author_scopus_id==au.scopus_id,
-                                    Keyword.affil_scopus_id==afid).first()
+                                    Keyword.affil_scopus_id==afid.scopus_id).first()
                 if wordobj:
                     wordobj.count += 1
                     wordobj.abstracts.append(abstract_)
                     kw_session.add(wordobj)
                     kw_session.commit()
         else:
-            kw_th = translator.translate(kw, dest='th').text
+            kw_th = ''
             for i in range(len(author_list)):
                 au = author_list[i]
-                afid = affil_id_list[i]
-                new_keyword = Keyword(
-                    word_en=kw,
-                    word_th=kw_th,
-                    count=1,
-                    first_name=au.first_name,
-                    last_name=au.last_name,
-                    author_scopus_id=au.scopus_id,
-                    affil_scopus_id=afid,
-                    from_keyword=False,
-                    abstracts=[abstract_],
-                )
+                for afid in affil_id_list[i]:
+                    new_keyword = Keyword(
+                        word_en=kw,
+                        word_th=kw_th,
+                        count=1,
+                        first_name=au.first_name,
+                        last_name=au.last_name,
+                        author_scopus_id=au.scopus_id,
+                        affil_scopus_id=afid.scopus_id,
+                        from_keyword=False,
+                        abstracts=[abstract_],
+                    )
                 kw_session.add(new_keyword)
             kw_session.commit()
     for nc in nounchunks:
@@ -207,7 +227,7 @@ for pub in pub_session.query(Pub).limit(5):
             kw_session.add(nc_)
             kw_session.commit()
         else:
-            nc_th = translator.translate(nc, dest='th').text
+            nc_th = ''
             new_nc = NounChunk(chunk_en=nc,
                                 chunk_th=nc_th,
                                 abstracts=[abstract_],
@@ -219,4 +239,3 @@ for pub in pub_session.query(Pub).limit(5):
                 new_nc.keywords += kw_session.query(Keyword).filter(Keyword.word_en==token).all()
             kw_session.add(new_nc)
             kw_session.commit()
-# title_th = translator.translate(title, dest='th').text
