@@ -34,5 +34,30 @@ class Abstract(Base):
     pub_date = Column(Date())
 
 
+class Affiliation(Base):
+    __tablename__ = 'affils'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    scopus_id = Column(String(64))
+    name = Column(String())
+    country = Column(String())
+
+
+class AffiliationHistory(Base):
+    __tablename__ = 'affil_history'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    year = Column(Integer())
+    affiliation_id = Column(Integer(), ForeignKey('affils.id'))
+    author_id = Column(Integer(), ForeignKey('authors.id'))
+    affilation = relationship('Affiliation', backref=backref('history'))
+    author = relationship('Author', backref=backref('affilations'))
+
+
+class Author(Base):
+    __tablename__ = 'authors'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    first_name = Column(String(255))
+    last_name = Column(String(255))
+
+
 if __name__ == '__main__':
     Base.metadata.create_all(kw_engine)
