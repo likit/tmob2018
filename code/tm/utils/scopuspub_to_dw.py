@@ -8,7 +8,7 @@ from sqlalchemy.ext.automap import automap_base
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from keywordsdw import session as kw_session
-from keywordsdw import Keyword, Abstract, Author, NounChunk, Affiliation, AffiliationHistory
+from keywordsdw import Keyword, Abstract, Author, NounChunk, Affiliation, AffiliationHistory, ResearchField
 
 translator = Translator()
 nlp = spacy.load('en_core_web_sm')
@@ -70,6 +70,25 @@ def add_author(au, pubyear):
         return new_author, affil_id
 
 
+def add_subject_area(subj):
+    name = subj.get('$')
+    scopus_id = subj.get('@code')
+    abbr = subj.get('@abbrev')
+    field_ = kw_session.query(ResearchField).filter(ResearchField.scopus_id==scopus_id).first()
+    if field_ is not None:
+        return field_
+    else:
+        new_field = ResearchField(
+            name=name,
+            abbr=abbr,
+            scopus_id=scopus_id,
+            abstracts=[],
+        )
+        kw_session.add(new_field)
+        kw_session.commit()
+        return new_field
+
+
 for pub in pub_session.query(Pub).limit(5):
     print('Pub ID: {}'.format(pub.scopus_id))
     if 'abstracts-retrieval-response' not in pub.data:
@@ -84,6 +103,12 @@ for pub in pub_session.query(Pub).limit(5):
         elif isinstance(affiliation, list):
             for af in affiliation:
                 add_affiliation(af)
+    subj_areas = []
+    if 'subject-areas' in data:
+        if 'subject-area' in data['subject-areas']:
+            for subj in data['subject-areas']['subject-area']:
+                subj_areas.append(add_subject_area(subj))
+
     if 'coredata' in data:
         coredata = data['coredata']
         if 'prism:coverDate' in coredata:
@@ -116,6 +141,10 @@ for pub in pub_session.query(Pub).limit(5):
             kw_session.add(new_abstract)
             kw_session.commit()
             abstract_ = new_abstract
+        for subj in subj_areas:
+            subj.abstracts.append(abstract_)
+            kw_session.add(subj)
+        kw_session.commit()
         keywords = []
         nounchunks = []
         for text in [title_en, abstract_en]:
@@ -150,6 +179,7 @@ for pub in pub_session.query(Pub).limit(5):
                                     Keyword.affil_scopus_id==afid).first()
                 if wordobj:
                     wordobj.count += 1
+                    wordobj.abstracts.append(abstract_)
                     kw_session.add(wordobj)
                     kw_session.commit()
         else:
@@ -166,17 +196,21 @@ for pub in pub_session.query(Pub).limit(5):
                     author_scopus_id=au.scopus_id,
                     affil_scopus_id=afid,
                     from_keyword=False,
-                    abstract=abstract_,
+                    abstracts=[abstract_],
                 )
                 kw_session.add(new_keyword)
             kw_session.commit()
     for nc in nounchunks:
         nc_ = kw_session.query(NounChunk).filter(NounChunk.chunk_en==nc).first()
-        if nc_ is None:
+        if nc_ is not None:
+            nc_.abstracts.append(abstract_)  # nc exists, add abstract
+            kw_session.add(nc_)
+            kw_session.commit()
+        else:
             nc_th = translator.translate(nc, dest='th').text
             new_nc = NounChunk(chunk_en=nc,
                                 chunk_th=nc_th,
-                                abstract=abstract_,
+                                abstracts=[abstract_],
                                 keywords=[],
                                 )
             doc = nlp(nc)

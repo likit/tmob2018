@@ -13,13 +13,39 @@ nounchunk_has_keyword = Table('nounchunk_has_keyword', Base.metadata,
     Column('keyword_id', Integer, ForeignKey('keywords.id'))
 )
 
+field_has_abstract = Table('field_has_abstract', Base.metadata,
+    Column('field_id', Integer, ForeignKey('research_fields.id')),
+    Column('abstract_id', Integer, ForeignKey('abstracts.id'))
+)
+
+abstract_has_nounchunk = Table('abstract_has_nounchunk', Base.metadata,
+    Column('abstract_id', Integer, ForeignKey('abstracts.id')),
+    Column('noun_chunk_id', Integer, ForeignKey('noun_chunks.id'))
+)
+
+abstract_has_keywords = Table('abstract_has_keywords', Base.metadata,
+    Column('abstract_id', Integer, ForeignKey('abstracts.id')),
+    Column('keyword_id', Integer, ForeignKey('keywords.id'))
+)
+
+class ResearchField(Base):
+    __tablename__ = 'research_fields'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    name = Column(String(255))
+    abbr = Column(String(8))
+    scopus_id = Column(String())
+    abstracts = relationship('Abstract', secondary=field_has_abstract,
+                                backref='fields')
+
+
 class NounChunk(Base):
     __tablename__ = 'noun_chunks'
     id = Column(Integer(), primary_key=True, autoincrement=True)
     chunk_en = Column(String(255), nullable=False)
     chunk_th = Column(String(255), nullable=False)
     abstract_id = Column(Integer(), ForeignKey('abstracts.id'))
-    abstract = relationship('Abstract', backref=backref('nounchunks'))
+    abstracts = relationship('Abstract', secondary=abstract_has_nounchunk,
+                                backref='noun_chunks')
     keywords = relationship('Keyword', secondary=nounchunk_has_keyword,
                                 backref='noun_chunks')
 
@@ -36,7 +62,8 @@ class Keyword(Base):
     author_scopus_id = Column(String(64))
     affil_scopus_id = Column(String(32))
     from_keyword = Column(Boolean(), default=False)
-    abstract = relationship('Abstract', backref=backref('keywords'))
+    abstracts = relationship('Abstract', backref=backref('keywords'),
+                        secondary=abstract_has_keywords)
 
     def __str__(self):
         return self.word_en
