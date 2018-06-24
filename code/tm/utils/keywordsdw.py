@@ -28,6 +28,11 @@ abstract_has_keywords = Table('abstract_has_keywords', Base.metadata,
     Column('keyword_id', Integer, ForeignKey('keywords.id'))
 )
 
+abstract_has_author = Table('abstract_has_author', Base.metadata,
+    Column('abstract_id', Integer, ForeignKey('abstracts.id')),
+    Column('author_id', Integer, ForeignKey('authors.id'))
+)
+
 class ResearchField(Base):
     __tablename__ = 'research_fields'
     id = Column(Integer(), primary_key=True, autoincrement=True)
@@ -76,6 +81,8 @@ class Abstract(Base):
     title_th = Column(Text())
     abstract_th = Column(Text())
     scopus_id = Column(String(32), nullable=False, unique=True)
+    authors = relationship('Author', backref=backref('abstracts'),
+                        secondary=abstract_has_author)
     cited = Column(Integer())
     pub_date = Column(Date())
 
@@ -96,7 +103,7 @@ class AffiliationHistory(Base):
     affiliation_id = Column(Integer(), ForeignKey('affils.id'))
     author_id = Column(Integer(), ForeignKey('authors.id'))
     affiliation = relationship('Affiliation', backref=backref('history'))
-    author = relationship('Author', backref=backref('affilations'))
+    author = relationship('Author', backref=backref('affiliations'))
 
 
 class Author(Base):

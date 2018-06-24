@@ -55,14 +55,15 @@ def add_author(au, pubyear):
                 affil_ = kw_session.query(Affiliation).filter(Affiliation.scopus_id==affil_id).first()
                 affil_list.append(affil_)
 
-    author_ = kw_session.query(Author).filter(Author.scopus_id==scopus_id).first()
+    author_ = kw_session.query(Author).filter(Author.scopus_id==auid).first()
     if author_:
         print('\t\tAuthor exists!')
         for a in affil_list:
             history_ = kw_session.query(AffiliationHistory).filter(
-                                            affiliation=a,
-                                            author=author_,
-                                        ).first()
+                                    AffiliationHistory.affiliation==a,
+                                    AffiliationHistory.author==author_,
+                                    AffiliationHistory.year==pubyear,
+                                ).first()
             if history_ is None:
                 new_history = AffiliationHistory(
                     year=pubyear,
@@ -123,11 +124,11 @@ for n, pub in enumerate(pub_session.query(Pub)):
         elif isinstance(affiliation, list):
             for af in affiliation:
                 add_affiliation(af)
-    print(data['authkeywords'])
     nounchunks = []
-    if data.get('authkeywords'):
-        for ak in data.get('authkeywords'):
-            nounchunks.append(ak['$'].lower())
+    if 'authkeyword' in data:
+        if 'author-keyword' in data['authkeyword']:
+            for ak in data['authkeywords']['author-keyword']:
+                nounchunks.append(ak['$'].lower())
 
     subj_areas = []
     if 'subject-areas' in data:
@@ -161,6 +162,7 @@ for n, pub in enumerate(pub_session.query(Pub)):
                                     abstract_th=abstract_th,
                                     title_en=title_en,
                                     title_th=title_th,
+                                    authors=[],
                                     pub_date=pubdate,
                                     cited=cited,
                                 )
@@ -187,8 +189,11 @@ for n, pub in enumerate(pub_session.query(Pub)):
         if 'author' in authors:
             for au in authors['author']:
                 a, f = add_author(au, pubyear)
+                abstract_.authors.append(a)
                 author_list.append(a)
                 affil_id_list.append(f)
+            kw_session.add(abstract_)
+            kw_session.commit()
 
     for kw in keywords:
         kw_ = kw_session.query(Keyword).filter(Keyword.word_en==kw).first()
@@ -220,7 +225,6 @@ for n, pub in enumerate(pub_session.query(Pub)):
                         last_name=au.last_name,
                         author_scopus_id=au.scopus_id,
                         affil_scopus_id=afid.scopus_id,
-                        from_keyword=False,
                         abstracts=[abstract_],
                     )
                 kw_session.add(new_keyword)
