@@ -13,6 +13,7 @@ class Profile(models.Model):
     scholarship = models.BooleanField(default=False)
     college = models.CharField(max_length=255, blank=True)
     country = models.CharField(max_length=255, blank=True)
+    scopus_id = models.CharField(max_length=255, blank=True)
     degree = models.IntegerField(choices=(
                                     (1, u'ปริญญาตรี'),
                                     (2, u'ปริญญาโท'),

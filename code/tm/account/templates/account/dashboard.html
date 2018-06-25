@@ -37,16 +37,17 @@
           {% if profile.scholarship %}
           <h6 class="title">Scholarship Student Info</h6>
           <p>
-            ประเทศที่เรียน {{ profile.country|title }}<br>
-            สถาบัน {{ profile.college|title }}<br>
-            สาขาที่เรียน {{ profile.field_of_study|title }}<br>
-            ความเชี่ยวชาญ {{ profile.specialty|title }}<br>
-            ระดับ {{ degree }}<br>
-            จบการศึกษาเมื่อ {{ profile.graduated_at }}
+            Institute/University <strong>{{ profile.college|title }}</strong><br>
+            Country <strong>{{ profile.country|title }}</strong><br>
+            Major <strong>{{ profile.field_of_study|title }}</strong><br>
+            Specialty <strong>{{ profile.specialty|title }}</strong><br>
+            Level <strong>{{ degree }}</strong><br>
+            Graduated <strong>{{ profile.graduated_at }}</strong>
           </p>
           <br>
           {% endif %}
           <h6 class="title">Scopus-indexed Publications</h6>
+          <h6 class="subtitle text-muted">Author ID {{ profile.scopus_id }}</h6>
           <p>Total 3 articles</p>
           <ul>
             <li>Biochemistry 1</li>

@@ -39,4 +39,8 @@ class ProfileEditForm(forms.ModelForm):
                     'degree', 'photo',
                     'specialty', 'designated_affiliation',
                     'current_position', 'current_affiliation',
-                    'about', 'country', 'title')
+                    'about', 'country', 'title', 'scopus_id',
+                    )
+        widgets = {
+            'about': forms.Textarea(attrs={'placeholder': 'Enter your short bio here'})
+        }

@@ -138,8 +138,8 @@ AUTHENTICATION_BACKENDS = [
 
 LANGUAGE_CODE = 'en-us'
 LANGUAGES = (
-  ('th', _('Thai')),
-  ('en', _('English')),
+  ('th', 'Thai'),
+  ('en', 'English'),
 )
 
 TIME_ZONE = 'UTC'
