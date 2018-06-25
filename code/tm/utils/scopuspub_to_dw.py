@@ -112,6 +112,8 @@ def add_subject_area(subj):
 
 for n, pub in enumerate(pub_session.query(Pub)):
     print('Pub #{}, ID={}'.format(n, pub.scopus_id))
+    if n < 414:
+        continue
     if 'abstracts-retrieval-response' not in pub.data:
         print('\t\tNo abstract data found..skipped.')
         continue
@@ -152,7 +154,7 @@ for n, pub in enumerate(pub_session.query(Pub)):
         scopus_id = coredata.get('dc:identifier').lstrip('SCOPUS_ID:')
         abstract_ = kw_session.query(Abstract).filter(Abstract.scopus_id==scopus_id).first()
         if abstract_ is not None:
-            print('\t\ttPublication #SCOPUS_ID={} exists!'.format(abstract_.scopus_id))
+            print('\t\tPublication #SCOPUS_ID={} exists!'.format(abstract_.scopus_id))
             continue
         else:
             new_abstract = Abstract(
@@ -175,6 +177,11 @@ for n, pub in enumerate(pub_session.query(Pub)):
         kw_session.commit()
         keywords = []
         for text in [title_en, abstract_en]:
+            # some abstracts do not have title or abstract text
+            if title_en is None:
+                continue
+            elif abstract_en is None:
+                continue
             doc = nlp(text)
             for token in doc:
                 word = str(token).lower()

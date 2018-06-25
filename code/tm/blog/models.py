@@ -4,6 +4,7 @@ from django.http import Http404, HttpResponse
 from django.db import models
 from django.conf import settings
 from django.utils.dateformat import DateFormat
+from django.utils import translation
 from django.utils.formats import date_format
 from wagtail.core.models import Page
 from wagtail.core.fields import RichTextField
@@ -14,6 +15,18 @@ from taggit.models import TaggedItemBase, Tag as TaggitTag
 from modelcluster.fields import ParentalKey, ParentalManyToManyField, ForeignKey
 from modelcluster.tags import ClusterTaggableManager
 # Create your models here.
+
+class TranslatedField:
+    def __init__(self, en_field, th_field):
+        self.en_field = en_field
+        self.th_field = th_field
+
+    def __get__(self, instance, owner):
+        if translation.get_language() == 'th':
+            return getattr(instance, self.th_field)
+        else:
+            return getattr(instance, self.en_field)
+
 
 class BlogPageTag(TaggedItemBase):
     content_object = ParentalKey('PostPage', related_name='post_tags')
@@ -202,7 +215,13 @@ class BlogCategory(models.Model):
 
 
 class AboutPage(Page):
-    body = RichTextField(blank=True)
+    body_en = RichTextField(blank=True)
+    body_th = RichTextField(blank=True)
     content_panels = Page.content_panels + [
-        FieldPanel('body', classname='full'),
+        FieldPanel('body_en', classname='full'),
+        FieldPanel('body_th', classname='full'),
     ]
+    body = TranslatedField(
+        'body_en',
+        'body_th',
+    )
