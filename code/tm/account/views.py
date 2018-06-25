@@ -43,14 +43,7 @@ def profile(request, username):
     social_user = user.social_auth.filter(
         provider='facebook',
     ).first()
-    profile = Profile.objects.filter(user=user).first()
-    if profile is None:
-        Profile.objects.create(user=request.user)
-        profile = Profile.objects.filter(user=user).first()
-
     if social_user: # use facebook login
-        name_th = u'{} {}'.format(profile.first_name_th, profile.last_name_th)
-        name_en = u'{} {}'.format(user.first_name, user.last_name)
         url = 'https://graph.facebook.com/{0}/'.format(social_user.uid)
         res = requests.get(url, {'fields': 'picture.type(large)', 'access_token':social_user.extra_data['access_token']}).json()
         picture_url = res['picture']['data']['url']
@@ -59,18 +52,20 @@ def profile(request, username):
             provider='google-oauth2',
         ).first()
         if social_user:
-            profile = Profile.objects.filter(user=user).first()
-            name_th = u'{} {}'.format(profile.first_name_th, profile.last_name_th)
-            name_en = u'{} {}'.format(user.first_name, user.last_name)
             google_token = social_user.extra_data['access_token']
             url = 'https://www.googleapis.com/oauth2/v1/userinfo'.format(social_user.uid)
             res = requests.get(url, {'access_token': google_token, 'alt': 'json'}).json()
             picture_url = res.get('picture')
         else:  # use username login
-            profile = Profile.objects.filter(user=user).first()
-            name_th = u'{} {}'.format(profile.first_name_th, profile.last_name_th)
-            name_en = u'{} {}'.format(user.first_name, user.last_name)
             picture_url = None
+
+    profile = Profile.objects.filter(user=user).first()
+    if profile is None:
+        Profile.objects.create(user=request.user)
+
+    name_th = u'{} {}'.format(user.profile.first_name_th, user.profile.last_name_th)
+    name_en = u'{} {}'.format(user.first_name, user.last_name)
+
     return render(request,
             'account/dashboard.html',
             {'section': 'dashboard',
