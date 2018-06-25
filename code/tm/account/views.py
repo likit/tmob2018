@@ -59,21 +59,27 @@ def profile(request, username):
         else:  # use username login
             picture_url = None
 
-    profile = Profile.objects.filter(user=user).first()
-    if profile is None:
+    if Profile.objects.filter(user=user).first() is None:
         Profile.objects.create(user=request.user)
+    if social_user:
+        print("Update profile photo...")
+        if not user.profile.social_photo:
+            user.profile.social_photo = picture_url
+            user.profile.save()
 
     name_th = u'{} {}'.format(user.profile.first_name_th, user.profile.last_name_th)
     name_en = u'{} {}'.format(user.first_name, user.last_name)
+
+    profile_photo = user.profile.social_photo if social_user else user.profile.photo
 
     return render(request,
             'account/dashboard.html',
             {'section': 'dashboard',
             'name_th': name_th,
             'name_en': name_en,
-            'picture_url': picture_url,
-            'profile': profile,
-            'degree': degrees.get(profile.degree, ''),
+            'picture_url': profile_photo,
+            'profile': user.profile,
+            'degree': degrees.get(user.profile.degree, ''),
             'user': user
             })
 

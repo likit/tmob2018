@@ -27,12 +27,12 @@ urlpatterns = [
     path('cmsadmin/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
     path('admin/', admin.site.urls),
+    path('social-auth/',
+         include('social_django.urls', namespace='social')),
 ]
 
 urlpatterns += i18n_patterns(
     path('account/', include('account.urls')),
-    path('social-auth/',
-         include('social_django.urls', namespace='social')),
     path('', include(wagtail_urls)),
 )
 

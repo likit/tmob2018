@@ -24,6 +24,7 @@ class Profile(models.Model):
     specialty = models.CharField(max_length=255, blank=True)
     designated_affiliation = models.CharField(max_length=255, blank=True)  # affiliation of the student after graduate
     photo = models.ImageField(upload_to='users/%Y/%m/%d', blank=True)
+    social_photo = models.CharField(max_length=255, blank=True)
     current_position = models.CharField(max_length=255, blank=True)
     current_affiliation = models.CharField(max_length=255, blank=True)
     about = models.TextField(blank=True)
