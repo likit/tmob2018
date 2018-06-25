@@ -21,7 +21,7 @@
               <h5 class="title">{{ profile.title }}&nbsp;{{ name_th }}</h5>
               <h6 class="subtitle text-muted">{{ name_en }}</h6>
             </p>
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and backends.associated %}
               <a href="/account/edit">
                 <i class="fa fa-pencil"></i>&nbsp;Edit Profile
               </a>
