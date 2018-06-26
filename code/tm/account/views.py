@@ -10,7 +10,7 @@ from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditFor
 from py2neo import Graph
 from .models import Profile
 
-graph = Graph(host='neo4j_db', password='_genius01_', scheme='bolt')
+# graph = Graph(host='neo4j_db', password='_genius01_', scheme='bolt')
 
 # Create your views here.
 def user_login(request):
