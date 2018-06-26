@@ -69,7 +69,6 @@ def profile(request, username):
             user.profile.save()
             messages.info(request, 'You social profile photo has been added to your account.')
 
-    messages.info(request, 'You have been successfully logged in.')
     name_th = u'{} {}'.format(user.profile.first_name_th, user.profile.last_name_th)
     name_en = u'{} {}'.format(user.first_name, user.last_name)
 

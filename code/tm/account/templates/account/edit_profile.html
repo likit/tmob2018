@@ -37,7 +37,8 @@
                 </div>
             </div>
             <div class="form-group input-lg row">
-                <label for="id_last_name_th" class="col-sm-2 col-form-label"><strong>ชื่อนามสกุล</strong></label>
+                <label for="id_last_name_th" class="col-sm-2 col-form-label"><strong>ชื่อนามสกุล</strong>
+                </label>
                 <div class="col-sm-4">
                     {{ profile_form.last_name_th|add_css:"form-control" }}
                 </div>
@@ -76,6 +77,17 @@
                 <label for="id_scopus_id" class="col-sm-2 col-form-label"><strong>SCOPUS ID</strong></label>
                 <div class="col-sm-4">
                     {{ profile_form.scopus_id|add_css:"form-control"}}
+                </div>
+            </div>
+            <hr>
+            <br>
+            <h6 class="subtitle text-center">Research and Expertise</h6>
+            <br>
+            <div class="form-group input-lg row">
+                <label for="id_scopus_id" class="col-sm-2 col-form-label"><strong>Field of interest</strong></label>
+                <div class="col-sm-8">
+                    {{ profile_form.field_of_interest|add_css:"form-control"}}
+                    <p>ใส่ keyword คั่นด้วยเครื่องหมาย ,</p>
                 </div>
             </div>
             <hr>

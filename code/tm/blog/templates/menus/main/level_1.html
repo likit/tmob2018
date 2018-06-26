@@ -20,7 +20,7 @@
                 {% endfor %}
                 {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="/account">
+                    <a class="nav-link" href="{{ user.get_absolute_url }}">
                         <i class="fa fa-user-circle"></i>
                         <strong>Profile</strong>
                     </a>

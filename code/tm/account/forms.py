@@ -39,8 +39,11 @@ class ProfileEditForm(forms.ModelForm):
                     'degree', 'photo',
                     'specialty', 'designated_affiliation',
                     'current_position', 'current_affiliation',
-                    'about', 'country', 'title', 'scopus_id',
+                    'about', 'country',
+                    'title', 'scopus_id',
+                    'field_of_interest',
                     )
         widgets = {
-            'about': forms.Textarea(attrs={'placeholder': 'Enter your short bio here'})
+            'about': forms.Textarea(attrs={'placeholder': 'Enter your short bio here'}),
+            'field_of_interest': forms.TextInput(attrs={'placeholder': 'Enter keywords'})
         }

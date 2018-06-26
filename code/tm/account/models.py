@@ -28,6 +28,7 @@ class Profile(models.Model):
     current_position = models.CharField(max_length=255, blank=True)
     current_affiliation = models.CharField(max_length=255, blank=True)
     about = models.TextField(blank=True)
+    field_of_interest = models.TextField(blank=True)
 
 
     def __str__(self):
