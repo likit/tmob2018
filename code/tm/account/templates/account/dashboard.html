@@ -95,10 +95,9 @@
           </div>
           <h4 class="subtitle">Field of Interest</h4>
           <div>
-            <span class="badge badge-info">Bioinformatics</span>
-            <span class="badge badge-info">Microbiology</span>
-            <span class="badge badge-info">Computer</span>
-            <span class="badge badge-info">Python</span>
+            {% for f in profile.field_of_interest_as_list %}
+              <span class="badge badge-info">{{ f }}</span>
+            {% endfor %}
           </div>
           <h4 class="subtitle">Commercial Research</h4>
           <ul>

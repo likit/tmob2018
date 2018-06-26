@@ -30,7 +30,9 @@ class Profile(models.Model):
     about = models.TextField(blank=True)
     field_of_interest = models.TextField(blank=True)
 
-
     def __str__(self):
         return 'Profile for user {}'.format(self.user.username)
+
+    def field_of_interest_as_list(self):
+        return [f.strip() for f in self.field_of_interest.split(',')]
 
