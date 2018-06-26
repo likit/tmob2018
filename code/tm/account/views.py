@@ -2,6 +2,7 @@
 import requests
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse
+from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
@@ -60,13 +61,15 @@ def profile(request, username):
             picture_url = None
 
     if Profile.objects.filter(user=user).first() is None:
+        messages.info(request, 'Please edit your profile by clicking at "edit profile" link.')
         Profile.objects.create(user=request.user)
     if social_user:
-        print("Update profile photo...")
         if not user.profile.social_photo:
             user.profile.social_photo = picture_url
             user.profile.save()
+            messages.info(request, 'You social profile photo has been added to your account.')
 
+    messages.info(request, 'You have been successfully logged in.')
     name_th = u'{} {}'.format(user.profile.first_name_th, user.profile.last_name_th)
     name_en = u'{} {}'.format(user.first_name, user.last_name)
 
