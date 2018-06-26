@@ -1,6 +1,6 @@
 .idea
-*.pyc
+*.py[cod]
 *.DS_Store
-__pycache__
+__pycache__/
 pg_data
 neo_data
