@@ -30,7 +30,9 @@ class MainPage extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Talent Mobility App',
-      home: new PostsList(),
+      home: Scaffold(
+        body: PostsList(),
+      ),
     );
   }
 }
@@ -89,9 +91,15 @@ class _PostsListState extends State<PostsList> {
                         ),
                       ),
                     subtitle: Text('lorem posum i am going to hongkong this month, please let me handle this.'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context)=>DetailPost(post: snapshot.data[index])),
+                      );
+                    }
                   ),
                   Divider(),
-                ],
+                ]
               );
             },
           );
@@ -108,6 +116,39 @@ class _PostsListState extends State<PostsList> {
           onRefresh: refreshPostList,
           child: postListFuture,
       ),
+    );
+  }
+}
+
+class DetailPost extends StatelessWidget {
+  final Post post;
+
+  DetailPost({Key, key, @required this.post}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Post Page'),
+      ),
+      body: Container(
+        margin: const EdgeInsets.all(16.0),
+        child: Column(
+          children: <Widget>[
+            Text('${post.title}',
+              style: TextStyle(
+                  fontSize: 18.0),
+              ),
+            Text('posted by user id = ${post.userId}'),
+            RaisedButton(
+              child: Text('Back'),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        ),
+      )
     );
   }
 }
