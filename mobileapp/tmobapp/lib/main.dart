@@ -111,6 +111,17 @@ class _PostsListState extends State<PostsList> {
     return new Scaffold(
       appBar: AppBar(
         title: new Text('Recent Posts'),
+        actions: <Widget>[
+          new IconButton(
+            icon: new Icon(Icons.search),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => SearchPostForm())
+              );
+            },
+          )
+        ]
       ),
       body: new RefreshIndicator(
           onRefresh: refreshPostList,
@@ -211,6 +222,48 @@ class _PostCommentFormState extends State<PostCommentForm> {
           );
         },
         tooltip: 'Show me the comment!',
+        child: Icon(Icons.text_fields),
+      ),
+    );
+  }
+}
+
+class SearchPostForm extends StatefulWidget {
+  @override
+  _SearchPostFormState createState() => _SearchPostFormState();
+}
+
+class _SearchPostFormState extends State<SearchPostForm> {
+  final inputCtrl = TextEditingController();
+  @override
+  void dispose() {
+    inputCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Search Post'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: TextField(
+          controller: inputCtrl,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          return showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: Text(inputCtrl.text),
+              );
+            },
+          );
+        },
         child: Icon(Icons.text_fields),
       ),
     );
