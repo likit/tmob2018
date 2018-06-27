@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'wagtail.admin',
     'wagtail.core',
     'wagtailmenus',
+    'wagtail.api.v2',
     'el_pagination',
     'modelcluster',
     'taggit',

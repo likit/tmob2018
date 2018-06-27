@@ -11,6 +11,7 @@ from wagtail.core.fields import RichTextField
 from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, MultiFieldPanel, PageChooserPanel
 from wagtail.snippets.models import register_snippet
 from wagtail.contrib.routable_page.models import RoutablePageMixin, route
+from wagtail.api import APIField
 from taggit.models import TaggedItemBase, Tag as TaggitTag
 from modelcluster.fields import ParentalKey, ParentalManyToManyField, ForeignKey
 from modelcluster.tags import ClusterTaggableManager
@@ -182,6 +183,15 @@ class PostPage(RoutablePageMixin, Page):
 
     settings_panels = Page.settings_panels + [
         FieldPanel('date'),
+    ]
+
+    api_fields = [
+        APIField('date'),
+        APIField('title'),
+        APIField('slug'),
+        APIField('body'),
+        APIField('categories'),
+        APIField('tags'),
     ]
 
     @property

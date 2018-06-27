@@ -4,4 +4,4 @@ from ..models import PostPage
 class PostPageSerializer(serializers.ModelSerializer):
     class Meta:
         model = PostPage
-        fields = ['id', 'title', 'slug']
+        fields = ['id', 'title', 'slug', 'body']
