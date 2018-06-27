@@ -24,59 +24,78 @@ class Post {
   }
 }
 
-List<Post> parsePosts(String responseBody) {
-  final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-  return parsed.map<Post>((json)=>Post.fromJson(json)).toList();
-}
-
-Future<List<Post>> fetchPost(http.Client client) async {
-  final response = await client.get(
-      'https://jsonplaceholder.typicode.com/posts');
-  if (response.statusCode == 200) {
-    return compute(parsePosts,response.body);
-  }
-}
-
 class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Talent Mobility App',
-      home: new Scaffold(
-        appBar: AppBar(
-          title: new Text('Recent Posts'),
-        ),
-        body: new FutureBuilder<List<Post>>(
-          future: fetchPost(http.Client()),
-          builder: (context, snapshot) {
-            if (snapshot.hasError) print(snapshot.error);
-            return snapshot.hasData
-                ? PostsList(posts: snapshot.data)
-                : Center(child: CircularProgressIndicator());
-          },
-        ),
-      ),
+      home: new PostsList(),
     );
   }
 }
 
 
-class PostsList extends StatelessWidget {
-  final List<Post> posts;
+class PostsList extends StatefulWidget {
+  createState() => new _PostsListState();
+}
 
-  PostsList({Key key, this.posts}) : super(key: key);
+class _PostsListState extends State<PostsList> {
+
+  List<Post> posts;
+
+  List<Post> parsePosts(String responseBody) {
+    final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+    return parsed.map<Post>((json) => Post.fromJson(json)).toList();
+  }
+
+  Future<Null> refreshPostList() async {
+    setState((){});
+    return null;
+  }
+
+  Future<List<Post>> fetchPost() async {
+    final response = await http.get('https://jsonplaceholder.typicode.com/posts');
+    if (response.statusCode == 200) {
+      setState(() {});
+      return parsePosts(response.body);
+    } else {
+      throw Exception('Failed to load post');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    refreshPostList();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return new ListView.builder(
-      itemCount: posts.length,
-      itemBuilder: (BuildContext context, index) {
-        if (index.isOdd) return new Divider();
-        return ListTile(
-          title: new Text(posts[index].title),
-          subtitle: new Text('User ID: ${posts[index].userId}'),
-        );
-      },
+    FutureBuilder<List<Post>> postListFuture = FutureBuilder<List<Post>>(
+      future: fetchPost(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return ListView.builder(
+            itemCount: snapshot.data?.length,
+            itemBuilder: (BuildContext context, index) {
+              return ListTile(
+                title: Text('${snapshot.data[index].title}'),
+              );
+            },
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      }
+    );
+    return new Scaffold(
+      appBar: AppBar(
+        title: new Text('Recent Posts'),
+      ),
+      body: new RefreshIndicator(
+          onRefresh: refreshPostList,
+          child: postListFuture,
+      ),
     );
   }
 }
