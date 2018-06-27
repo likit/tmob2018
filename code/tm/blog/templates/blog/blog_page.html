@@ -1,6 +1,7 @@
 {% extends "blog/base.html" %}
 
 {% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
+{% load wagtailimages_tags %}
 {% block content %}
 {% main_menu template="menus/main/level_1.html" %}
 <section class="section">
@@ -23,6 +24,7 @@
                 {% paginate 10 posts %}
                 {% get_pages %}
                 {% for post in posts %}
+                    {% image post.feed_image width-400 %}
                     <h3 class="title"><a href="{% post_date_url post blog_page %}">{{ post.title }}</a></h3>
                     <h6 class="text-muted">Posted on {{ post.date }}</h6>
                     {{ post.body|truncatewords_html:50|richtext }}

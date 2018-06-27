@@ -6,6 +6,8 @@ from django.conf import settings
 from django.utils.dateformat import DateFormat
 from django.utils import translation
 from django.utils.formats import date_format
+from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.images.api.fields import ImageRenditionField
 from wagtail.core.models import Page
 from wagtail.core.fields import RichTextField
 from wagtail.admin.edit_handlers import FieldPanel, InlinePanel, MultiFieldPanel, PageChooserPanel
@@ -175,6 +177,8 @@ class PostPage(RoutablePageMixin, Page):
     date = models.DateTimeField(verbose_name="Post date", default=datetime.today)
     categories = ParentalManyToManyField('blog.BlogCategory', blank=True)
     tags = ClusterTaggableManager(through='blog.BlogPageTag', blank=True)
+    feed_image = models.ForeignKey('wagtailimages.Image', null=True,
+                                    blank=True, on_delete=models.SET_NULL, related_name='+')
     content_panels = Page.content_panels + [
         FieldPanel('body', classname='full'),
         FieldPanel('categories', widget=forms.CheckboxSelectMultiple),
@@ -185,6 +189,10 @@ class PostPage(RoutablePageMixin, Page):
         FieldPanel('date'),
     ]
 
+    promote_panels = [
+        ImageChooserPanel('feed_image'),
+    ]
+
     api_fields = [
         APIField('date'),
         APIField('title'),
@@ -192,6 +200,8 @@ class PostPage(RoutablePageMixin, Page):
         APIField('body'),
         APIField('categories'),
         APIField('tags'),
+        APIField('feed_image_thumbnail',
+            serializer=ImageRenditionField('width-200', source='feed_image')),
     ]
 
     @property

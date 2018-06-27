@@ -1,11 +1,13 @@
 {% extends "blog/landing_page.html" %}
 {% load wagtailcore_tags wagtailroutablepage_tags el_pagination_tags %}
+{% load wagtailimages_tags %}
 
 {% block content %}
     <h2 class="title">Recent Posts</h2>
     {% paginate 5 posts %}
     {% get_pages %}
     {% for post in posts %}
+        {% image post.feed_image width-400 %}
         <h3 class="title"><a href="{% pageurl post %}">{{ post.title }}</a></h3>
         <h6 class="text-muted">Posted on {{ post.date }}</h6>
         {{ post.body|truncatewords_html:50|richtext }}
