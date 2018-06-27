@@ -24,6 +24,7 @@ from wagtail.admin import urls as wagtailadmin_urls
 from django.conf.urls.static import static
 
 urlpatterns = [
+    path('api/', include('blog.api.urls', namespace='api')),
     path('cmsadmin/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
     path('admin/', admin.site.urls),

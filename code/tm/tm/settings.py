@@ -57,7 +57,8 @@ INSTALLED_APPS = [
     'el_pagination',
     'modelcluster',
     'taggit',
-    'blog'
+    'blog',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -181,4 +182,8 @@ WAGTAIL_SITE_NAME = 'Talent Mobility Content Management System'
 
 ABSOLUTE_URL_OVERRIDES = {
     'auth.user': lambda u: reverse_lazy('profile', args=[u.username])
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': ('rest_framework.permissions.IsAuthenticatedOrReadOnly',)
 }
