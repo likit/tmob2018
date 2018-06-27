@@ -28,6 +28,7 @@ class MainPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Talent Mobility App',
       home: new PostsList(),
     );
@@ -78,8 +79,19 @@ class _PostsListState extends State<PostsList> {
           return ListView.builder(
             itemCount: snapshot.data?.length,
             itemBuilder: (BuildContext context, index) {
-              return ListTile(
-                title: Text('${snapshot.data[index].title}'),
+              return Column(
+                children: <Widget>[
+                  ListTile(
+                    title: Text(
+                        '${snapshot.data[index].title}',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                        ),
+                      ),
+                    subtitle: Text('lorem posum i am going to hongkong this month, please let me handle this.'),
+                  ),
+                  Divider(),
+                ],
               );
             },
           );
