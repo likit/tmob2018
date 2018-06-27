@@ -116,6 +116,22 @@ class _PostsListState extends State<PostsList> {
           onRefresh: refreshPostList,
           child: postListFuture,
       ),
+      bottomNavigationBar: BottomNavigationBar(
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.category),
+              title: Text('Categories'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.label),
+              title: Text('Tags'),
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people),
+              title: Text('Community'),
+            )
+          ]
+      ),
     );
   }
 }
@@ -137,18 +153,66 @@ class DetailPost extends StatelessWidget {
           children: <Widget>[
             Text('${post.title}',
               style: TextStyle(
-                  fontSize: 18.0),
+                  fontSize: 22.0),
               ),
+            Text('lomrem posum skshuglg sj lsls kdkdks lsksl dksls klslsksl slsks lslsksks lsksk kalsjsj euuosogj'),
             Text('posted by user id = ${post.userId}'),
-            RaisedButton(
-              child: Text('Back'),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
           ],
         ),
-      )
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.format_quote),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => PostCommentForm())
+          );
+        },
+        tooltip: 'Show me the comment!',
+      ),
+    );
+  }
+}
+
+class PostCommentForm extends StatefulWidget {
+  @override
+  _PostCommentFormState createState() => _PostCommentFormState();
+}
+
+class _PostCommentFormState extends State<PostCommentForm> {
+  final commentInputCtrl = TextEditingController();
+  @override
+  void dispose() {
+    commentInputCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Post Comment'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: TextField(
+          controller: commentInputCtrl,
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          return showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                content: Text(commentInputCtrl.text),
+              );
+            },
+          );
+        },
+        tooltip: 'Show me the comment!',
+        child: Icon(Icons.text_fields),
+      ),
     );
   }
 }
