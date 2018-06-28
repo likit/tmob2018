@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
+
+{% block title %}Authors in Field{% endblock %}
+
+{% block content %}
+<section class="section">
+<div class="container">
+    <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/analytics/database">Database</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Authors in field</li>
+    </ol>
+    </nav>
+    <h1 class="title">Thai Authors in {{ field }}</h1>
+    <table class="table">
+        <thead>
+            <th>Name</th>
+            <th>Affiliation</th>
+            <th>City</th>
+        </thead>
+        <tbody>
+        {% for author in authors %}
+            <tr>
+                <td>{{ author.0.first_name}} {{ author.0.last_name }}</td>
+                <td>{{ author.1.name }}</td>
+                <td>{{ author.1.city }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    </ul>
+</div>
+{% endblock %}

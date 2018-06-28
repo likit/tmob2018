@@ -2,6 +2,10 @@
 from django.shortcuts import render
 from sqlalchemy import MetaData, create_engine
 from collections import namedtuple, defaultdict
+from py2neo import Graph, Relationship, NodeMatcher, Node
+from datetime import datetime
+
+graph = Graph(host='neo4j_db', password='_genius01_', scheme='bolt')
 
 meta = MetaData()
 engine = create_engine('postgresql+psycopg2://postgres:_genius01_@postgres_db/keywordsdw')
@@ -132,3 +136,14 @@ def main_db(request):
                             'total_abstracts': total_abstracts,
                             'fields': fields
                             })
+
+
+def show_field(request, field_name):
+    query = 'MATCH (f:Field{name:"%s"})-[:IN]-(:Abstract)-[:AUTHORED]-(au:Author)-[:AFFILIATE]-(af:Affiliation{country:"Thailand"}) RETURN f,au,af' % field_name
+    results = list(graph.run(query))
+    authors = []
+    if results:
+        for res in results:
+            authors.append((res['au'], res['af']))
+    return render(request, template_name="analytics/field_author.html",
+                context={'authors': authors, 'field': field_name})

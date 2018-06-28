@@ -48,6 +48,7 @@ def profile(request, username):
         url = 'https://graph.facebook.com/{0}/'.format(social_user.uid)
         res = requests.get(url, {'fields': 'picture.type(large)', 'access_token':social_user.extra_data['access_token']}).json()
         picture_url = res['picture']['data']['url']
+        print(picture_url)
     else: # use google login
         social_user = user.social_auth.filter(
             provider='google-oauth2',
@@ -63,16 +64,11 @@ def profile(request, username):
     if Profile.objects.filter(user=user).first() is None:
         messages.info(request, 'Please edit your profile by clicking at "edit profile" link.')
         Profile.objects.create(user=request.user)
-    if social_user:
-        if not user.profile.social_photo:
-            user.profile.social_photo = picture_url
-            user.profile.save()
-            messages.info(request, 'You social profile photo has been added to your account.')
 
     name_th = u'{} {}'.format(user.profile.first_name_th, user.profile.last_name_th)
     name_en = u'{} {}'.format(user.first_name, user.last_name)
 
-    profile_photo = user.profile.social_photo if social_user else user.profile.photo
+    profile_photo = picture_url if social_user else user.profile.photo
 
     return render(request,
             'account/dashboard.html',
