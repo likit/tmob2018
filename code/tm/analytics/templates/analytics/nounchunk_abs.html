@@ -1,0 +1,55 @@
+{% extends "blog/base.html" %}
+{% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
+{% load wagtailimages_tags %}
+{% block content %}
+{% main_menu template="menus/main/level_1.html" %}
+<section class="section">
+    <div class="container">
+        <h4>Articles with "<strong>{{ noun_chunk }}</strong>"</h4>
+        <form role="search" method="get"
+            class="form-search" action="/analytics/keywords/" method="get">
+            <div class="input-group">
+                <input type="text" class="form-control" name="q"
+                    aria-describedby="searchHelp"
+                    placeholder="Search for experts with keywords&hellip;" title="Search for: "/>
+                <div class="input-group-addon">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-search"></i>
+                </div>
+            </div>
+        </form>
+        <table class="table">
+            <thead>
+                <th>Title</th>
+                <th>Authors</th>
+                <th>Terms</th>
+                <th>Publish Date</th>
+                <th>Cited</th>
+            </thead>
+            <col width="20">
+            <col width="10">
+            <col width="50">
+            <col width="10">
+            <col width="10">
+            {% for abs in abstracts %}
+            <tr>
+                <td>{{ abs.abstract.1 }}</td>
+                <td>
+                    {% for author in abs.authors %}
+                        <a href="#">{{ author.first_name }} {{ author.last_name}}</a>,
+                    {% endfor %}
+                </td>
+                <td>
+                    {% for term in abs.nounchunks %}
+                        <a href="/analytics/keywords?q={{ term.1 }}">
+                            <span class="badge badge-info">{{ term.1 }}</span>
+                        </a>
+                    {% endfor %}
+                </td>
+                <td>{{ abs.abstract.2 }}</td>
+                <td>{{ abs.abstract.3}}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endblock %}

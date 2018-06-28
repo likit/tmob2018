@@ -21,6 +21,7 @@
             <thead>
                 <th>First Name</th>
                 <th>Last Name</th>
+                <th>Affiliation</th>
                 <th>Matched Keyword</th>
                 <th>Occurrence</th>
                 <th>Published Articles</th>
@@ -30,9 +31,14 @@
             <tr {% if rec.sc %}class="table-primary"{% endif %}>
                 <td>{{ rec.firstname }}</td>
                 <td>{{ rec.lastname }}</td>
+                <td>{{ rec.affiliation }}</td>
                 <td>{{ rec.word_en}}</td>
                 <td>{{ rec.count }}</td>
-                <td>{{ rec.total_abstracts }}</td>
+                <td>
+                    {%for f in rec.fields %}
+                        <span class="badge badge-primary">{{ f }}</span>
+                    {% endfor %}
+                </td>
                 <td>{{ rec.sc }}</td>
             </tr>
             {% endfor %}
@@ -41,7 +47,7 @@
         <h4>Noun phrases containing {{ search_term }}</h4>
         <ul>
             {% for nc in nounchunks %}
-            <li><a href="#">{{ nc.1|title }}</a></li>
+            <li><a href="/analytics/nounchunk/?ncid={{ nc.0 }}">{{ nc.1|title }}</a></li>
             {% endfor %}
         </ul>
     </div>
