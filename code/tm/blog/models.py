@@ -17,6 +17,7 @@ from wagtail.api import APIField
 from taggit.models import TaggedItemBase, Tag as TaggitTag
 from modelcluster.fields import ParentalKey, ParentalManyToManyField, ForeignKey
 from modelcluster.tags import ClusterTaggableManager
+from rest_framework.fields import DateTimeField
 # Create your models here.
 
 class TranslatedField:
@@ -194,7 +195,7 @@ class PostPage(RoutablePageMixin, Page):
     ]
 
     api_fields = [
-        APIField('date'),
+        APIField('pubdate', serializer=DateTimeField(format='%A %d %B %Y', source='date')),
         APIField('title'),
         APIField('slug'),
         APIField('body'),
