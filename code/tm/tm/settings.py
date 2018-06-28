@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'taggit',
     'blog',
     'rest_framework',
+    'analytics',
 ]
 
 MIDDLEWARE = [
