@@ -32,7 +32,7 @@
             <p><h4>Database contains <strong>{{ total_words }}</strong> word{{ total_words|pluralize}}
             extracted from <strong>{{ total_abstracts }}</strong> research article{{ total_abstracts|pluralize }}.</h4></p>
             {% for field in fields %}
-            <span><a href="">{{ field.1 }}</a> <strong>({{ field.0 }})</strong></span>
+            <span><a href="/analytics/show_field/{{ field.1 }}">{{ field.1 }}</a> <strong>({{ field.0 }})</strong></span>
             {% endfor %}
         </div>
     </section>
