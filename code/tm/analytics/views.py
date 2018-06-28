@@ -6,7 +6,7 @@ meta = MetaData()
 engine = create_engine('postgresql+psycopg2://postgres:_genius01_@postgres_db/keywordsdw')
 conn = engine.connect()
 
-Researcher = namedtuple('Researcher', ['firstname', 'lastname',
+Researcher = namedtuple('Researcher', ['id', 'firstname', 'lastname',
                                         'word_en', 'count', 'affiliation',
                                         'total_abstract' ,'sc'])
 
@@ -47,7 +47,7 @@ def res_list(request):
                         sc = True
                     else:
                         sc = False
-                    res_list.append(Researcher(rec[1], rec[2], rec[3], rec[4], rec[5], total_abstract, sc))
+                    res_list.append(Researcher(_author_id, rec[1], rec[2], rec[3], rec[4], rec[5], total_abstract, sc))
 
     return render(request, template_name='analytics/res_list.html',
             context={'search_term': search_term, 'results': res_list, 'nounchunks': nounchunks})

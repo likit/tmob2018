@@ -35,7 +35,13 @@
                 <td>{{ rec.word_en}}</td>
                 <td>{{ rec.count }}</td>
                 <td>{{ rec.total_abstract }}</td>
-                <td>{{ rec.sc }}</td>
+                <td>
+                    {% if rec.sc %}
+                    <a href="/analytics/profile/{{ rec.id }}">
+                        profile
+                    </a>
+                    {% endif %}
+                </td>
             </tr>
             {% endfor %}
         </table>
