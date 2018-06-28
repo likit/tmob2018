@@ -1,25 +1,27 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:flutter_html_view/flutter_html_view.dart';
 
 void main() => runApp(new MainPage());
 
 class Post {
-  final int userId;
   final int id;
   final String title;
   final String body;
+  final feedImage;
 
-  Post({this.userId, this.id, this.title, this.body});
+  Post({this.id, this.title, this.body, this.feedImage});
 
   factory Post.fromJson(Map<String, dynamic> json) {
     return Post(
-      userId: json['userId'],
       id: json['id'],
       title: json['title'],
       body: json['body'],
+      feedImage: json['feed_image_thumbnail'],
     );
   }
 }
@@ -30,6 +32,11 @@ class MainPage extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Talent Mobility App',
+      theme: ThemeData(
+        brightness: Brightness.light,
+        primaryColor: Colors.deepOrangeAccent,
+        accentColor: Colors.blueGrey,
+      ),
       home: Scaffold(
         body: PostsList(),
       ),
@@ -47,8 +54,9 @@ class _PostsListState extends State<PostsList> {
   List<Post> posts;
 
   List<Post> parsePosts(String responseBody) {
-    final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
-    return parsed.map<Post>((json) => Post.fromJson(json)).toList();
+    // final parsed = json.decode(responseBody).cast<Map<String, dynamic>>();
+    final parsed = json.decode(responseBody);
+    return parsed['items'].map<Post>((json) => Post.fromJson(json)).toList();
   }
 
   Future<Null> refreshPostList() async {
@@ -56,11 +64,18 @@ class _PostsListState extends State<PostsList> {
     return null;
   }
 
+  HttpClient http = new HttpClient();
+
   Future<List<Post>> fetchPost() async {
-    final response = await http.get('https://jsonplaceholder.typicode.com/posts');
+    var uri = Uri.http('209.97.174.132', '/api/v2/pages',
+        {"type":"blog.PostPage", "fields":"feed_image_thumbnail,body"});
+    var request = await http.getUrl(uri);
+    var response = await request.close();
+    var responseBody = await response.transform(UTF8.decoder).join();
+    // final response = await http.get('http://209.97.174.132/api/v2/pages?type=blog.PostPage&fields=feed_image_thumbnail,body');
     if (response.statusCode == 200) {
-      setState(() {});
-      return parsePosts(response.body);
+      // setState(() {});
+      return parsePosts(responseBody);
     } else {
       throw Exception('Failed to load post');
     }
@@ -83,23 +98,35 @@ class _PostsListState extends State<PostsList> {
             itemBuilder: (BuildContext context, index) {
               return Column(
                 children: <Widget>[
-                  ListTile(
-                    title: Text(
-                        '${snapshot.data[index].title}',
-                        style: TextStyle(
-                          fontSize: 20.0,
+                  Card(
+                    child: Container(
+                        padding: EdgeInsets.all(16.0),
+                        child: Column(
+                          children: <Widget>[
+                            snapshot.data[index].feedImage != null ?
+                            Image.network(
+                                'http://209.97.174.132${snapshot.data[index].feedImage['url']}'
+                            ) : Container(),
+                            ListTile(
+                              title: Text(
+                                '${snapshot.data[index].title}',
+                                style: TextStyle(
+                                  fontSize: 20.0,
+                                ),
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder:
+                                (context)=>DetailPost(post:snapshot.data[index]))
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ),
-                    subtitle: Text('lorem posum i am going to hongkong this month, please let me handle this.'),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context)=>DetailPost(post: snapshot.data[index])),
-                      );
-                    }
-                  ),
-                  Divider(),
-                ]
+                    ),
+                  ]
               );
             },
           );
@@ -110,6 +137,7 @@ class _PostsListState extends State<PostsList> {
     );
     return new Scaffold(
       appBar: AppBar(
+        elevation: 1.0,
         title: new Text('Recent Posts'),
         actions: <Widget>[
           new IconButton(
@@ -156,20 +184,22 @@ class DetailPost extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 1.0,
         title: Text('Post Page'),
       ),
       body: Container(
         margin: const EdgeInsets.all(16.0),
-        child: Column(
-          children: <Widget>[
-            Text('${post.title}',
-              style: TextStyle(
-                  fontSize: 22.0),
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Text('${post.title}',
+                style: TextStyle(
+                    fontSize: 22.0),
               ),
-            Text('lomrem posum skshuglg sj lsls kdkdks lsksl dksls klslsksl slsks lslsksks lsksk kalsjsj euuosogj'),
-            Text('posted by user id = ${post.userId}'),
-          ],
-        ),
+              HtmlView(data: post.body),
+            ],
+          ),
+        )
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.format_quote),
@@ -202,6 +232,7 @@ class _PostCommentFormState extends State<PostCommentForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 1.0,
         title: Text('Post Comment'),
       ),
       body: Padding(
@@ -245,6 +276,7 @@ class _SearchPostFormState extends State<SearchPostForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        elevation: 1.0,
         title: Text('Search Post'),
       ),
       body: Padding(
