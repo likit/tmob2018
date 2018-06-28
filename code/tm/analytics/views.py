@@ -115,3 +115,20 @@ def show_profile(request, author_id):
                                 'degree': degrees.get(int(profile.degree), 'Other'),
                                 'fields': fields,
                                 'keywords': keywords})
+
+
+def main_db(request):
+    total_words = conn.execute('select count(*) from keywords').scalar()
+    total_abstracts = conn.execute('select count(*) from abstracts').scalar()
+    fields = []
+    query = ('select count(*), name from research_fields inner join '
+                'field_has_abstract on field_has_abstract.field_id=research_fields.id group by name;')
+    for field in conn.execute(query).fetchall():
+        fields.append(field)
+
+    fields = sorted(fields, key=lambda x: x[0], reverse=True)
+    return render(request, template_name="analytics/main.html",
+                context={'total_words': total_words,
+                            'total_abstracts': total_abstracts,
+                            'fields': fields
+                            })
