@@ -1,6 +1,42 @@
-<!doctype html>
-<html>
-    <body>
+{% extends "blog/base.html" %}
+{% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
+{% load wagtailimages_tags %}
+{% block content %}
+{% main_menu template="menus/main/level_1.html" %}
+<section class="section">
+    <div class="container">
         <h1>We are looking for {{ search_term }}...</h1>
-    </body>
-</html>
+        <form role="search" method="get"
+            class="form-search" action="." method="get">
+            <div class="input-group">
+                <input type="text" class="form-control" name="q"
+                    aria-describedby="searchHelp"
+                    placeholder="Search for experts with keywords&hellip;" title="Search for: "/>
+                <div class="input-group-addon">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-search"></i>
+                </div>
+            </div>
+        </form>
+        <table class="table">
+            <thead>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Matched Keyword</th>
+                <th>Occurrence</th>
+                <th>Published Articles</th>
+                <th>Scholarship Student</th>
+            </thead>
+            {% for rec in results %}
+            <tr {% if rec.sc %}class="table-primary"{% endif %}>
+                <td>{{ rec.firstname }}</td>
+                <td>{{ rec.lastname }}</td>
+                <td>{{ rec.word_en}}</td>
+                <td>{{ rec.count }}</td>
+                <td>{{ rec.total_abstracts }}</td>
+                <td>{{ rec.sc }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</section>
+{% endblock %}
