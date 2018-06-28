@@ -112,6 +112,24 @@ class Author(Base):
     first_name = Column(String(255))
     last_name = Column(String(255))
     scopus_id = Column(String(64))
+    scholarship_info_id = Column(Integer(), ForeignKey('scholarship_info.id'))
+    scholarship_info = relationship("ScholarshipInfo",
+                            backref=backref('author'), uselist=False)
+
+
+class ScholarshipInfo(Base):
+    __tablename__ = 'scholarship_info'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    first_name_en = Column(String(255))
+    last_name_en = Column(String(255))
+    first_name_th = Column(String(255))
+    last_name_th = Column(String(255))
+    country = Column(String())
+    status = Column(Boolean())
+    field_of_study = Column(String())
+    specialty = Column(String())
+    degree =Column(Integer())
+    contact = Column(String())
 
 
 if __name__ == '__main__':
