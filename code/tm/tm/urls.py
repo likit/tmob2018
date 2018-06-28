@@ -25,6 +25,7 @@ from django.conf.urls.static import static
 from blog.api.api import api_router
 
 urlpatterns = [
+    path('analytics/', include('analytics.urls', namespace='analytics')),
     url(r'^api/v2/', api_router.urls),
     path('api/', include('blog.api.urls', namespace='api')),
     path('cmsadmin/', include(wagtailadmin_urls)),
