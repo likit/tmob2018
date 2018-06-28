@@ -8,7 +8,7 @@ conn = engine.connect()
 
 Researcher = namedtuple('Researcher', ['firstname', 'lastname',
                                         'word_en', 'count', 'affiliation',
-                                        'fields' ,'sc'])
+                                        'total_abstract' ,'sc'])
 
 # Create your views here.
 def res_list(request):
@@ -16,8 +16,12 @@ def res_list(request):
     res_list = []
     nounchunks = []
     if search_term:
-        tsquery = ' & '.join(search_term.split(' '))
-        tsquery_word = ' | '.join(search_term.split(' '))
+        if len(search_term.split(' ')) > 1:
+            tsquery = ' & '.join(search_term.split(' '))
+            tsquery_word = ' | '.join(search_term.split(' '))
+        else:
+            tsquery = search_term
+            tsquery_word = search_term
         query = ("select id, chunk_en from noun_chunks where "
                     "to_tsvector(chunk_en) @@ to_tsquery('%s');")
         nounchunks += conn.execute(query % tsquery).fetchall()
@@ -26,26 +30,24 @@ def res_list(request):
                                 "where to_tsvector(word_en) @@ to_tsquery('%s')"
                                 " order by count desc" % tsquery_word).fetchall()
         if results:
-            fields = set()
             for rec in results:
-                query = ('select research_fields.abbr from abstracts inner join abstract_has_keywords '
+                query = ('select count(*) from abstracts inner join abstract_has_keywords '
                             'on abstract_has_keywords.abstract_id=abstracts.id '
                             'inner join keywords on keywords.id=abstract_has_keywords.keyword_id '
-                            'inner join field_has_abstract on field_has_abstract.abstract_id=abstracts.id '
-                            'inner join research_fields on field_has_abstract.field_id=research_fields.id '
                             'where keywords.id=%d;')
-                for field in conn.execute(query % int(rec[0])).fetchall():
-                    fields.add(field[0])
+                total_abstract = conn.execute(query % int(rec[0])).scalar()
 
                 query = ("select id,scholarship_info_id from authors where lower(first_name)=lower('%s') "
                             "and lower(last_name)=lower('%s')")
-                _author_id, _sc_id = conn.execute(query % (rec[1], rec[2])).fetchone()
+                _author = conn.execute(query % (rec[1], rec[2])).fetchone()
+                if _author:
+                    _author_id, _sc_id = _author[0], _author[1]
                 if _author_id:
                     if _sc_id:
                         sc = True
                     else:
                         sc = False
-                    res_list.append(Researcher(rec[1], rec[2], rec[3], rec[4], rec[5], fields, sc))
+                    res_list.append(Researcher(rec[1], rec[2], rec[3], rec[4], rec[5], total_abstract, sc))
 
     return render(request, template_name='analytics/res_list.html',
             context={'search_term': search_term, 'results': res_list, 'nounchunks': nounchunks})

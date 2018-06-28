@@ -34,11 +34,7 @@
                 <td>{{ rec.affiliation }}</td>
                 <td>{{ rec.word_en}}</td>
                 <td>{{ rec.count }}</td>
-                <td>
-                    {%for f in rec.fields %}
-                        <span class="badge badge-primary">{{ f }}</span>
-                    {% endfor %}
-                </td>
+                <td>{{ rec.total_abstract }}</td>
                 <td>{{ rec.sc }}</td>
             </tr>
             {% endfor %}
