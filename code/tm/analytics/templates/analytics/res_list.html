@@ -5,7 +5,7 @@
 {% main_menu template="menus/main/level_1.html" %}
 <section class="section">
     <div class="container">
-        <h1>We are looking for {{ search_term }}...</h1>
+        <h4>We've found someone who knows a thing or two about <strong>{{ search_term }}</strong>...</h4>
         <form role="search" method="get"
             class="form-search" action="." method="get">
             <div class="input-group">
@@ -37,6 +37,13 @@
             </tr>
             {% endfor %}
         </table>
+        <p>* Scholarship students are highlighted.</p>
+        <h4>Noun phrases containing {{ search_term }}</h4>
+        <ul>
+            {% for nc in nounchunks %}
+            <li><a href="#">{{ nc.1|title }}</a></li>
+            {% endfor %}
+        </ul>
     </div>
 </section>
 {% endblock %}

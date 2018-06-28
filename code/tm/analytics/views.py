@@ -13,15 +13,21 @@ Researcher = namedtuple('Researcher', ['firstname', 'lastname',
 def res_list(request):
     search_term = request.GET.get('q')
     res_list = []
+    nounchunks = []
     if search_term:
-        results = conn.execute("select distinct first_name, last_name, word_en, count "
+        tsquery = ' & '.join(search_term.split(' '))
+        tsquery_word = ' | '.join(search_term.split(' '))
+        query = ("select id, chunk_en from noun_chunks where "
+                    "to_tsvector(chunk_en) @@ to_tsquery('%s');")
+        nounchunks += conn.execute(query % tsquery).fetchall()
+        results = conn.execute("select distinct id, first_name, last_name, word_en, count "
                                 "from keywords where to_tsvector(word_en) @@ to_tsquery('%s')"
-                                " order by count desc" % search_term).fetchall()
+                                " order by count desc" % tsquery_word).fetchall()
         if results:
             for rec in results:
                 query = ("select id,scholarship_info_id from authors where lower(first_name)=lower('%s') "
                             "and lower(last_name)=lower('%s')")
-                _author_id, _sc_id = conn.execute(query % (rec[0], rec[1])).fetchone()
+                _author_id, _sc_id = conn.execute(query % (rec[1], rec[2])).fetchone()
                 if _author_id:
                     query = ('select count(*) from abstracts inner join abstract_has_author '
                                 'on abstract_has_author.abstract_id=abstracts.id '
@@ -31,6 +37,7 @@ def res_list(request):
                         sc = True
                     else:
                         sc = False
-                    res_list.append(Researcher(rec[0], rec[1], rec[2], rec[3], total_abstracts, sc))
+                    res_list.append(Researcher(rec[1], rec[2], rec[3], rec[4], total_abstracts, sc))
+
     return render(request, template_name='analytics/res_list.html',
-            context={'search_term': search_term, 'results': res_list})
+            context={'search_term': search_term, 'results': res_list, 'nounchunks': nounchunks})
