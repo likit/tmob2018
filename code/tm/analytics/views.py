@@ -1,6 +1,7 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from sqlalchemy import MetaData, create_engine
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 
 meta = MetaData()
 engine = create_engine('postgresql+psycopg2://postgres:_genius01_@postgres_db/keywordsdw')
@@ -78,3 +79,39 @@ def noun_chunk_detail(request):
         nc = ''
     return render(request, template_name='analytics/nounchunk_abs.html',
                     context={'noun_chunk': nc, 'abstracts': abstracts_list})
+
+def show_profile(request, author_id):
+    degrees = {1: 'Bachelor', 2: 'Master', 3: 'Doctorate'}
+    author = conn.execute('select * from authors where id=%s' % author_id).fetchone()
+    profile = conn.execute('select * from scholarship_info where scholarship_info.id=%d'
+                            % author.scholarship_info_id).fetchone()
+    author_scopus_id = author[3]
+    if author:
+        query = ("select word_en from keywords where author_scopus_id='%s'" % author_scopus_id)
+        results = conn.execute(query).fetchall()
+        keywords = []
+        for rec in results:
+            keywords.append(rec[0])
+
+        query = ("select * from abstracts inner join abstract_has_author "
+                "on abstract_has_author.abstract_id=abstracts.id inner join "
+                "authors on abstract_has_author.author_id=authors.id "
+                "where authors.id=%s" % author_id)
+        abstracts = conn.execute(query).fetchall()
+        fields = defaultdict(int)
+        for abstract in abstracts:
+            query = ("select name from research_fields inner join field_has_abstract on "
+                     "field_has_abstract.field_id=research_fields.id inner join "
+                     "abstracts on field_has_abstract.abstract_id=abstracts.id "
+                     "where abstracts.id=%d" % int(abstract[0]))
+            results =  conn.execute(query).fetchall()
+            for f in results:
+                fields[f[0]] += 1
+        fields.default_factory = None
+        return render(request, template_name="analytics/profile.html",
+                        context={'author': author,
+                                'abstracts': abstracts,
+                                'profile': profile,
+                                'degree': degrees.get(int(profile.degree), 'Other'),
+                                'fields': fields,
+                                'keywords': keywords})

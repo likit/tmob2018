@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<section class="section">
+<div class="container">
+  <h1 class="title">Student Scholarship Profile</h1>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item">Database</li>
+      <li class="breadcrumb-item active" aria-current="page">Student Scholarship Profile</li>
+    </ol>
+  </nav>
+  <div class="row justify-content-center">
+    <div class="container">
+      <div class="content text-center">
+            <img src="{{ picture_url }}" class="rounded-circle" width=120>
+            <p>
+              <h5 class="title">{{ profile.first_name_th }} {{ profile.last_name_th }}</h5>
+              <h6 class="subtitle text-muted">{{ profile.first_name_en }} {{ profile.last_name_en }}</h6>
+            </p>
+            <hr>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card card-plain">
+        <div class="card-body">
+          <br>
+          <h6 class="title">Scopus-indexed Publications</h6>
+          <h6 class="subtitle text-muted">Author ID {{ author.scopus_id }}</h6>
+          <p>Total {{ abstracts|length }} articles</p>
+          <ul>
+            {% for field,count in fields.items %}
+            <li>{{ field }} {{ count }}</li>
+            {% endfor %}
+          </ul>
+          <p>Keywords</p>
+          <div>
+            {% for kw in keywords %}
+            <a href="/analytics/keywords?q={{ kw }}">
+              <span class="badge badge-primary">{{ kw }}</span>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-8">
+      <div class="card card-plain">
+        <div class="card-body">
+          <h4 class="title">About</h4>
+          <div>
+            <div class="row">
+              <div class="col">
+                <p>Country <strong>{{ profile.country|title }}</strong><br></p>
+                <p>Major <strong>{{ profile.field_of_study|title }}</strong></p>
+                <p>Specialty <strong>{{ profile.specialty|title }}</strong></p>
+              </div>
+              <div class="col">
+                <p>Level <strong>{{ degree }}</strong></p>
+                Status <strong>{% if profile.status %}Graduated{% else %}Studying{% endif %}</strong>
+                <p><h6 class="title">E-mail</h6>  {{ profile.contact }}</p>
+              </div>
+            </div>
+          </div>
+          <h4 class="subtitle">Publications</h4>
+          <ul>
+            {% for abstract in abstracts %}
+            <li>{{ abstract.2 }}</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+{% endblock %}

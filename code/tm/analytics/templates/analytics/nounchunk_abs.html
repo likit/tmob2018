@@ -5,6 +5,13 @@
 {% main_menu template="menus/main/level_1.html" %}
 <section class="section">
     <div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item">Database</li>
+        <li class="breadcrumb-item active" aria-current="page">Abstracts List</li>
+        </ol>
+    </nav>
         <h4>Articles with "<strong>{{ noun_chunk }}</strong>"</h4>
         <form role="search" method="get"
             class="form-search" action="/analytics/keywords/" method="get">
@@ -32,7 +39,7 @@
             <col width="10">
             {% for abs in abstracts %}
             <tr>
-                <td>{{ abs.abstract.1 }}</td>
+                <td><h5>{{ abs.abstract.1 }}</h5></td>
                 <td>
                     {% for author in abs.authors %}
                         <a href="#">{{ author.first_name }} {{ author.last_name}}</a>,
