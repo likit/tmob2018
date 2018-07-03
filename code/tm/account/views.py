@@ -1,16 +1,21 @@
 # -*- coding: utf-8 -*-
 import requests
+from collections import defaultdict
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from .forms import LoginForm, UserRegistrationForm, UserEditForm, ProfileEditForm
+from sqlalchemy import create_engine
 from py2neo import Graph
 from .models import Profile
+from social_django.utils import psa
 
 # graph = Graph(host='neo4j_db', password='_genius01_', scheme='bolt')
+engine = create_engine('postgresql+psycopg2://postgres:_genius01_@postgres_db/keywordsdw')
+conn = engine.connect()
 
 # Create your views here.
 def user_login(request):
@@ -69,7 +74,31 @@ def profile(request, username):
     name_en = u'{} {}'.format(user.first_name, user.last_name)
 
     profile_photo = picture_url if social_user else user.profile.photo
+    scopus_id = user.profile.scopus_id
+    if scopus_id:
+        author = conn.execute("select * from authors where scopus_id='%s'" % scopus_id).fetchone()
+        if author:
+            query = ("select word_en from keywords where author_scopus_id='%s'" % scopus_id)
+            results = conn.execute(query).fetchall()
+            keywords = []
+            for rec in results:
+                keywords.append(rec[0])
 
+            query = ("select * from abstracts inner join abstract_has_author "
+                     "on abstract_has_author.abstract_id=abstracts.id inner join "
+                     "authors on abstract_has_author.author_id=authors.id "
+                     "where authors.id=%s" % author.id)
+            abstracts = conn.execute(query).fetchall()
+            fields = defaultdict(int)
+            for abstract in abstracts:
+                query = ("select name from research_fields inner join field_has_abstract on "
+                         "field_has_abstract.field_id=research_fields.id inner join "
+                         "abstracts on field_has_abstract.abstract_id=abstracts.id "
+                         "where abstracts.id=%d" % int(abstract[0]))
+                results =  conn.execute(query).fetchall()
+                for f in results:
+                    fields[f[0]] += 1
+            fields.default_factory = None
     return render(request,
             'account/dashboard.html',
             {'section': 'dashboard',
@@ -78,7 +107,10 @@ def profile(request, username):
             'picture_url': profile_photo,
             'profile': user.profile,
             'degree': degrees.get(user.profile.degree, ''),
-            'user': user
+            'user': user,
+             'abstracts': abstracts,
+             'keywords': keywords,
+             'fields': fields,
             })
 
 
@@ -117,3 +149,18 @@ def edit_profile(request):
         profile_form = ProfileEditForm(instance=request.user.profile)
     return render(request, 'account/edit_profile.html',
                     {'user_form': user_form, 'profile_form': profile_form})
+
+
+@psa('social:complete')
+def register_by_access_token(request, backend):
+    # This view expects an access_token GET parameter, if it's needed,
+    # request.backend and request.strategy will be loaded with the current
+    # backend and strategy.
+    token = request.GET.get('access_token')
+    user = request.backend.do_auth(token)
+    if user:
+        login(request, user)
+        return JsonResponse({'status': 'passed'})
+    else:
+        return JsonResponse({'status': 'failed'})
+

@@ -60,17 +60,19 @@
           {% endif %}
           <h6 class="title">Scopus-indexed Publications</h6>
           <h6 class="subtitle text-muted">Author ID {{ profile.scopus_id }}</h6>
-          <p>Total 3 articles</p>
+          <p>Total {{ abstracts|length }} articles</p>
           <ul>
-            <li>Biochemistry 1</li>
-            <li>Computer science 2</li>
+            {% for field,count in fields.items %}
+              <li>{{ field }} {{ count }}</li>
+            {% endfor %}
           </ul>
           <p>Keywords</p>
           <div>
-            <span class="badge badge-primary">Graphene</span>
-            <span class="badge badge-primary">Machine learning</span>
-            <span class="badge badge-primary">Data mining</span>
-            <span class="badge badge-primary">QSAR</span>
+            {% for kw in keywords %}
+            <a href="/analytics/keywords?q={{ kw }}">
+              <span class="badge badge-primary">{{ kw }}</span>
+            </a>
+            {% endfor %}
           </div>
         </div>
       </div>
@@ -99,19 +101,12 @@
               <span class="badge badge-info">{{ f }}</span>
             {% endfor %}
           </div>
-          <h4 class="subtitle">Commercial Research</h4>
-          <ul>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-          </ul>
+          <!-- <h4 class="subtitle">Commercial Research</h4> -->
           <h4 class="subtitle">Publications</h4>
           <ul>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
-            <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt..</li>
+            {% for abstract in abstracts %}
+              <li>{{ abstract.title_en }}</li>
+            {% endfor %}
           </ul>
         </div>
       </div>
