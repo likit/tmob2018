@@ -8,7 +8,8 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-8">
-                <h1 class="title">Posts Page</h1>
+                <h1 class="title">{{ blog_page.translated_title }}</h1>
+                <h4 class="subtitle">{{ blog_page.description }}</h4>
                 {% if blog_page.search_term %}
                 <h6 class="subtitle">Posts
                     {% if blog_page.search_type == "tag" %}
@@ -25,7 +26,7 @@
                 {% get_pages %}
                 {% for post in posts %}
                     {% image post.feed_image width-400 %}
-                    <h3 class="title"><a href="{% post_date_url post blog_page %}">{{ post.title }}</a></h3>
+                    <h3 class="title"><a href="{% post_date_url post blog_page %}">{{ post.translated_title }}</a></h3>
                     <h6 class="text-muted">Posted on {{ post.date }}</h6>
                     {{ post.body|truncatewords_html:50|richtext }}
                     <p><strong>Recent Comments</strong></p>

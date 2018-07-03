@@ -57,11 +57,24 @@ class HomePage(Page):
         return PostPage.objects.all().live()
 
 class BlogPage(RoutablePageMixin, Page):
-    description = models.CharField(max_length=255, blank=True)
+    description_en = models.CharField(max_length=255, blank=True)
+    description_th = models.CharField(max_length=255, blank=True)
+    title_th = models.CharField(max_length=255, blank=True)
 
     content_panels = Page.content_panels + [
-        FieldPanel('description')
+        FieldPanel('title_th'),
+        FieldPanel('description_en'),
+        FieldPanel('description_th'),
     ]
+
+    translated_title = TranslatedField(
+        'title',
+        'title_th',
+    )
+    description = TranslatedField(
+        'description_en',
+        'description_th',
+    )
 
     def get_context(self, request, *args, **kwargs):
         context = super(BlogPage, self).get_context(request, *args, **kwargs)
@@ -174,6 +187,7 @@ class PostCommentForm(forms.ModelForm):
 
 
 class PostPage(RoutablePageMixin, Page):
+    title_th = models.CharField(max_length=255)
     body_en = RichTextField(blank=True)
     body_th = RichTextField(blank=True)
     date = models.DateTimeField(verbose_name="Post date", default=datetime.today)
@@ -182,6 +196,7 @@ class PostPage(RoutablePageMixin, Page):
     feed_image = models.ForeignKey('wagtailimages.Image', null=True,
                                     blank=True, on_delete=models.SET_NULL, related_name='+')
     content_panels = Page.content_panels + [
+        FieldPanel('title_th', classname='full'),
         FieldPanel('body_en', classname='full'),
         FieldPanel('body_th', classname='full'),
         FieldPanel('categories', widget=forms.CheckboxSelectMultiple),
@@ -207,6 +222,10 @@ class PostPage(RoutablePageMixin, Page):
             serializer=ImageRenditionField('width-200', source='feed_image')),
     ]
 
+    translated_title = TranslatedField(
+        'title',
+        'title_th',
+    )
     body = TranslatedField(
         'body_en',
         'body_th',
