@@ -174,14 +174,16 @@ class PostCommentForm(forms.ModelForm):
 
 
 class PostPage(RoutablePageMixin, Page):
-    body = RichTextField(blank=True)
+    body_en = RichTextField(blank=True)
+    body_th = RichTextField(blank=True)
     date = models.DateTimeField(verbose_name="Post date", default=datetime.today)
     categories = ParentalManyToManyField('blog.BlogCategory', blank=True)
     tags = ClusterTaggableManager(through='blog.BlogPageTag', blank=True)
     feed_image = models.ForeignKey('wagtailimages.Image', null=True,
                                     blank=True, on_delete=models.SET_NULL, related_name='+')
     content_panels = Page.content_panels + [
-        FieldPanel('body', classname='full'),
+        FieldPanel('body_en', classname='full'),
+        FieldPanel('body_th', classname='full'),
         FieldPanel('categories', widget=forms.CheckboxSelectMultiple),
         FieldPanel('tags'),
     ]
@@ -204,6 +206,11 @@ class PostPage(RoutablePageMixin, Page):
         APIField('feed_image_thumbnail',
             serializer=ImageRenditionField('width-200', source='feed_image')),
     ]
+
+    body = TranslatedField(
+        'body_en',
+        'body_th',
+    )
 
     @property
     def blog_page(self):
