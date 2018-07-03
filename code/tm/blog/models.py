@@ -1,4 +1,5 @@
 from datetime import date, datetime
+from django.contrib.postgres.search import SearchVector
 from django import forms
 from django.http import Http404, HttpResponse
 from django.db import models
@@ -94,7 +95,8 @@ class BlogPage(RoutablePageMixin, Page):
         search_query = request.GET.get('q', None)
         self.posts = self.get_posts()
         if search_query:
-            self.posts = self.posts.filter(body__contains=search_query)
+            self.posts = self.posts.annotate(
+                search=SearchVector('title', 'title_th', 'body_en', 'body_th')).filter(search=search_query)
             self.search_term = search_query
             self.search_type = 'search'
         return Page.serve(self, request, *args, **kwargs)
