@@ -1,4 +1,5 @@
 from django.urls import path
+from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 from . import views
 
@@ -13,4 +14,5 @@ urlpatterns = [
     path('edit/', views.edit_profile, name='edit_profile'),
     path('social-login/', views.social_login, name='social_login'),
     path('<username>/', views.profile, name='profile'),
+    url(r'^register-by-token/(?P<backend>[^/]+)/$', views.register_by_access_token),
 ]
