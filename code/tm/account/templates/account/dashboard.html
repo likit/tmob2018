@@ -98,7 +98,9 @@
           <h4 class="subtitle">Field of Interest</h4>
           <div>
             {% for f in profile.field_of_interest_as_list %}
-              <span class="badge badge-info">{{ f }}</span>
+              <a href="/analytics/keywords/?q={{f}}">
+                <span class="badge badge-info">{{ f }}</span>
+              </a>
             {% endfor %}
           </div>
           <!-- <h4 class="subtitle">Commercial Research</h4> -->
