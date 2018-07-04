@@ -99,7 +99,7 @@ def profile(request, username):
                 results =  conn.execute(query).fetchall()
                 for f in results:
                     fields[f[0]] += 1
-            fields.default_factory = None
+    fields.default_factory = None
     return render(request,
             'account/dashboard.html',
             {'section': 'dashboard',
