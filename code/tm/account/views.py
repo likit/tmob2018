@@ -75,6 +75,8 @@ def profile(request, username):
 
     profile_photo = picture_url if social_user else user.profile.photo
     scopus_id = user.profile.scopus_id
+    abstracts = []
+    fields = defaultdict(int)
     if scopus_id:
         author = conn.execute("select * from authors where scopus_id='%s'" % scopus_id).fetchone()
         if author:
@@ -89,7 +91,6 @@ def profile(request, username):
                      "authors on abstract_has_author.author_id=authors.id "
                      "where authors.id=%s" % author.id)
             abstracts = conn.execute(query).fetchall()
-            fields = defaultdict(int)
             for abstract in abstracts:
                 query = ("select name from research_fields inner join field_has_abstract on "
                          "field_has_abstract.field_id=research_fields.id inner join "
