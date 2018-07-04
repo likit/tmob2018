@@ -46,7 +46,19 @@
             {% endfor %}
         </table>
         <p>* Scholarship students are highlighted.</p>
-        <h4>Noun phrases that contain the keyword {{ search_term }}</h4>
+        <h4>Researchers whose research of interests may include <strong>{{ search_term }}</strong></h4>
+        <ul>
+            {% for username,profile in profiles.items %}
+            <li><a href="/account/{{ username }}/">{{ profile.0 }} {{ profile.1 }}</a>
+                {% for fi in profile.2 %}
+                    <a href="/analytics/keywords/?q={{ fi }}">
+                    <span class="badge badge-info">{{ fi }}</span>
+                    </a>
+                {% endfor %}
+            </li>
+            {% endfor %}
+        </ul>
+        <h4>Noun phrases that contain the keyword <strong>{{ search_term }}</strong></h4>
         <ul>
             {% for nc in nounchunks %}
             <li><a href="/analytics/nounchunk/?ncid={{ nc.0 }}">{{ nc.1|title }}</a></li>

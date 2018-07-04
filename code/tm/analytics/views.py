@@ -3,7 +3,11 @@ from django.shortcuts import render
 from sqlalchemy import MetaData, create_engine
 from collections import namedtuple, defaultdict
 from py2neo import Graph, Relationship, NodeMatcher, Node
-from datetime import datetime
+from django.contrib.postgres.search import SearchVector
+from django.contrib.auth import get_user_model
+from account.models import Profile
+
+User = get_user_model()
 
 graph = Graph(host='neo4j_db', password='_genius01_', scheme='bolt')
 
@@ -54,8 +58,17 @@ def res_list(request):
                         sc = False
                     res_list.append(Researcher(_author_id, rec[1], rec[2], rec[3], rec[4], rec[5], total_abstract, sc))
 
+
+    profiles = {}
+    for word in search_term.split(' '):
+        for p in Profile.objects.annotate(
+            search=SearchVector('field_of_interest')).filter(search=word):
+            field_of_interest = (f.strip() for f in p.field_of_interest.split(','))
+            profiles[p.user.username] = (p.user.first_name, p.user.last_name, field_of_interest)
+
     return render(request, template_name='analytics/res_list.html',
-            context={'search_term': search_term, 'results': res_list, 'nounchunks': nounchunks})
+            context={'search_term': search_term, 'results': res_list,
+                        'nounchunks': nounchunks, 'profiles': profiles})
 
 def noun_chunk_detail(request):
     nc_id = request.GET.get('ncid')
