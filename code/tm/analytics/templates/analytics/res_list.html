@@ -56,12 +56,16 @@
                     </a>
                 {% endfor %}
             </li>
+            {% empty %}
+            <li>No researchers found.</li>
             {% endfor %}
         </ul>
         <h4>Noun phrases that contain the keyword <strong>{{ search_term }}</strong></h4>
         <ul>
             {% for nc in nounchunks %}
             <li><a href="/analytics/nounchunk/?ncid={{ nc.0 }}">{{ nc.1|title }}</a></li>
+            {% empty %}
+              <li>No noun phrases found.</li>
             {% endfor %}
         </ul>
     </div>
