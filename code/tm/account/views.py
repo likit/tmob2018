@@ -76,13 +76,13 @@ def profile(request, username):
     profile_photo = picture_url if social_user else user.profile.photo
     scopus_id = user.profile.scopus_id
     abstracts = []
+    keywords = []
     fields = defaultdict(int)
     if scopus_id:
         author = conn.execute("select * from authors where scopus_id='%s'" % scopus_id).fetchone()
         if author:
             query = ("select word_en from keywords where author_scopus_id='%s'" % scopus_id)
             results = conn.execute(query).fetchall()
-            keywords = []
             for rec in results:
                 keywords.append(rec[0])
 
