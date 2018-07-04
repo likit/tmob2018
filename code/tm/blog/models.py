@@ -215,9 +215,9 @@ class PostPage(RoutablePageMixin, Page):
 
     api_fields = [
         APIField('pubdate', serializer=DateTimeField(format='%A %d %B %Y', source='date')),
-        APIField('title'),
+        APIField('title_th'),
         APIField('slug'),
-        APIField('body'),
+        APIField('body_th'),
         APIField('categories'),
         APIField('tags'),
         APIField('feed_image_thumbnail',
