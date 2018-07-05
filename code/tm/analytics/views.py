@@ -110,7 +110,7 @@ def show_profile(request, author_id):
         for rec in results:
             keywords.append(rec[0])
 
-        query = ("select * from abstracts inner join abstract_has_author "
+        query = ("select abstracts.id,abstracts.title_en from abstracts inner join abstract_has_author "
                 "on abstract_has_author.abstract_id=abstracts.id inner join "
                 "authors on abstract_has_author.author_id=authors.id "
                 "where authors.id=%s" % author_id)
@@ -164,14 +164,25 @@ def show_field(request, field_name):
 def show_profile_by_name(request):
     first_name = request.GET.get('firstname', '')
     last_name = request.GET.get('lastname', '')
+    degrees = {1: 'Bachelor', 2: 'Master', 3: 'Doctorate'}
     if first_name and last_name:
         author = conn.execute("select * from authors where "
                       "lower(first_name)=lower('%s') and lower(last_name)=lower('%s')"
                       % (first_name, last_name)).fetchone()
         if author:
+            if author.scholarship_info_id:
+                profile = conn.execute('select * from scholarship_info where scholarship_info.id=%d'
+                                       % author.scholarship_info_id).fetchone()
+                degree = degrees.get(profile.degree, '')
+            else:
+                profile = None
+                degree = ''
             keywords = conn.execute("select word_en,count from keywords where author_scopus_id='%s'"
                                     % author.scopus_id).fetchall()
-            query = ("select * from abstracts inner join abstract_has_author "
+            keywords = set([(kw.word_en,kw.count) for kw in keywords])
+            keywords = sorted(keywords, key=lambda x: x[1], reverse=True)
+            query = ("select abstracts.id,abstracts.title_en "
+                     "from abstracts inner join abstract_has_author "
                      "on abstract_has_author.abstract_id=abstracts.id inner join "
                      "authors on abstract_has_author.author_id=authors.id "
                      "where authors.id=%s" % author.id)
@@ -193,6 +204,28 @@ def show_profile_by_name(request):
 
         return render(request, template_name="analytics/profile_by_name.html",
                       context={'author': author, 'abstracts': abstracts,
-                      'fields': fields, 'affils': affiliations, 'keywords': keywords})
+                      'fields': fields, 'affils': affiliations,
+                      'keywords': keywords, 'profile': profile,
+                       'degree': degree})
     return render(request, template_name="analytics/profile_by_name.html",
                   context={})
+
+
+def show_abstract(request, abstract_id):
+    if abstract_id:
+        abstract = conn.execute("select * from abstracts where id=%s;" % abstract_id).fetchone()
+        if abstract:
+            authors = conn.execute("select authors.* from abstracts inner join abstract_has_author "
+                            "on abstract_has_author.abstract_id=abstracts.id inner join "
+                            "authors on abstract_has_author.author_id=authors.id where abstracts.id=%s;"
+                            % abstract_id).fetchall()
+            keywords = conn.execute("select * from keywords inner join abstract_has_keywords "
+                                    "on abstract_has_keywords.keyword_id=keywords.id inner join "
+                                    "abstracts on abstract_has_keywords.abstract_id=abstracts.id "
+                                    "where abstracts.id=%s" % abstract_id).fetchall()
+            keywords = set([kw.word_en for kw in keywords])
+            print(keywords)
+            return render(request, template_name='analytics/abstract.html',
+                  context={'authors': authors, 'abstract': abstract, 'keywords': keywords})
+    return render(request, template_name='analytics/abstract.html',
+                  context={'authors': [], 'abstract': None})

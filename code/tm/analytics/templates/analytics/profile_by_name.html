@@ -3,6 +3,7 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
+<section class="section">
 <div class="container">
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -44,12 +45,27 @@
       </ul>
     </div>
     <div class="col-md-8">
+      {% if profile %}
+        <h3>Scholarship Information</h3>
+        <div class="row">
+          <div class="col">
+            <p>Country <strong>{{ profile.country|title }}</strong><br></p>
+            <p>Major <strong>{{ profile.field_of_study|title }}</strong></p>
+            <p>Specialty <strong>{{ profile.specialty|title }}</strong></p>
+          </div>
+          <div class="col">
+            <p>Level <strong>{{ degree }}</strong></p>
+            Status <strong>{% if profile.status %}Graduated{% else %}Studying{% endif %}</strong>
+            <p><h6 class="title">E-mail</h6>  {{ profile.contact }}</p>
+          </div>
+        </div>
+      {% endif %}
       <h3>Publications</h3>
       <ul>
         {% for abs in abstracts %}
-        <li>{{ abs.title_en }}</li>
+          <li><a href="/analytics/abstract/{{abs.0}}">{{ abs.1 }}</a></li>
         {% empty %}
-        <li>Nobody with the specified name in our database.</li>
+          <li>Nobody with the specified name in our database.</li>
         {% endfor %}
       </ul>
       <h3>Keywords</h3>
@@ -63,4 +79,5 @@
     </div>
   </div>
 </div>
+</section>
 {% endblock %}

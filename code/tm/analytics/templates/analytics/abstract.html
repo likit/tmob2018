@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="/">Home</a></li>
+        <li class="breadcrumb-item"><a href="/analytics/database">Database</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Abstract</li>
+      </ol>
+    </nav>
+    <table class="table">
+      <thead>
+        <th>Scopus ID</th>
+        <th>Title</th>
+        <th>Authors</th>
+        <th>Keywords</th>
+        <th>Published Date</th>
+        <th>Cited</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ abstract.scopus_id }}</td>
+          <td>{{ abstract.title_en }}</td>
+          <td>
+            {% for author in authors %}
+              <a href="/analytics/profile-by-name/?firstname={{author.first_name}}&lastname={{author.last_name}}">
+                <span>{{ author.first_name }} {{author.last_name }},</span>
+              </a>
+            {% endfor %}
+          </td>
+          <td>
+            {% for kw in keywords %}
+              <a href="/analytics/keywords/?q={{ kw }}">
+                <span class="badge badge-info">{{ kw }}</span>
+              </a>
+            {% endfor %}
+          </td>
+          <td>{{ abstract.pub_date }}</td>
+          <td>{{ abstract.cited }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

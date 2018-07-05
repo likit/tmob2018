@@ -86,7 +86,7 @@ def profile(request, username):
             for rec in results:
                 keywords.append(rec[0])
 
-            query = ("select * from abstracts inner join abstract_has_author "
+            query = ("select abstracts.id,abstracts.title_en from abstracts inner join abstract_has_author "
                      "on abstract_has_author.abstract_id=abstracts.id inner join "
                      "authors on abstract_has_author.author_id=authors.id "
                      "where authors.id=%s" % author.id)

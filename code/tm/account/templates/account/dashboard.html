@@ -107,7 +107,11 @@
           <h4 class="subtitle">Publications</h4>
           <ul>
             {% for abstract in abstracts %}
-              <li>{{ abstract.title_en }}</li>
+              <li>
+                <a href="/analytics/abstract/{{ abstract.0 }}/">
+                  {{ abstract.1 }}
+                </a>
+              </li>
             {% endfor %}
           </ul>
         </div>

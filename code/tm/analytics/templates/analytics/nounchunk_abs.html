@@ -8,7 +8,7 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/">Home</a></li>
-        <li class="breadcrumb-item">Database</li>
+        <li class="breadcrumb-item"><a href="/analytics/database">Database</a></li>
         <li class="breadcrumb-item active" aria-current="page">Abstracts List</li>
         </ol>
     </nav>
@@ -39,7 +39,9 @@
             <col width="10">
             {% for abs in abstracts %}
             <tr>
-                <td><h5>{{ abs.abstract.1 }}</h5></td>
+                <td>
+                    <h5>{{ abs.abstract.1 }}</h5>
+                </td>
                 <td>
                     {% for author in abs.authors %}
                         <a href="/analytics/profile-by-name/?firstname={{author.first_name}}&lastname={{author.last_name}}">{{ author.first_name }} {{ author.last_name}}</a>,
