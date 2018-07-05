@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="/">Home</a></li>
+      <li class="breadcrumb-item"><a href="/analytics/database">Database</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Profile by Name</li>
+    </ol>
+  </nav>
+  <h1 class="title">Profile</h1>
+  <div class="text-center">
+    <h3 class="title">{{ author.first_name }} {{ author.last_name }}</h3>
+    <h6 class="title">SCOPUS ID {{ author.scopus_id }}</h6>
+    <h4 class="title">Affiliation Timeline</h4>
+    <table class="table">
+      <thead>
+          <th>Name</th>
+          <th>Country</th>
+          <th>Year</th>
+      </thead>
+      <tbody>
+        {% for af in affils %}
+        <tr>
+          <td>{{ af.0 }}</td>
+          <td>{{ af.1 }}</td>
+          <td>{{ af.2 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <hr>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      <h3>Research Fields</h3>
+      <ul>
+        {% for f,c in fields.items %}
+        <li>{{ f }} ({{ c }})</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="col-md-8">
+      <h3>Publications</h3>
+      <ul>
+        {% for abs in abstracts %}
+        <li>{{ abs.title_en }}</li>
+        {% empty %}
+        <li>Nobody with the specified name in our database.</li>
+        {% endfor %}
+      </ul>
+      <h3>Keywords</h3>
+      <div>
+        {% for kw in keywords %}
+          <a href="/analytics/keywords/?q={{kw.0}}">
+            <span class="badge badge-primary">{{ kw.0 }} {{ kw.1 }}</span>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -42,7 +42,7 @@
                 <td><h5>{{ abs.abstract.1 }}</h5></td>
                 <td>
                     {% for author in abs.authors %}
-                        <a href="#">{{ author.first_name }} {{ author.last_name}}</a>,
+                        <a href="/analytics/profile-by-name/?firstname={{author.first_name}}&lastname={{author.last_name}}">{{ author.first_name }} {{ author.last_name}}</a>,
                     {% endfor %}
                 </td>
                 <td>

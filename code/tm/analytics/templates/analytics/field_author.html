@@ -13,7 +13,7 @@
         <li class="breadcrumb-item active" aria-current="page">Authors in field</li>
     </ol>
     </nav>
-    <h1 class="title">Thai Authors in {{ field }}</h1>
+    <h1 class="title">Thai Researchers in {{ field }}</h1>
     <table class="table">
         <thead>
             <th>Name</th>
@@ -23,7 +23,11 @@
         <tbody>
         {% for author in authors %}
             <tr>
-                <td>{{ author.0.first_name}} {{ author.0.last_name }}</td>
+                <td>
+                    <a href="/analytics/profile-by-name/?firstname={{author.0.first_name}}&lastname={{author.0.last_name}}">
+                      {{ author.0.first_name}} {{ author.0.last_name }}
+                    </a>
+                </td>
                 <td>{{ author.1.name }}</td>
                 <td>{{ author.1.city }}</td>
             </tr>

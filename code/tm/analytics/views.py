@@ -160,3 +160,39 @@ def show_field(request, field_name):
             authors.append((res['au'], res['af']))
     return render(request, template_name="analytics/field_author.html",
                 context={'authors': authors, 'field': field_name})
+
+def show_profile_by_name(request):
+    first_name = request.GET.get('firstname', '')
+    last_name = request.GET.get('lastname', '')
+    if first_name and last_name:
+        author = conn.execute("select * from authors where "
+                      "lower(first_name)=lower('%s') and lower(last_name)=lower('%s')"
+                      % (first_name, last_name)).fetchone()
+        if author:
+            keywords = conn.execute("select word_en,count from keywords where author_scopus_id='%s'"
+                                    % author.scopus_id).fetchall()
+            query = ("select * from abstracts inner join abstract_has_author "
+                     "on abstract_has_author.abstract_id=abstracts.id inner join "
+                     "authors on abstract_has_author.author_id=authors.id "
+                     "where authors.id=%s" % author.id)
+            abstracts = conn.execute(query).fetchall()
+            fields = defaultdict(int)
+            for abstract in abstracts:
+                query = ("select name from research_fields inner join field_has_abstract on "
+                         "field_has_abstract.field_id=research_fields.id inner join "
+                         "abstracts on field_has_abstract.abstract_id=abstracts.id "
+                         "where abstracts.id=%d" % int(abstract[0]))
+                results =  conn.execute(query).fetchall()
+                for f in results:
+                    fields[f[0]] += 1
+            fields.default_factory = None
+            query = ("select name, country, year from affil_history inner join affils "
+                     "on affils.id=affiliation_id where author_id=%s;" % author.id)
+            affiliations = set((tuple(af) for af in conn.execute(query).fetchall()))
+            affiliations = sorted(affiliations, key=lambda x: x[2])
+
+        return render(request, template_name="analytics/profile_by_name.html",
+                      context={'author': author, 'abstracts': abstracts,
+                      'fields': fields, 'affils': affiliations, 'keywords': keywords})
+    return render(request, template_name="analytics/profile_by_name.html",
+                  context={})
