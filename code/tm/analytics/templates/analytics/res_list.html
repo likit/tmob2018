@@ -19,8 +19,7 @@
         </form>
         <table class="table">
             <thead>
-                <th>First Name</th>
-                <th>Last Name</th>
+                <th>Name</th>
                 <th>Affiliation</th>
                 <th>Matched Keyword</th>
                 <th>Occurrence</th>
@@ -29,8 +28,11 @@
             </thead>
             {% for rec in results %}
             <tr {% if rec.sc %}class="table-primary"{% endif %}>
-                <td>{{ rec.firstname }}</td>
-                <td>{{ rec.lastname }}</td>
+                <td>
+                    <a href="/analytics/profile-by-name/?firstname={{rec.firstname}}&lastname={{rec.lastname}}">
+                      {{ rec.firstname }} {{ rec.lastname }}
+                    </a>
+                </td>
                 <td>{{ rec.affiliation }}</td>
                 <td>{{ rec.word_en}}</td>
                 <td>{{ rec.count }}</td>
