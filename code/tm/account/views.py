@@ -168,6 +168,6 @@ def register_by_access_token(request, backend):
         login(request, user)
         payload = jwt_payload_handler(user)
         token = jwt_encode_handler(payload)
-        return JsonResponse({'token': token})
+        return JsonResponse({'token': token, 'user_id': user.id})
     else:
-        return JsonResponse({'token': None})
+        return JsonResponse({'token': None, 'user_id': None})
