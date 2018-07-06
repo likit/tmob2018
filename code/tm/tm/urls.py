@@ -22,15 +22,21 @@ from wagtail.documents import urls as wagtaildocs_urls
 from wagtail.core import urls as wagtail_urls
 from wagtail.admin import urls as wagtailadmin_urls
 from django.conf.urls.static import static
+from rest_framework_jwt.views import obtain_jwt_token, verify_jwt_token, refresh_jwt_token
+
 from blog.api.api import api_router
 
 urlpatterns = [
-    path('analytics/', include('analytics.urls', namespace='analytics')),
     url(r'^api/v2/', api_router.urls),
+    url(r'^api-token-auth/', obtain_jwt_token),
+    url(r'^auth-jwt-refresh/', refresh_jwt_token),
+    url(r'^api-token-verify/', verify_jwt_token),
     path('api/', include('blog.api.urls', namespace='api')),
+    path('account/api/', include('account.api.urls', namespace='api')),
     path('cmsadmin/', include(wagtailadmin_urls)),
     path('documents/', include(wagtaildocs_urls)),
     path('admin/', admin.site.urls),
+    path('analytics/', include('analytics.urls', namespace='analytics')),
     path('social-auth/',
          include('social_django.urls', namespace='social')),
 ]

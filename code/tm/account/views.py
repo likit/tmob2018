@@ -151,17 +151,23 @@ def edit_profile(request):
     return render(request, 'account/edit_profile.html',
                     {'user_form': user_form, 'profile_form': profile_form})
 
+from rest_framework_jwt.settings import api_settings
+
 
 @psa('social:complete')
 def register_by_access_token(request, backend):
     # This view expects an access_token GET parameter, if it's needed,
     # request.backend and request.strategy will be loaded with the current
     # backend and strategy.
+    jwt_payload_handler = api_settings.JWT_PAYLOAD_HANDLER
+    jwt_encode_handler = api_settings.JWT_ENCODE_HANDLER
+
     token = request.GET.get('access_token')
     user = request.backend.do_auth(token)
     if user:
         login(request, user)
-        return JsonResponse({'status': 'passed'})
+        payload = jwt_payload_handler(user)
+        token = jwt_encode_handler(payload)
+        return JsonResponse({'token': token})
     else:
-        return JsonResponse({'status': 'failed'})
-
+        return JsonResponse({'token': None})
