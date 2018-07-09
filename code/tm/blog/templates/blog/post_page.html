@@ -26,19 +26,22 @@
         <div class="col-sm-10">
             {{ page.body|richtext }}
             <div>
-                <h3 class="subtitle">Comment</h3>
+                <h3 class="subtitle">Comments</h3>
+                {% if user.is_authenticated %}
                 <form action="{% post_date_url page blog_page %}" method="post">
                     {{ comment_form.comment|add_css:"form-control" }}
                     {% csrf_token %}
                     <button class="btn btn-primary" type="submit" value="submit">Submit</button>
                 </form>
-                <br>
+                {% endif %}
                 {% for comment in page.comments.all %}
                 <blockquote class="blockquote">
-                    <p class="mb-0">{{ comment.comment }}</p>
+                    <p class="mb-0"><i class="fa fa-quote-left"></i><br>&emsp;{{ comment.comment }}</p>
                     <footer class="blockquote-footer">
                         <cite title="by">{{ comment.user.first_name }}</cite> at {{ comment.commented_at }}</footer>
                 </blockquote>
+                {% empty %}
+                <p>No comments for this post yet.</p>
                 {% endfor %}
             </div>
         </div>
