@@ -27,10 +27,10 @@ class TranslatedField:
         self.th_field = th_field
 
     def __get__(self, instance, owner):
-        if translation.get_language() == 'th':
+        if translation.get_language() == 'en':
             return getattr(instance, self.th_field)
         else:
-            return getattr(instance, self.en_field)
+            return getattr(instance, self.th_field)
 
 
 class BlogPageTag(TaggedItemBase):
