@@ -1,4 +1,5 @@
 {% extends "blog/base.html" %}
+{% load static %}
 
 {% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
 {% load wagtailimages_tags %}
@@ -25,9 +26,9 @@
                 {% paginate 10 posts %}
                 {% get_pages %}
                 {% for post in posts %}
-                    {% image post.feed_image width-400 %}
                     <h3 class="title"><a href="{% post_date_url post blog_page %}">{{ post.translated_title }}</a></h3>
                     <h6 class="text-muted">Posted on {{ post.date }}</h6>
+                    {% image post.feed_image width-400 %}
                     {{ post.body|truncatewords_html:50|richtext }}
                     <p><strong>Recent Comments</strong></p>
                     {% for comment in post.comments.all|slice:":2" %}
