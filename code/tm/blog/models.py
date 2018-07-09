@@ -55,7 +55,7 @@ class HomePage(Page):
         return context
 
     def get_posts(self):
-        return PostPage.objects.all().live()
+        return PostPage.objects.all().live().order_by('-date')
 
 class BlogPage(RoutablePageMixin, Page):
     description_en = models.CharField(max_length=255, blank=True)
@@ -79,7 +79,7 @@ class BlogPage(RoutablePageMixin, Page):
 
     def get_context(self, request, *args, **kwargs):
         context = super(BlogPage, self).get_context(request, *args, **kwargs)
-        context['posts'] = self.posts
+        context['posts'] = self.get_posts()
         context['blog_page'] = self
         context['categories'] = BlogCategory.objects.all()
         context['search_type'] = getattr(self, 'search_type', "")
@@ -88,7 +88,7 @@ class BlogPage(RoutablePageMixin, Page):
         return context
 
     def get_posts(self):
-        return PostPage.objects.descendant_of(self).live()
+        return PostPage.objects.descendant_of(self).live().order_by('-date')
 
     @route(r'^search/$')
     def post_search(self, request, *args, **kwargs):
@@ -232,6 +232,7 @@ class PostPage(RoutablePageMixin, Page):
         'body_en',
         'body_th',
     )
+
 
     @property
     def blog_page(self):
