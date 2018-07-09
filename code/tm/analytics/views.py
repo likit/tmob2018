@@ -46,17 +46,20 @@ def res_list(request):
                             'where keywords.id=%d;')
                 total_abstract = conn.execute(query % int(rec[0])).scalar()
 
-                query = ("select id,scholarship_info_id from authors where lower(first_name)=lower('%s') "
-                            "and lower(last_name)=lower('%s')")
-                _author = conn.execute(query % (rec[1], rec[2])).fetchone()
+                fname = rec[1].replace("'", "\'") if rec[1] else ''
+                lname = rec[2].replace("'", "\'") if rec[2] else ''
+
+                query = ("select id,scholarship_info_id from authors where lower(first_name)=lower(%s) "
+                            "and lower(last_name)=lower(%s)")
+                _author = conn.execute(query, (fname, lname)).fetchone()
                 if _author:
                     _author_id, _sc_id = _author[0], _author[1]
-                if _author_id:
-                    if _sc_id:
-                        sc = True
-                    else:
-                        sc = False
-                    res_list.append(Researcher(_author_id, rec[1], rec[2], rec[3], rec[4], rec[5], total_abstract, sc))
+                    if _author_id:
+                        if _sc_id:
+                            sc = True
+                        else:
+                            sc = False
+                        res_list.append(Researcher(_author_id, rec[1], rec[2], rec[3], rec[4], rec[5], total_abstract, sc))
 
 
     profiles = {}
@@ -164,11 +167,13 @@ def show_field(request, field_name):
 def show_profile_by_name(request):
     first_name = request.GET.get('firstname', '')
     last_name = request.GET.get('lastname', '')
+    first_name = first_name.replace("'", "\'") if first_name else first_name
+    last_name = last_name.replace("'", "\'") if last_name else last_name
     degrees = {1: 'Bachelor', 2: 'Master', 3: 'Doctorate'}
     if first_name and last_name:
         author = conn.execute("select * from authors where "
-                      "lower(first_name)=lower('%s') and lower(last_name)=lower('%s')"
-                      % (first_name, last_name)).fetchone()
+                      "lower(first_name)=lower(%s) and lower(last_name)=lower(%s)",
+                      (first_name, last_name)).fetchone()
         if author:
             if author.scholarship_info_id:
                 profile = conn.execute('select * from scholarship_info where scholarship_info.id=%d'
