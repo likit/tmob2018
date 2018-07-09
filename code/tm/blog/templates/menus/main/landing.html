@@ -11,34 +11,44 @@
         <div class="collapse navbar-collapse justify-content-end" id="navigation" data-nav-image="{% static 'blog/assets/img/blurred-image-1.jpg' %}">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="/analytics/database">
-                        <strong>Database</strong>
-                    </a>
+                    <h5>
+                        <a class="nav-link" href="/analytics/database">
+                            <strong>Database</strong>
+                        </a>
+                    </h5>
                 </li>
                 {% for item in menu_items %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ item.href }}">
-                        <strong>{{ item.text }}</strong>
-                    </a>
+                    <h5>
+                        <a class="nav-link" href="{{ item.href }}">
+                            <strong>{{ item.text }}</strong>
+                        </a>
+                    </h5>
                 </li>
                 {% endfor %}
                 {% if user.is_authenticated %}
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ user.get_absolute_url }}">
-                        <i class="fa fa-user-circle"></i>
-                        <strong>Profile</strong>
-                    </a>
+                    <h5>
+                        <a class="nav-link" href="{{ user.get_absolute_url }}">
+                            <i class="fa fa-user-circle"></i>
+                            <strong>Profile</strong>
+                        </a>
+                    </h5>
                 </li>
                 {% endif %}
                 <li class="nav-item">
                     {% if request.user.is_authenticated %}
-                    <a class="nav-link" href="/account/logout">
-                        <strong>Log out</strong>
-                    </a>
+                    <h5>
+                        <a class="nav-link" href="/account/logout">
+                            <strong>Log out</strong>
+                        </a>
+                    </h5>
                     {% else %}
-                    <a class="nav-link" href="/account/login">
-                        <strong>Log in</strong>
-                    </a>
+                    <h5>
+                        <a class="nav-link" href="/account/login">
+                            <strong>Log in</strong>
+                        </a>
+                    </h5>
                     {% endif %}
                 </li>
             </ul>
