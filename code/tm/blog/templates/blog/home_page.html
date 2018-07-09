@@ -1,6 +1,7 @@
 {% extends "blog/landing_page.html" %}
 {% load wagtailcore_tags wagtailroutablepage_tags el_pagination_tags %}
 {% load wagtailimages_tags %}
+{% load static %}
 
 {% block content %}
     <h2 class="title">Recent Posts</h2>
@@ -9,7 +10,13 @@
     {% for post in posts %}
         <div class="row">
           <div class="col-md-4">
-            {% image post.feed_image width-300 %}
+            {% if post.feed_image %}
+              {% image post.feed_image width-300 %}
+            {% else %}
+            <div class="text-center">
+              <img src="{% static "blog/assets/img/newspaper.png" %}">
+            </div>
+            {% endif %}
           </div>
           <div class="col-md-8">
             <h3 class="title"><a href="{% pageurl post %}">{{ post.translated_title }}</a></h3>
