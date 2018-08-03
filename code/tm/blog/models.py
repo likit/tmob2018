@@ -275,3 +275,25 @@ class AboutPage(Page):
         'body_en',
         'body_th',
     )
+
+
+class PortalPage(Page):
+    title_en = RichTextField(blank=True)
+    title_th = RichTextField(blank=True)
+    description_en = models.CharField(max_length=255, blank=True)
+    description_th = models.CharField(max_length=255, blank=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel('title_en', classname='full'),
+        FieldPanel('title_th', classname='full'),
+        FieldPanel('description_en'),
+        FieldPanel('description_th'),
+    ]
+    title = TranslatedField(
+        'title_en',
+        'title_th',
+    )
+    description = TranslatedField(
+        'description_en',
+        'description_th',
+    )
