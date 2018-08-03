@@ -277,7 +277,7 @@ class AboutPage(Page):
     )
 
 
-class PortalPage(Page):
+class PortalPage(RoutablePageMixin,Page):
     title_en = RichTextField(blank=True)
     title_th = RichTextField(blank=True)
     description_en = models.CharField(max_length=255, blank=True)
@@ -286,14 +286,74 @@ class PortalPage(Page):
     content_panels = Page.content_panels + [
         FieldPanel('title_en', classname='full'),
         FieldPanel('title_th', classname='full'),
-        FieldPanel('description_en'),
-        FieldPanel('description_th'),
+        FieldPanel('description_en', classname='full'),
+        FieldPanel('description_th', classname='full'),
     ]
-    title = TranslatedField(
+    translated_title = TranslatedField(
         'title_en',
         'title_th',
     )
-    description = TranslatedField(
+    translated_description = TranslatedField(
         'description_en',
         'description_th',
     )
+
+    def get_context(self, request, *args, **kwargs):
+        context = super(PortalPage, self).get_context(request, *args, **kwargs)
+        context['posts'] = self.get_posts()
+        context['portal_page'] = self
+        context['menuitems'] = self.get_children().filter(live=True, show_in_menus=True)
+        return context
+
+    def get_posts(self):
+        return PostPage.objects.descendant_of(self).live().order_by('-date')
+
+    @route(r'^(\d{4})/$')
+    @route(r'^(\d{4})/(\d{2})/$')
+    @route(r'^(\d{4})/(\d{2})/(\d{2})/$')
+    def post_by_date(self, request, year, month=None, day=None, *args, **kwargs):
+        self.posts = self.get_posts().filter(date__year=year)
+        self.search_type = 'date'
+        self.search_term = year
+        if month:
+            self.posts = self.posts.filter(date__month=month)
+            df = DateFormat(date(int(year), int(month), 1))
+            self.search_term = df.format('F Y')
+        if day:
+            self.posts = self.posts.filter(date__day=day)
+            self.search_term = date_format(date(int(year), int(month), int(day)))
+        return Page.serve(self, request, *args, **kwargs)
+
+    @route(r'^(\d{4})/(\d{2})/(\d{2})/(.+)/$')
+    def post_by_date_slug(self, request, year, month, day, slug, *args, **kwargs):
+        post_page = self.get_posts().filter(slug=slug).first()
+        if not post_page:
+            raise Http404
+        if request.method == 'POST':
+            form = PostCommentForm(request.POST)
+            if form.is_valid():
+                PostComment.objects.create(
+                    user=request.user,
+                    comment=form.cleaned_data['comment'],
+                    post=post_page
+                )
+        return Page.serve(post_page, request, *args, **kwargs)
+
+    @route(r'^tag/(?P<tag>[-\w]+)/$')
+    def post_by_tag(self, request, tag, *args, **kwargs):
+        self.search_type = 'tag'
+        self.search_term = tag
+        self.posts = self.get_posts().filter(tags__slug=tag)
+        return Page.serve(self, request, *args, **kwargs)
+
+    @route(r'^categoty/(?P<category>[-\w]+)/$')
+    def post_by_category(self, request, category, *args, **kwargs):
+        self.search_type = 'category'
+        self.search_term = category
+        self.posts = self.get_posts().filter(categories__slug=category)
+        return Page.serve(self, request, *args, **kwargs)
+
+    @route(r'^$')
+    def post_list(self, request, *args, **kwargs):
+        self.posts = self.get_posts()
+        return Page.serve(self, request, *args, **kwargs)

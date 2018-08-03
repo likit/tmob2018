@@ -9,10 +9,19 @@
     <div class="container">
         <div class="row">
             <div class="col-sm-8">
-                <h1 class="title">{{ blog_page.translated_title }}</h1>
-                <h4 class="subtitle">{{ blog_page.translated_description }}</h4>
+                <h1 class="title">{{ portal_page.translated_title|richtext }}</h1>
+                <h4 class="subtitle">{{ portal_page.translated_description }}</h4>
             </div>
         </div>
+        {% for post in posts %}
+        <div class="list-group">
+            <h5 class="title">
+            <a href="{% pageurl post %}"
+                class="list-group-item list-group-item-action">{{ forloop.counter }}. {{ post.translated_title }}</a>
+            </h5>
+            </h5>
+        </div>
+        {% endfor %}
     </div>
 </section>
 {% endblock %}
