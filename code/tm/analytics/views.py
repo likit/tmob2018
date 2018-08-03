@@ -234,3 +234,15 @@ def show_abstract(request, abstract_id):
                   context={'authors': authors, 'abstract': abstract, 'keywords': keywords})
     return render(request, template_name='analytics/abstract.html',
                   context={'authors': [], 'abstract': None})
+
+
+def show_abstract_per_person(request):
+    author_sum = {'active': 0, 'inactive': 0}
+    for author_id, nabstract in conn.execute("select author_id,count(abstract_has_author.abstract_id) from authors inner join abstract_has_author on abstract_has_author.author_id=id where authors.scholarship_info_id is not null group by author_id;"):
+        if nabstract >= 2:
+            author_sum['active'] += 1
+        else:
+            author_sum['inactive'] += 1
+        print(author_id, nabstract)
+    return render(request, template_name="analytics/num_abstract_person.html",
+                  context={'author_sum': [author_sum['active'], author_sum['inactive']]})

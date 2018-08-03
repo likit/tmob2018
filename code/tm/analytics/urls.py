@@ -11,4 +11,5 @@ urlpatterns = [
     path('profile-by-name/', views.show_profile_by_name, name='show_profile_by_name'),
     path('show_field/<field_name>/', views.show_field, name='show_field'),
     path('abstract/<abstract_id>/', views.show_abstract, name='show_abstract'),
+    path('num_abstract_person/', views.show_abstract_per_person, name='show_abstract_per_person'),
 ]
