@@ -278,19 +278,17 @@ class AboutPage(Page):
 
 
 class PortalPage(RoutablePageMixin,Page):
-    title_en = RichTextField(blank=True)
-    title_th = RichTextField(blank=True)
+    title_th = models.CharField(max_length=255, blank=True)
     description_en = models.CharField(max_length=255, blank=True)
     description_th = models.CharField(max_length=255, blank=True)
 
     content_panels = Page.content_panels + [
-        FieldPanel('title_en', classname='full'),
         FieldPanel('title_th', classname='full'),
         FieldPanel('description_en', classname='full'),
         FieldPanel('description_th', classname='full'),
     ]
     translated_title = TranslatedField(
-        'title_en',
+        'title',
         'title_th',
     )
     translated_description = TranslatedField(
