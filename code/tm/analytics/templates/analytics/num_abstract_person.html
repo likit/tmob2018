@@ -1,10 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="card">
+        <div class="card-header text-center">
+        <h3 class="title">จำนวนนักเรียนทุนที่มีผลงานล่าสุด</h3>
+        </div>
+        <div class="card-body text-center">
+        <div class="row">
+            <div class="col-md-10">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js"></script>
+<script>
+    var ctx = document.getElementById("myChart").getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            label: "Number of active and inactive scholars.",
+            datasets: [{
+                data: {{author_sum}},
+                backgroundColor: ['rgb(255, 99, 132)', 'rgb(124,56,123)'],
+            }],
+            labels: [
+                'Active',
+                'Inactive'
+            ]
+        }
+    });
+</script>
+{% endblock %}
