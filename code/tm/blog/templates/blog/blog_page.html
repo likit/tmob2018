@@ -3,12 +3,16 @@
 
 {% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
 {% load wagtailimages_tags %}
+{% block navbar %}
+{% main_menu template="menus/main/level_1_trans.html" %}
+{% endblock %}
 {% block content %}
-{% main_menu template="menus/main/level_1.html" %}
-<section class="section">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-8">
+    <div class="wrapper">
+        <div class="page-header page-header-small header-filter" filter-color="orange">
+            <div class="page-header-image" data-parallax="true"
+                style="background-image: url('{% static "blog/assets/img/shutterstock_2.jpg" %}');">
+            </div>
+            <div class="container">
                 <h1 class="title">{{ blog_page.translated_title }}</h1>
                 <h4 class="subtitle">{{ blog_page.description }}</h4>
                 {% if blog_page.search_term %}
@@ -23,20 +27,33 @@
                 </h6>
                 {% endif %}
                 <h4 class="subtitle">Total {{ posts|length }} posts.</h4>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-8">
                 {% paginate 10 posts %}
                 {% get_pages %}
                 {% for post in posts %}
-                    <h3 class="title"><a href="{% post_date_url post blog_page %}">{{ post.translated_title }}</a></h3>
-                    <h6 class="text-muted">Posted on {{ post.date }}</h6>
-                    {% image post.feed_image width-400 %}
-                    {{ post.body|truncatewords_html:50|richtext }}
-                    <p><strong>Recent Comments</strong></p>
-                    {% for comment in post.comments.all|slice:":2" %}
-                        <p class="text-muted">{{ comment.user.first_name }} said "{{ comment.comment|truncatewords_html:10 }}" {{ comment.commented_at }}</p>
-                    {% endfor %}
-                    <p>Total <strong>{{ post.comments.all|length }}</strong> comment(s).</p>
-                    <a href="{% post_date_url post blog_page %}">Read more</span></a>
-                    <hr>
+                <div class="card card-blog card-plain">
+                    <div class="card-body">
+                        {% image post.feed_image width-400 %}
+                        <h3 class="category text-primary card-title">
+                            <a href="{% post_date_url post blog_page %}">{{ post.translated_title }}</a>
+                        </h3>
+                        <p class="card-description">
+                        <h6 class="text-muted">Posted on {{ post.date }}</h6>
+                        {{ post.body|truncatewords_html:50|richtext }}
+                        </p>
+                        {% for comment in post.comments.all|slice:":2" %}
+                            <p class="text-muted"><i class="far fa-comment text-danger"></i>&nbsp;{{ comment.user.first_name }} said "{{ comment.comment|truncatewords_html:10 }}" {{ comment.commented_at }}</p>
+                        {% endfor %}
+                        <p>Total <strong>{{ post.comments.all|length }}</strong> comment(s).</p>
+                        <a class="btn btn-primary btn-round" href="{% post_date_url post blog_page %}">Read more</span></a>
+                    </div>
+                </div>
+                <hr>
                 {% endfor %}
                 {% if pages.paginated %}
                 <ul class="pagination pagination-primary">
@@ -75,5 +92,4 @@
             </div>
         </div>
     </div>
-</section>
 {% endblock %}
