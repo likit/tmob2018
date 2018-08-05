@@ -16,21 +16,23 @@
         <form role="search" method="get"
             class="form-search" action="/analytics/keywords/" method="get">
             <div class="input-group">
-                <input type="text" class="form-control" name="q"
-                    aria-describedby="searchHelp"
-                    placeholder="Search for experts with keywords&hellip;" title="Search for: "/>
-                <div class="input-group-addon">
-                    &nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-search"></i>
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <i class="now-ui-icons ui-1_zoom-bold"></i>&nbsp;&nbsp;&nbsp;
+                    </div>
                 </div>
+                <input type="text" class="form-control" name="q"
+                       aria-describedby="searchHelp"
+                       placeholder="Search for experts with keywords&hellip;" title="Search for: "/>
             </div>
         </form>
         <table class="table">
             <thead>
-                <th>Title</th>
-                <th>Authors</th>
-                <th>Terms</th>
-                <th>Publish Date</th>
-                <th>Cited</th>
+                <th><strong>Title</strong></th>
+                <th><strong>Authors</strong></th>
+                <th><strong>Terms</strong></th>
+                <th><strong>Publish Date</strong></th>
+                <th><strong>Cited</strong></th>
             </thead>
             <col width="20">
             <col width="10">
