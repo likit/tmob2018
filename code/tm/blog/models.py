@@ -383,11 +383,14 @@ class PortalPage(RoutablePageMixin,Page):
 class HomePageLink(Page):
     title_th = models.CharField(max_length=255, blank=True)
     icon = models.CharField(max_length=64, blank=True)
+    url = models.CharField(max_length=128, blank=True)
     description_en = models.CharField(max_length=255, blank=True)
     description_th = models.CharField(max_length=255, blank=True)
 
     content_panels = Page.content_panels + [
         FieldPanel('title_th', classname='full'),
+        FieldPanel('icon', classname='full'),
+        FieldPanel('url', classname='full'),
         FieldPanel('description_en', classname='full'),
         FieldPanel('description_th', classname='full'),
     ]
