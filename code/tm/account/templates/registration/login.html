@@ -19,16 +19,20 @@
           <p>Please, use the following form to log in.</p>
       </div>
       <div class="content">
-        <div class="input-group form-group-no-border input-lg">
-          <span class="input-group-addon">
-            <i class="fa fa-user-circle"></i>&nbsp;&nbsp;
-          </span>
+        <div class="input-group no-border input-lg">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <i class="fa fa-user-circle"></i>&nbsp;&nbsp;&nbsp;
+            </div>
+          </div>
           {{ form.username|add_css:"form-control"}}
         </div>
-        <div class="input-group form-group-no-border input-lg">
-          <span class="input-group-addon">
-            <i class="fa fa-unlock-alt"></i>&nbsp;&nbsp;
-          </span>
+        <div class="input-group no-border input-lg">
+          <div class="input-group-prepend">
+            <div class="input-group-text">
+              <i class="fa fa-unlock-alt"></i>&nbsp;&nbsp;&nbsp;
+            </div>
+          </div>
           {{ form.password|add_css:"form-control"}}
         </div>
       </div>
