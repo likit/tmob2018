@@ -3,7 +3,6 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-<section class="section">
 <div class="container">
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -12,11 +11,17 @@
       <li class="breadcrumb-item active" aria-current="page">Profile by Name</li>
     </ol>
   </nav>
-  <h1 class="title">Profile</h1>
+    <div class="info info-hover">
+      <div class="icon">
+        <i class="fa fa-user-circle" style="font-size: 70px;"></i>
+      </div>
+      <p class="description">
+        <h3 class="h3"><strong>{{ author.first_name }} {{ author.last_name }}</strong></h3>
+        <h6 class="h6">SCOPUS ID {{ author.scopus_id }}</h6>
+      </p>
+    </div>
   <div class="text-center">
-    <h3 class="title">{{ author.first_name }} {{ author.last_name }}</h3>
-    <h6 class="title">SCOPUS ID {{ author.scopus_id }}</h6>
-    <h4 class="title">Affiliation Timeline</h4>
+    <h4 class="h4"><strong>Affiliation Timeline</strong></h4>
     <table class="table">
       <thead>
           <th>Name</th>
@@ -79,5 +84,4 @@
     </div>
   </div>
 </div>
-</section>
 {% endblock %}
