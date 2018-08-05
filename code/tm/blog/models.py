@@ -1,3 +1,6 @@
+import requests
+import dateutil.parser
+from collections import namedtuple
 from datetime import date, datetime
 from django.contrib.postgres.search import SearchVector
 from django import forms
@@ -21,6 +24,8 @@ from modelcluster.tags import ClusterTaggableManager
 from rest_framework.fields import DateTimeField
 # Create your models here.
 
+fb_post = namedtuple('FbPost', ['post_id', 'page_id', 'story', 'message', 'created_time'])
+
 class TranslatedField:
     def __init__(self, en_field, th_field):
         self.en_field = en_field
@@ -42,6 +47,10 @@ class Tag(TaggitTag):
     class Meta:
         proxy = True
 
+#fb_page_access_token = 'EAAEzlJsTZBB8BABslGZBK5gquc526CvFhGcR4IvwDRzZC4pn7qVvgZAr7S0KJ2wqcZCcZCqdYoIWqHGWsNZCXVucU633gFiLSZCreekpUAHIzHgFW99bGlAT1028dmzbGZB41jP8Rf4PaAgS2oHx8LPxQOE43CoNweecYXuMBZBCLLcFslwXZBve8Le89xIZCMa4AP4ZD'
+fb_page_id = '241755426012824'
+fb_user_access_token = 'EAAEzlJsTZBB8BAFvEfLNZAQXzLV0V1YN3hWrOgW8VFZBCZBhelTWm9JphPEqkWvgjFustelwuLZBhNZAf67YmbW4kW80pYcUZCU5EwfzHT9JPuJhlv2cXEniP9w6NHMGx1XlmPAYTZAGcF8XZAHoDZB64yeeLcVPi1CTHiacerLhIPrAZDZD'
+
 class HomePage(Page):
     description = models.CharField(max_length=255, blank=True)
 
@@ -55,7 +64,21 @@ class HomePage(Page):
         return context
 
     def get_posts(self):
-        return PostPage.objects.all().live().order_by('-date')
+        resp = requests.get('https://graph.facebook.com/v2.9/{}/posts?access_token={}'.format(fb_page_id, fb_user_access_token))
+        posts = []
+        activities = []
+        for n,st in enumerate(resp.json()['data']):
+            _id = st.get('id', None)
+            _page_id, _post_id = _id.split('_')
+            _story = st.get('story', '')
+            _message = st.get('message', '')
+            _created_time = dateutil.parser.parse(st.get('created_time', ''))
+            story = fb_post(_post_id, _page_id, _story, _message, _created_time)
+            posts.append(story)
+            if n==4:
+                break
+        return posts
+        # return PostPage.objects.all().live().order_by('-date')
 
 class BlogPage(RoutablePageMixin, Page):
     description_en = models.CharField(max_length=255, blank=True)
