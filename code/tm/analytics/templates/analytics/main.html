@@ -1,10 +1,12 @@
-{% extends "base.html" %}
+{% extends "blog/base.html" %}
 {% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
 
 {% block title %}Database{% endblock %}
 
+{% block navbar %}
+{% main_menu template="menus/main/level_1.html" %}
+{% endblock %}
 {% block content %}
-<section class="section">
 <div class="container">
     <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
@@ -12,19 +14,25 @@
         <li class="breadcrumb-item active" aria-current="page">Database</li>
     </ol>
     </nav>
-    <h1 class="title">Database</h1>
+    <div class="info info-hover">
+        <div class="icon icon-info">
+            <i class="fa fa-database" style="font-size: 70px"></i>
+        </div>
+    </div>
     <div class="text-center">
         <h5>Search for experts in the field using keywords or terms</h5>
     </div>
     <form role="search" method="get"
         class="form-search" action="/analytics/keywords" method="get">
-        <div class="input-group">
+        <div class="input-group no-border">
+            <div class="input-group-prepend">
+                <div class="input-group-text">
+                    <i class="now-ui-icons ui-1_zoom-bold"></i>&nbsp;&nbsp;&nbsp;
+                </div>
+            </div>
             <input type="text" class="form-control" name="q"
                 aria-describedby="searchHelp"
                 placeholder="Search for experts with keywords&hellip;" title="Search for: "/>
-            <div class="input-group-addon">
-                &nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-search"></i>
-            </div>
         </div>
     </form>
     <section class="section">
@@ -37,5 +45,4 @@
         </div>
     </section>
 </div>
-</section>
 {% endblock %}

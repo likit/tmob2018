@@ -3,23 +3,32 @@
 
 {% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
 {% load wagtailimages_tags %}
+{% block navbar %}
+{% main_menu template="menus/main/level_1_trans.html" %}
+{% endblock %}
 {% block content %}
-{% main_menu template="menus/main/level_1.html" %}
-<section class="section">
-    <div class="container">
-        <div class="row">
-            <div class="col-sm-8">
-                <h1 class="title">{{ portal_page.translated_title|richtext }}</h1>
-                <h4 class="subtitle">{{ portal_page.translated_description }}</h4>
-            </div>
-        </div>
-        <div class="list-group">
-            {% for post in posts %}
-            <h5 class="title list-group-item list-group-action">
-                <a href="{% pageurl post %}">{{ forloop.counter }}. {{ post.translated_title }}</a>
-            </h5>
-            {% endfor %}
-        </div>
+<div class="wrapper">
+    <div class="page-header page-header-small header-filter" filter-color="">
+        <div class="page-header-image" data-parallax="true"
+             style="background-image: url('{% static "blog/assets/img/shutterstock_3.jpg" %}');">
     </div>
-</section>
+    <div class="container">
+        <h1 class="title">{{ portal_page.translated_title|richtext }}</h1>
+    </div>
+</div>
+<div class="container">
+    <div class="info info-hover">
+        <div class="icon icon-primary">
+            <i class="fas fa-info-circle"></i>
+        </div>
+        <p class="description">{{ portal_page.translated_description }}</p>
+    </div>
+    <div class="list-group">
+        {% for post in posts %}
+        <h5 class="title list-group-item list-group-action">
+            <a href="{% pageurl post %}">{{ forloop.counter }}. {{ post.translated_title }}</a>
+        </h5>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}
