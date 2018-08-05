@@ -3,72 +3,72 @@
 {% load wagtailimages_tags %}
 {% block content %}
 {% main_menu template="menus/main/level_1.html" %}
-<section class="section">
-    <div class="container">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="/">Home</a></li>
-                <li class="breadcrumb-item"><a href="/analytics/database">Database</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Keywords Search</li>
-            </ol>
-        </nav>
-        <h4>We've found someone who knows a thing or two about <strong>{{ search_term }}</strong>...</h4>
-        <form role="search" method="get"
-            class="form-search" action="." method="get">
-            <div class="input-group">
-                <input type="text" class="form-control" name="q"
-                    aria-describedby="searchHelp"
-                    placeholder="Search for experts with keywords&hellip;" title="Search for: "/>
-                <div class="input-group-addon">
-                    &nbsp;&nbsp;&nbsp;&nbsp;<i class="fa fa-search"></i>
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/analytics/database">Database</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Keywords Search</li>
+        </ol>
+    </nav>
+    <form role="search" method="get"
+        class="form-search" action="." method="get">
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <div class="input-group-text">
+                    <i class="now-ui-icons ui-1_zoom-bold"></i>&nbsp;&nbsp;&nbsp;
                 </div>
             </div>
-        </form>
-        <table class="table">
-            <thead>
-                <th>Name</th>
-                <th>Affiliation</th>
-                <th>Matched Keyword</th>
-                <th>Occurrence</th>
-                <th>Published Articles</th>
-            </thead>
-            {% for rec in results %}
-            <tr {% if rec.sc %}class="table-primary"{% endif %}>
-                <td>
-                    <a href="/analytics/profile-by-name/?firstname={{rec.firstname}}&lastname={{rec.lastname}}">
-                      {{ rec.firstname }} {{ rec.lastname }}
-                    </a>
-                </td>
-                <td>{{ rec.affiliation }}</td>
-                <td>{{ rec.word_en}}</td>
-                <td>{{ rec.count }}</td>
-                <td>{{ rec.total_abstract }}</td>
-            </tr>
+            <input type="text" class="form-control" name="q"
+                   aria-describedby="searchHelp"
+                   placeholder="Search for experts with keywords&hellip;" title="Search for: "/>
+        </div>
+    </form>
+    <h4>We've found someone who knows a thing or two about <strong>{{ search_term }}</strong>...</h4>
+    <table class="table">
+        <thead>
+            <th>Name</th>
+            <th>Affiliation</th>
+            <th>Matched Keyword</th>
+            <th>Occurrence</th>
+            <th>Published Articles</th>
+        </thead>
+        {% for rec in results %}
+        <tr {% if rec.sc %}class="table-primary"{% endif %}>
+            <td>
+                <a href="/analytics/profile-by-name/?firstname={{rec.firstname}}&lastname={{rec.lastname}}">
+                  {{ rec.firstname }} {{ rec.lastname }}
+                </a>
+            </td>
+            <td>{{ rec.affiliation }}</td>
+            <td>{{ rec.word_en}}</td>
+            <td>{{ rec.count }}</td>
+            <td>{{ rec.total_abstract }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    <p>* Scholarship students are highlighted.</p>
+    <h4>Researchers whose research of interests may include <strong>{{ search_term }}</strong></h4>
+    <ul>
+        {% for username,profile in profiles.items %}
+        <li><a href="/account/{{ username }}/">{{ profile.0 }} {{ profile.1 }}</a>
+            {% for fi in profile.2 %}
+                <a href="/analytics/keywords/?q={{ fi }}">
+                <span class="badge badge-info">{{ fi }}</span>
+                </a>
             {% endfor %}
-        </table>
-        <p>* Scholarship students are highlighted.</p>
-        <h4>Researchers whose research of interests may include <strong>{{ search_term }}</strong></h4>
-        <ul>
-            {% for username,profile in profiles.items %}
-            <li><a href="/account/{{ username }}/">{{ profile.0 }} {{ profile.1 }}</a>
-                {% for fi in profile.2 %}
-                    <a href="/analytics/keywords/?q={{ fi }}">
-                    <span class="badge badge-info">{{ fi }}</span>
-                    </a>
-                {% endfor %}
-            </li>
-            {% empty %}
-            <li>No researchers found.</li>
-            {% endfor %}
-        </ul>
-        <h4>Noun phrases that contain the keyword <strong>{{ search_term }}</strong></h4>
-        <ul>
-            {% for nc in nounchunks %}
-            <li><a href="/analytics/nounchunk/?ncid={{ nc.0 }}">{{ nc.1|title }}</a></li>
-            {% empty %}
-              <li>No noun phrases found.</li>
-            {% endfor %}
-        </ul>
-    </div>
-</section>
+        </li>
+        {% empty %}
+        <li>No researchers found.</li>
+        {% endfor %}
+    </ul>
+    <h4>Noun phrases that contain the keyword <strong>{{ search_term }}</strong></h4>
+    <ul>
+        {% for nc in nounchunks %}
+        <li><a href="/analytics/nounchunk/?ncid={{ nc.0 }}">{{ nc.1|title }}</a></li>
+        {% empty %}
+          <li>No noun phrases found.</li>
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}
