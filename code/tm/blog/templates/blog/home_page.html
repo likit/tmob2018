@@ -1,4 +1,5 @@
 {% extends "blog/landing_page.html" %}
+{% load menu_tags %}
 {% load wagtailcore_tags wagtailroutablepage_tags el_pagination_tags %}
 {% load wagtailimages_tags %}
 {% load static %}
@@ -18,39 +19,30 @@
               </div>
               </p>
             {% endfor %}
-            <h4><a href="https://www.facebook.com/TalentMobility">More on Facebook page</h4>
+            <h4><a href="https://www.facebook.com/TalentMobility" class="btn btn-primary btn-round">More on Facebook page</a></h4>
           </div>
       </div>
     </div>
     <div class="section">
       <div class="row">
+      <div class="col-md text-center">
+        <h2 class="title">Discover Talent Mobility Program</h2>
+      </div>
+      </div>
+      <div class="row">
+        {% for homepagelink in homepagelinks %}
         <div class="col-md-4 text-center">
-          <div class="alert alert-info" role="alert">
-            <a href="/network" style="color: white">
-              <i class="fa fa-connectdevelop" style="font-size: 60px"></i>
-              <h4 class="alert-heading">Talent Mobility Network</h4>
-            </a>
-            <p>Explore our collaborative network consisting of a number of leading universities and institutes from all over the country.</p>
-          </div>
+          <div class="info info-hover">
+            <div class="icon icon-info icon-circle">
+              <a href="/{{homepagelink.pageurl}}">
+              <i class="{{homepagelink.icon}}" style="font-size: 30px"></i>
+              </a>
+            </div>
+            <h4 class="info-title">{{homepagelink.translated_title}}</h4>
+            <p class="description">{{homepagelink.translated_description}}</p>
         </div>
-        <div class="col-md-4 text-center">
-          <div class="alert alert-info" role="alert">
-            <a href="/analytics/database" style="color: white">
-              <i class="fa fa-database" style="font-size: 60px"></i>
-              <h4 class="alert-heading">Expert Database</h4>
-            </a>
-            <p>Explore our expert database containing profile data, useful research and expertise information extracted from thoundsands of research articles.</p>
-          </div>
         </div>
-        <div class="col-md-4 text-center">
-          <div class="alert alert-info" role="alert">
-            <a href="/about-us" style="color: white">
-              <i class="fa fa-info" style="font-size: 60px"></i>
-              <h4 class="alert-heading">About the Program</h4>
-            </a>
-            <p>Learn more about the talent mobility program, our mission, goal and plans that can benefit you and your organization and how to join the program.</p>
-          </div>
-        </div>
+        {% endfor %}
       </div>
     </div>
 {% endblock %}
