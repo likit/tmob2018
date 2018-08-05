@@ -378,3 +378,32 @@ class PortalPage(RoutablePageMixin,Page):
     def post_list(self, request, *args, **kwargs):
         self.posts = self.get_posts()
         return Page.serve(self, request, *args, **kwargs)
+
+
+class HomePageLink(Page):
+    title_th = models.CharField(max_length=255, blank=True)
+    icon = models.CharField(max_length=64, blank=True)
+    description_en = models.CharField(max_length=255, blank=True)
+    description_th = models.CharField(max_length=255, blank=True)
+
+    content_panels = Page.content_panels + [
+        FieldPanel('title_th', classname='full'),
+        FieldPanel('description_en', classname='full'),
+        FieldPanel('description_th', classname='full'),
+    ]
+    translated_title = TranslatedField(
+        'title',
+        'title_th',
+    )
+    translated_description = TranslatedField(
+        'description_en',
+        'description_th',
+    )
+
+    def get_context(self, request, *args, **kwargs):
+        context = super(PortalPage, self).get_context(request, *args, **kwargs)
+        context['posts'] = self.get_posts()
+        return context
+
+    def get_posts(self):
+        return HomePageLink.objects.descendant_of(self).live()
