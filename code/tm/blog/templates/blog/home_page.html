@@ -4,41 +4,24 @@
 {% load static %}
 
 {% block content %}
-    <h2 class="title">Recent Posts</h2>
-    {% paginate 5 posts %}
-    {% get_pages %}
-    {% for post in posts %}
-        <div class="row">
-          <div class="col-md-4">
-            {% if post.feed_image %}
-              {% image post.feed_image width-300 %}
-            {% else %}
-            <div class="text-center">
-              <img src="{% static "blog/assets/img/newspaper.png" %}">
-            </div>
-            {% endif %}
+    <div class="row">
+      <div class="col">
+          <div class="text-center">
+            <h2 class="title">Recent Posts</h2>
+            {% for post in posts %}
+              <p>
+              <div class="fb-post" data-width="800"
+                data-href="https://facebook.com/{{ post.page_id }}/posts/{{ post.post_id }}"></div>
+              <br><br>
+              <div class="text-center">
+                <i class="fas fa-quote-right fa-2x"></i>
+              </div>
+              </p>
+            {% endfor %}
+            <h4><a href="https://www.facebook.com/TalentMobility">More on Facebook page</h4>
           </div>
-          <div class="col-md-8">
-            <h3 class="title"><a href="{% pageurl post %}">{{ post.translated_title }}</a></h3>
-            <h6 class="text-muted">Posted on {{ post.date }}</h6>
-            {{ post.body|truncatewords_html:50|richtext }}
-            <a href="{% pageurl post %}">Read more</a>
-          </div>
-        </div>
-    {% endfor %}
-    {% if pages.paginated %}
-    <hr>
-    <ul class="pagination pagination-primary">
-        Page&nbsp;&nbsp;
-        {% for page in pages %}
-            {% if page.is_current %}
-                <li class="page-item active"><a class="page-link" href="{{page.path}}">{{ page.label }}</a></li>
-            {% else %}
-                <li class="page-item"><a class="page-link" href="{{page.path}}">{{ page.label }}</a></li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-    {% endif %}
+      </div>
+    </div>
     <div class="section">
       <div class="row">
         <div class="col-md-4 text-center">
