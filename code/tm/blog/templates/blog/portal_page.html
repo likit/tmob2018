@@ -34,7 +34,8 @@
             </div>
             <div id="collapse{{forloop.counter}}" class="collapse" role="tabpanel" aria-labelledby="heading{{forloop.counter}}">
                 <div class="card-body">
-                    {{post.body|richtext|truncatechars:256}}
+                    {{post.body|richtext|truncatechars:400}}
+                    <br>
                     <a href="{% pageurl post %}" class="btn btn-round btn-primary">
                         Read more..
                     </a>
