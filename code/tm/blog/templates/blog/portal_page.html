@@ -34,9 +34,11 @@
             </div>
             <div id="collapse{{forloop.counter}}" class="collapse" role="tabpanel" aria-labelledby="heading{{forloop.counter}}">
                 <div class="card-body">
-                    {{post.body|richtext|truncatechars:400}}...
-                    <a href="{% pageurl post %}">
-                        go to page
+                    {{post.body|truncatewords_html:400|richtext}}...
+                </div>
+                <div class="card-footer">
+                    <a href="{% pageurl post %}" class="btn btn-primary btn-round">
+                        Go to page
                     </a>
                 </div>
             </div>
