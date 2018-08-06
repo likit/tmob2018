@@ -18,8 +18,8 @@
 </div>
 <div class="container">
     <div class="info info-hover">
-        <div class="icon icon-primary">
-            <i class="fas fa-info-circle"></i>
+        <div class="icon icon-info">
+            <i class="fas fa-info-circle" style="font-size: 80px;"></i>
         </div>
         <p class="description">{{ portal_page.translated_description }}</p>
     </div>
@@ -27,21 +27,20 @@
         {% for post in posts %}
         <div class="card card-plain">
             <div class="card-header" role="tab" id="heading{{forloop.counter}}">
+                <h5>
                 <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
                     {{post.translated_title}}
                     <i class="now-ui-icons arrows-1_minimal-down"></i>
                 </a>
+                </h5>
             </div>
             <div id="collapse{{forloop.counter}}" class="collapse" role="tabpanel" aria-labelledby="heading{{forloop.counter}}">
                 <div class="card-body">
                     {{post.body|truncatewords_html:400|richtext}}
-                    <p class="text-center">
-                        <i class="fas fa-ellipsis-h fa-2x"></i>
-                    </p>
                 </div>
                 <div class="card-footer">
                     <a href="{% pageurl post %}" class="btn btn-primary btn-round">
-                        Go to page
+                        Read more..
                     </a>
                 </div>
             </div>
