@@ -8,7 +8,7 @@
 {% endblock %}
 {% block content %}
 <div class="wrapper">
-    <div class="page-header page-header-small header-filter" filter-color="">
+    <div class="page-header page-header-small header-filter" filter-color="orange">
         <div class="page-header-image" data-parallax="true"
              style="background-image: url('{% static "blog/assets/img/shutterstock_3.jpg" %}');">
     </div>
@@ -23,11 +23,24 @@
         </div>
         <p class="description">{{ portal_page.translated_description }}</p>
     </div>
-    <div class="list-group">
+    <div id="accordion" role="tablist" aria-multiselectable="true" class="card-collapse">
         {% for post in posts %}
-        <h5 class="title list-group-item list-group-action">
-            <a href="{% pageurl post %}">{{ forloop.counter }}. {{ post.translated_title }}</a>
-        </h5>
+        <div class="card card-plain">
+            <div class="card-header" role="tab" id="heading{{forloop.counter}}">
+                <a data-toggle="collapse" data-parent="#accordion" href="#collapse{{forloop.counter}}" aria-expanded="false" aria-controls="collapse{{forloop.counter}}">
+                    {{post.translated_title}}
+                    <i class="now-ui-icons arrows-1_minimal-down"></i>
+                </a>
+            </div>
+            <div id="collapse{{forloop.counter}}" class="collapse" role="tabpanel" aria-labelledby="heading{{forloop.counter}}">
+                <div class="card-body">
+                    {{post.body|richtext|truncatechars:256}}
+                    <a href="{% pageurl post %}" class="btn btn-round btn-primary">
+                        Read more..
+                    </a>
+                </div>
+            </div>
+        </div>
         {% endfor %}
     </div>
 </div>
