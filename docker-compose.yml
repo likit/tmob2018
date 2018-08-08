@@ -37,6 +37,7 @@ services:
       - "8000:8000"
     depends_on:
       - postgres_db
+      - neo4j_db
 
 volumes:
   pg_data:
