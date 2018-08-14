@@ -5,8 +5,6 @@ from sqlalchemy import (create_engine, Table, Column, Text, Date,
 from sqlalchemy.orm import Session, relationship, backref
 
 Base = declarative_base()
-kw_engine = create_engine('postgresql+psycopg2://likit:password@localhost/keywordsdw')
-session = Session(kw_engine)
 
 nounchunk_has_keyword = Table('nounchunk_has_keyword', Base.metadata,
     Column('noun_chunk_id', Integer, ForeignKey('noun_chunks.id')),
@@ -124,6 +122,7 @@ class ScholarshipInfo(Base):
     last_name_en = Column(String(255))
     first_name_th = Column(String(255))
     last_name_th = Column(String(255))
+    affil = Column(String(255))
     country = Column(String())
     status = Column(Boolean())
     field_of_study = Column(String())
@@ -133,4 +132,6 @@ class ScholarshipInfo(Base):
 
 
 if __name__ == '__main__':
+    kw_engine = create_engine('postgresql+psycopg2://likit:password@localhost/keywordsdw')
+    session = Session(kw_engine)
     Base.metadata.create_all(kw_engine)
