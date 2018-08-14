@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
+from django.http import JsonResponse
 from sqlalchemy import MetaData, create_engine
 from collections import namedtuple, defaultdict
 from py2neo import Graph, Relationship, NodeMatcher, Node
@@ -237,12 +238,64 @@ def show_abstract(request, abstract_id):
 
 
 def show_abstract_per_person(request):
-    author_sum = {'active': 0, 'inactive': 0}
-    for author_id, nabstract in conn.execute("select author_id,count(abstract_has_author.abstract_id) from authors inner join abstract_has_author on abstract_has_author.author_id=id where authors.scholarship_info_id is not null group by author_id;"):
-        if nabstract >= 2:
-            author_sum['active'] += 1
-        else:
-            author_sum['inactive'] += 1
-        print(author_id, nabstract)
-    return render(request, template_name="analytics/num_abstract_person.html",
-                  context={'author_sum': [author_sum['active'], author_sum['inactive']]})
+    data = []
+    for rec in conn.execute(" select status, count(*) as c from scholarship_info group by status;"):
+        data.append(rec[1])
+    return JsonResponse({'data': data})
+
+def get_num_active_scholar_studs(request):
+    actives = {}
+    totals = {}
+    sqlquery = ('select affil,count(*) as c from active_scholar_students '
+                'inner join scholarship_info on scholarship_info_id=scholarship_info.id '
+                'where scholarship_info.status=true '
+                'group by affil order by c desc limit 30;')
+    for affil, cnt in conn.execute(sqlquery):
+        actives[affil] = cnt
+
+    sqlquery = ('select affil,count(*) as c from scholarship_info '
+                'where scholarship_info.status=true '
+                'group by affil;')
+
+    active_data = []
+    inactive_data = []
+    labels = []
+    activecolors = []
+    inactivecolors = []
+    for affil, cnt in conn.execute(sqlquery):
+        totals[affil] = cnt
+
+    sorted_active_data = sorted([(k,v) for k,v in actives.items()],
+                                    key=lambda x: x[1], reverse=True)
+    for k,v in sorted_active_data:
+        active_data.append(actives[k])
+        inactive_data.append(totals[k] - actives[k])
+        activecolors.append('rgb(199,0,57)')
+        inactivecolors.append('rgb(100,116,164)')
+        labels.append(k)
+
+    return JsonResponse({'actives': active_data,
+                'inactives': inactive_data,
+                'activecolors': activecolors,
+                'inactivecolors': inactivecolors,
+                'labels': labels})
+
+
+def get_abstract_fields(request):
+    sqlquery = ('select abbr,count(*) as c from field_has_abstract '
+                'inner join research_fields on research_fields.id=field_has_abstract.field_id '
+                'group by abbr order by c desc;')
+    data = []
+    labels = []
+    backgroundColors = []
+    for f,n in conn.execute(sqlquery):
+        data.append(n)
+        labels.append(f)
+        backgroundColors.append('rgb()')
+
+    return JsonResponse({'data': data, 'labels': labels})
+
+
+def show_dashboard(request):
+    return render(request, template_name="analytics/dashboard.html",
+                  context={})

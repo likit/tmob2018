@@ -11,5 +11,11 @@ urlpatterns = [
     path('profile-by-name/', views.show_profile_by_name, name='show_profile_by_name'),
     path('show_field/<field_name>/', views.show_field, name='show_field'),
     path('abstract/<abstract_id>/', views.show_abstract, name='show_abstract'),
-    path('num_abstract_person/', views.show_abstract_per_person, name='show_abstract_per_person'),
+    path('num_abstract_person/', views.show_abstract_per_person,
+            name='show_abstract_per_person'),
+    path('get_num_active_scholar_studs/', views.get_num_active_scholar_studs,
+            name='get_num_active_scholar_studs'),
+    path('get_abstract_field/', views.get_abstract_fields,
+            name='get_abstract_field'),
+    path('dashboard/', views.show_dashboard, name='dashboard')
 ]
