@@ -1,0 +1,23 @@
+digraph G {
+  rankdir=RL;
+  node [shape=record,height=.1];
+  projectTable [label="Project|<f0>id|project_name|expected_output|workplace|period_mth|assess_period_mth|status|<f1>research_team_id"];
+  team [label="<f0>project-author|<f1>id|<f2>author_id|<f3>project_id"];
+  keywords [label="Keyword|<f0>id|word_en|word_th|<f1>project_id|<f2>author_scopus_id|<f3>abstract_id|firstname|lastname|count|affil_scopus_id"];
+  author [label="Author|<f0>id|<f1>scopus_id|<f2>scholarship_id"];
+  abstract [label="Abstract|<f0>id|doi|title_en|abstract_en|title_th|abstract_th|cited|pub_date|scopus_id"];
+  scholarship [label="Scholar|<f0>id|firstname_en|lastname_en|firstname_th|lastname_th|country|status|field_of_study|specialty|degree|contact|affil"];
+  nounchunk [label="Nounchunk|<f0>id|chunk_en|chunk_th"];
+  nounabs [label="<f0>abstract-nounchunk|<f1>id|<f2>abstract_id|<f3>nounchunk_id"];
+  nounkeywords [label="<f0>nounchunk-keywords|<f1>id|<f2>keyword_id|<f3>nounchunk_id"];
+  projectTable:f0->team:f3;
+  keywords:f1->projectTable:f0;
+  keywords:f2->author:f1;
+  keywords:f3->abstract:f0;
+  team:f2->author:f0;
+  author:f2->scholarship:f0;
+  abstract:f0->nounabs:f2
+  nounabs:f3->nounchunk:f0;
+  keywords:f0->nounkeywords:f2;
+  nounkeywords:f3->nounchunk:f0;
+}
