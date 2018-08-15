@@ -37,6 +37,7 @@ urlpatterns = [
     path('documents/', include(wagtaildocs_urls)),
     path('admin/', admin.site.urls),
     path('analytics/', include('analytics.urls', namespace='analytics')),
+    path('blog/', include('blog.urls', namespace='blog')),
     path('social-auth/',
          include('social_django.urls', namespace='social')),
 ]
