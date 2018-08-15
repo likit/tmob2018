@@ -1,5 +1,6 @@
 {% extends "blog/base.html" %}
 
+{% load static %}
 {% load wagtailcore_tags blogapp_tags el_pagination_tags wagtailroutablepage_tags menu_tags %}
 {% block navbar %}
 {% main_menu template="menus/main/level_1.html"%}
@@ -7,6 +8,23 @@
 
 {% block content %}
 <div class="container">
+    <div class="row">
+        <div class="col-md text-right">
+            {% if not request.session.language %}
+            <strong>English</strong><a href="/blog/switchlang/">
+                <img src="{% static 'blog/assets/img/united-states.png' %}" alt="english"/>
+            </a>
+            {% elif request.session.language == 'en' %}
+            <strong>ไทย</strong><a href="/blog/switchlang/">
+                <img src="{% static 'blog/assets/img/thailand.png' %}" alt="english"/>
+            </a>
+            {% else %}
+            <strong>English</strong> <a href="/blog/switchlang/">
+                <img src="{% static 'blog/assets/img/united-states.png' %}" alt="thai"/>
+            </a>
+            {% endif %}
+        </div>
+    </div>
     <h1 class="title">About Us</h1>
     <div class="row">
         <div class="col-md">

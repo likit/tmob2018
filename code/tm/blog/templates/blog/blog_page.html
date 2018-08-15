@@ -27,6 +27,24 @@
                 </h6>
                 {% endif %}
                 <h4 class="subtitle">Total {{ posts|length }} posts.</h4>
+                <div>
+                    {% if not request.session.language %}
+                    <strong>English</strong>
+                    <a href="/blog/switchlang/">
+                        <img src="{% static 'blog/assets/img/united-states.png' %}" alt="english"/>
+                    </a>
+                    {% elif request.session.language == 'en' %}
+                    <strong>ไทย</strong>
+                    <a href="/blog/switchlang/">
+                        <img src="{% static 'blog/assets/img/thailand.png' %}" alt="english"/>
+                    </a>
+                    {% else %}
+                    <strong>English</strong>
+                    <a href="/blog/switchlang/">
+                        <img src="{% static 'blog/assets/img/united-states.png' %}" alt="thai"/>
+                    </a>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>

@@ -1,5 +1,5 @@
 {% extends "blog/base.html" %}
-{% load menu_tags wagtailcore_tags blogapp_tags wagtailroutablepage_tags form_tags %}
+{% load static menu_tags wagtailcore_tags blogapp_tags wagtailroutablepage_tags form_tags %}
 
 {% block navbar %}
 {% main_menu template="menus/main/level_1.html"%}
@@ -17,7 +17,23 @@
     </nav>
     <div class="row">
         <div class="col-sm-12">
-            <h3 class="title text-center"><strong>{{ page.translated_title }}</strong></h3>
+            <h3 class="title text-center">
+                <strong>{{ page.translated_title }}</strong>
+                <br>
+                {% if not request.session.language %}
+                <a href="/blog/switchlang/">
+                    <img src="{% static 'blog/assets/img/united-states.png' %}" alt="english"/>
+                </a>
+                {% elif request.session.language == 'en' %}
+                <a href="/blog/switchlang/">
+                    <img src="{% static 'blog/assets/img/thailand.png' %}" alt="english"/>
+                </a>
+                {% else %}
+                <a href="/blog/switchlang/">
+                    <img src="{% static 'blog/assets/img/united-states.png' %}" alt="thai"/>
+                </a>
+                {% endif %}
+            </h3>
             <h6 class="subtitle text-muted text-center">Posted on {{ page.date }}</h6>
             <hr>
         </div>
