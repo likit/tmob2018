@@ -6,33 +6,29 @@
 {% endblock %}
 
 {% block content %}
-<section class="section">
 <div class="container">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/">Home</a></li>
-            <li class="breadcrumb-item"><a href="{% pageurl blog_page %}">Posts</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Post</li>
-        </ol>
-    </nav>
+    <div class="row">
+        <div class="col-md text-right">
+            <br>
+            {% if not request.session.language %}
+            <strong>English</strong>&nbsp;<a href="/blog/switchlang/">
+                <img src="{% static 'blog/assets/img/united-states.png' %}" alt="english"/>
+            </a>
+            {% elif request.session.language == 'en' %}
+            <strong>ไทย</strong>&nbsp;<a href="/blog/switchlang/">
+                <img src="{% static 'blog/assets/img/thailand.png' %}" alt="english"/>
+            </a>
+            {% else %}
+            <strong>English</strong>&nbsp;<a href="/blog/switchlang/">
+                <img src="{% static 'blog/assets/img/united-states.png' %}" alt="thai"/>
+            </a>
+            {% endif %}
+        </div>
+    </div>
     <div class="row">
         <div class="col-sm-12">
             <h3 class="title text-center">
                 <strong>{{ page.translated_title }}</strong>
-                <br>
-                {% if not request.session.language %}
-                <a href="/blog/switchlang/">
-                    <img src="{% static 'blog/assets/img/united-states.png' %}" alt="english"/>
-                </a>
-                {% elif request.session.language == 'en' %}
-                <a href="/blog/switchlang/">
-                    <img src="{% static 'blog/assets/img/thailand.png' %}" alt="english"/>
-                </a>
-                {% else %}
-                <a href="/blog/switchlang/">
-                    <img src="{% static 'blog/assets/img/united-states.png' %}" alt="thai"/>
-                </a>
-                {% endif %}
             </h3>
             <h6 class="subtitle text-muted text-center">Posted on {{ page.date }}</h6>
             <hr>
@@ -90,5 +86,4 @@
         </div>
     </div>
 </div>
-</section>
 {% endblock %}
