@@ -4,7 +4,7 @@ from collections import namedtuple
 from datetime import date, datetime
 from django.contrib.postgres.search import SearchVector
 from django import forms
-from django.http import Http404, HttpResponse
+from django.http import Http404
 from django.db import models
 from django.conf import settings
 from django.utils.dateformat import DateFormat
@@ -22,7 +22,8 @@ from taggit.models import TaggedItemBase, Tag as TaggitTag
 from modelcluster.fields import ParentalKey, ParentalManyToManyField, ForeignKey
 from modelcluster.tags import ClusterTaggableManager
 from rest_framework.fields import DateTimeField
-# Create your models here.
+from .middleware import RequestMiddleware
+
 
 fb_post = namedtuple('FbPost', ['post_id', 'page_id', 'story', 'message', 'created_time'])
 
@@ -32,8 +33,14 @@ class TranslatedField:
         self.th_field = th_field
 
     def __get__(self, instance, owner):
-        if translation.get_language() == 'en':
+        # access request object to get data stored in its session
+        request = RequestMiddleware(get_response=None)
+        request = request.thread_local.current_request
+
+        if request.session.get('language') is None:
             return getattr(instance, self.th_field)
+        elif request.session.get('language') == 'en':
+            return getattr(instance, self.en_field)
         else:
             return getattr(instance, self.th_field)
 
