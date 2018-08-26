@@ -297,5 +297,5 @@ def get_abstract_fields(request):
 
 
 def show_dashboard(request):
-    return render(request, template_name="analytics/dashboard.html",
+    return render(request, template_name="analytics/scholar-dashboard.html",
                   context={})
