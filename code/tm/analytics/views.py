@@ -296,6 +296,6 @@ def get_abstract_fields(request):
     return JsonResponse({'data': data, 'labels': labels})
 
 
-def show_dashboard(request):
+def show_scholar_dashboard(request):
     return render(request, template_name="analytics/scholar-dashboard.html",
                   context={})

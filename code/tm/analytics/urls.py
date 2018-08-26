@@ -17,5 +17,5 @@ urlpatterns = [
             name='get_num_active_scholar_studs'),
     path('get_abstract_field/', views.get_abstract_fields,
             name='get_abstract_field'),
-    path('dashboard/', views.show_dashboard, name='dashboard')
+    path('scholar-dashboard/', views.show_scholar_dashboard, name='scholar-dashboard')
 ]
