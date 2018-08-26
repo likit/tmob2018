@@ -9,11 +9,11 @@ $.when($.getJSON('/analytics/num_abstract_person')).then(function(data) {
             label: "Number of graduated and graduating scholars.",
             datasets: [{
                 data: data['data'],
-        backgroundColor: ['rgb(255, 99, 132)', 'rgb(124,56,123)'],
+        backgroundColor: ['rgb(199, 0, 57)', 'rgb(100,116,164)'],
         }],
             labels: [
-                'Graduating',
-                'Graduated'
+                'กำลังศึกษาอยู่',
+                'จบการศึกษาแล้ว'
             ]
         }
     });
@@ -26,12 +26,12 @@ $.when($.getJSON('/analytics/get_num_active_scholar_studs')).then(function(data)
         data: {
             labels: data['labels'],
             datasets: [{
-                label: 'Inactive',
+                label: 'ยังไม่มีผลงานวิจัยในรอบห้าปี',
                 data: data['inactives'],
                 backgroundColor: data['inactivecolors']
             },
             {
-                label: 'Active',
+                label: 'มีผลงานวิจัยในรอบห้าปี',
                 data: data['actives'],
                 backgroundColor: data['activecolors']
             }]
@@ -53,6 +53,7 @@ $.when($.getJSON('/analytics/get_abstract_field')).then(function(data) {
             labels: data['labels'],
             datasets: [{
                 data: data['data'],
+                label: 'จำนวนผลงาน',
                 backgroundColor: data['backgroundColors'],
             }],
         },

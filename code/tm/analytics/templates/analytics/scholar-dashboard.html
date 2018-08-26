@@ -7,7 +7,19 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-category">
-                        จำนวนนักเรียนทุนที่จบการศึกษาแล้วสังกัดตามหน่วยงาน สถาบันต่างๆ
+                        สัดส่วนนักเรียนทุนกระทรวงวิทย์ที่จบการศึกษาแล้วและยังไม่จบการศึกษา
+                    </div>
+                </div>
+                <div class="card-body">
+                    <canvas id="activeResChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-category">
+                        จำนวนนักเรียนทุนกระทรวงวิทย์ที่จบการศึกษาแล้วสังกัดตามหน่วยงาน สถาบันต่างๆ
                     </div>
                 </div>
                 <div class="card-body">
@@ -16,31 +28,20 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-6 ml-auto">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-category">
-                            จำนวนนักเรียนทุนกระทรวงวิทย์ที่จบการศึกษาแล้วและยังไม่จบการศึกษา
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="activeResChart"></canvas>
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-category">
+                        จำนวนงานวิจัยในแต่ละสาขาแบ่งตามฐานข้อมูล SCOPUS
                     </div>
                 </div>
-            </div>
-            <div class="col-md-6 ml-auto">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-category">
-                            จำนวนงานวิจัยในแต่ละสาขาแบ่งตาม Scopus
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="paperPerField"></canvas>
-                    </div>
+                <div class="card-body">
+                    <canvas id="paperPerField"></canvas>
                 </div>
             </div>
         </div>
     </div>
 {% endblock %}
 
+{% block scripts %}
+<script src="{% static 'analytics/assets/app/dashboard.js' %}" type="text/javascript"></script>
+{% endblock %}
