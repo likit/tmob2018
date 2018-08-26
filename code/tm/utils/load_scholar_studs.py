@@ -3,14 +3,24 @@ import pandas as pd
 from sqlalchemy import func
 from sqlalchemy import create_engine
 from sqlalchemy.ext.automap import automap_base
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
 from keywordsdw import ScholarshipInfo, Author
 
-engine = create_engine('postgresql+psycopg2://postgres:_genius01_@localhost:5434/keywordsdw')
+def load_stud_to_db2(inputfile, sheetname):
+    df = pd.read_excel(inputfile, sheet_name=sheetname)
+    for idx, row in df.iterrows():
+        firstname_th = row['FirstNameTh'] if not pd.isna(row['FirstNameTh']) else ''
+        lastname_th = row['LastNameTh'] if not pd.isna(row['LastNameTh']) else ''
+        affil = row['Department'].lower() if not pd.isna(row['Department']) else ''
+        person = session.query(ScholarshipInfo).filter(id==2975).first()
+        person = session.query(ScholarshipInfo).filter(
+                    ScholarshipInfo.last_name_th==lastname_th,
+                    ScholarshipInfo.first_name_th==firstname_th).first()
+        person.affil = affil
+        # print(person.first_name_th, person.last_name_th, person.affil, person.degree)
+        session.add(person)
+    session.commit()
 
-session = Session(engine)
-
-Person = ScholarshipInfo
 
 def load_stud_to_db(inputfile, sheetname):
     df = pd.read_excel(inputfile, sheet_name=sheetname)
@@ -63,10 +73,17 @@ def link_author():
 
 
 if __name__ == '__main__':
+    engine = create_engine('postgresql+psycopg2://postgres:_genius01_@localhost:5434/keywordsdw')
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+    Person = ScholarshipInfo
+
     inputfile = sys.argv[1]
     sheetname = sys.argv[2]
+
     if inputfile == 'link':
         link_author()
     else:
-        load_stud_to_db(inputfile, sheetname)
+        load_stud_to_db2(inputfile, sheetname)
 
