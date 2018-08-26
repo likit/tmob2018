@@ -131,7 +131,18 @@ class ScholarshipInfo(Base):
     contact = Column(String())
 
 
-if __name__ == '__main__':
-    kw_engine = create_engine('postgresql+psycopg2://likit:password@localhost/keywordsdw')
-    session = Session(kw_engine)
-    Base.metadata.create_all(kw_engine)
+class TMResearcherProfile(Base):
+    __tablename__ = 'tm_researcher_profile'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    first_name_th = Column(String(255))
+    last_name_th = Column(String(255))
+    first_name_en = Column(String(255))
+    last_name_en = Column(String(255))
+    profile_id = Column(Integer())
+    gender = Column(String(1))
+    dob = Column(Date())
+    isRegistered = Column(Boolean())
+    email = Column(String(128))
+    scholarship_info_id = Column(Integer(), ForeignKey('scholarship_info.id'))
+    scholarship_info = relationship("ScholarshipInfo",
+                                    backref=backref('tm_researcher'), uselist=False)
