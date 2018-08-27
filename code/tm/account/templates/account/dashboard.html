@@ -8,16 +8,37 @@
 <div class="container">
   {% if messages %}
     {% for message in messages %}
-      <div class="alert alert-{{message.tags}} role="alert">
+      <div class="alert alert-{{message.tags}}" role="alert">
         <div class="container">
           {{ message|safe }}
-          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-            <span aria-hidden="true"><i class="now-ui-icons ui-1_simple-remove"></i></span>
-          </button>
         </div>
       </div>
     {% endfor %}
   {% endif %}
+    {% if matches and not user.profile.tm_profile_id %}
+        <div class="alert alert-info" role="alert">
+        <div class="container">
+            <h5>เราพบชื่อคุณในฐานข้อมูลนักวิจัยโครงการ Talent Mobility
+                โปรดตรวจสอบรายชื่อเพื่อเชื่อมโยงบัญชีเข้าด้วยกันเพื่อความสะดวกในการเข้าใช้งานระบบทั้งสองระบบ ระบบจะส่งอีเมลเพื่อให้คุณยืนยันตัวตนก่อนทำการเชื่อมต่อข้อมูลตามอีเมลที่ปรากฏในรายการ</h5>
+        </div>
+        </div>
+        <table class="table">
+            <thead>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Email</th>
+            <th></th>
+            </thead>
+            {% for r in matches %}
+                <tr>
+                    <td>{{ r.first_name_en }}</td>
+                    <td>{{ r.last_name_en }}</td>
+                    <td>{{ r.email }}</td>
+                    <td><a href="/account/verify_email/{{ user.id }}/{{ r.id }}/" class="btn btn-primary btn-round">Link</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
   <h1 class="title">Profile</h1>
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">

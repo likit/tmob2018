@@ -29,6 +29,7 @@ class Profile(models.Model):
     current_affiliation = models.CharField(max_length=255, blank=True)
     about = models.TextField(blank=True)
     field_of_interest = models.TextField(blank=True)
+    tm_profile_id = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return 'Profile for user {}'.format(self.user.username)

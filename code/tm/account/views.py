@@ -12,6 +12,14 @@ from sqlalchemy import create_engine
 from py2neo import Graph
 from .models import Profile
 from social_django.utils import psa
+from django.contrib.sites.shortcuts import get_current_site
+from django.utils.encoding import force_bytes, force_text
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.template.loader import render_to_string
+from .token import account_activation_token
+from django.core.mail import EmailMessage
+
+
 
 # graph = Graph(host='neo4j_db', password='_genius01_', scheme='bolt')
 engine = create_engine('postgresql+psycopg2://postgres:_genius01_@postgres_db/keywordsdw')
@@ -100,6 +108,8 @@ def profile(request, username):
                 for f in results:
                     fields[f[0]] += 1
     fields.default_factory = None
+    sqlquery = "select * from tm_researcher_profile where lower(first_name_en)='{}' and lower(last_name_en)='{}'".format(user.first_name.lower(),user.last_name.lower())
+    results = conn.execute(sqlquery)
     return render(request,
             'account/dashboard.html',
             {'section': 'dashboard',
@@ -112,6 +122,7 @@ def profile(request, username):
              'abstracts': abstracts,
              'keywords': keywords,
              'fields': fields,
+             'matches': results,
             })
 
 
@@ -125,14 +136,61 @@ def register(request):
             )
             new_user.save()
             Profile.objects.create(user=new_user)
-            return render(request,
-                          'account/register_done.html',
-                          {'new_user': new_user})
+            return redirect('tm_account', new_user_id=new_user.id)
     else:
         user_form = UserRegistrationForm()
     return render(request,
                   'account/register.html',
                   {'user_form': user_form})
+
+
+def link_tm_account(request, new_user_id):
+    user = User.objects.get(pk=new_user_id)
+    sqlquery = "select * from tm_researcher_profile where lower(first_name_en)='{}' and lower(last_name_en)='{}'".format(user.first_name.lower(),user.last_name.lower())
+    results = conn.execute(sqlquery)
+    return render(request,
+                  'account/register_done.html',
+                  {'new_user': user, 'matches': results})
+
+
+def verify_email(request, user_id, profile_id):
+    user = User.objects.get(pk=user_id)
+    sqlquery = "select * from tm_researcher_profile where id={}".format(profile_id)
+    tm = conn.execute(sqlquery).first()
+    email = tm['email']
+    current_site = get_current_site(request)
+    mail_subject = 'Confirm your email to link account.'
+    message = render_to_string('account/acc_active_email.html', {
+        'user': user,
+        'domain': current_site.domain,
+        'uid': urlsafe_base64_encode(force_bytes(user.pk)).decode(),
+        'pid': urlsafe_base64_encode(force_bytes(profile_id)).decode(),
+        'token': account_activation_token.make_token(user),
+    })
+    email = EmailMessage(
+        mail_subject, message, to=[email]
+    )
+    email.send()
+    return render(request, 'account/verify_mail.html', {'status': 'pending'})
+
+
+def activate_link(request, uidb64, pidb64, token):
+    try:
+        uid = force_text(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+        pid = force_text(urlsafe_base64_decode(pidb64))
+        sqlquery = 'select * from tm_researcher_profile where id={}'.format(pid)
+        profile = conn.execute(sqlquery).first()
+    except(TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    if user is not None and account_activation_token.check_token(user, token):
+        user.profile.tm_profile_id = int(profile['id'])
+        user.profile.save()
+        login(request, user,backend='django.contrib.auth.backends.ModelBackend')
+        # return redirect('home')
+        return render(request, 'account/verify_mail.html', {'status': 'succeeded', 'user': user, 'profile': profile})
+    else:
+        return HttpResponse('Activation link is invalid!')
 
 
 @login_required

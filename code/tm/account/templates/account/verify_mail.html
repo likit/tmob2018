@@ -1,10 +1,44 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        {% if status == 'pending' %}
+        <h3>Please check your email for a message to confirm your account linkage.</h3>
+        {% elif status == 'succeeded' %}
+        <h3>Your account linkage has been confirmed.</h3>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="card card-block">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                TM Web Account
+                            </h4>
+                            <p><i class="now-ui-icons users_circle-08"></i>&nbsp;{{ user.first_name }} {{ user.last_name }}</p>
+                            <p><strong>Account ID.</strong>&nbsp;{{ user.pk }}</p>
+                            <p><strong>Email</strong>&nbsp;{{ user.email }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <i class="fa fa-link fa-4x"></i>
+                </div>
+                <div class="col-md-4">
+                    <div class="card card-block">
+                        <div class="card-body">
+                            <h4 class="card-title">
+                                TM Project Management System Account
+                            </h4>
+                            <p><i class="now-ui-icons users_circle-08"></i>&nbsp;{{ profile.first_name_en }} {{ profile.last_name_en }}</p>
+                            <p><strong>Account ID.</strong>&nbsp;{{ profile.id }}</p>
+                            <p><strong>Email</strong>&nbsp;{{ profile.email }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

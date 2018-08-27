@@ -6,7 +6,28 @@
 <section class="section">
     <div class="container">
         <h1 class="title">Welcome {{ new_user.first_name }}!</h1>
-        <p>Your account has been successfully created. Now you can <a href="{% url 'login' %}">log in</a>.</p>
+        <p>Your account has been successfully created. Now you can <a class="btn btn-round btn-primary" href="{% url 'login' %}">log in</a>.</p>
+        {% if matches %}
+        <h2>เราพบชื่อคุณในฐานข้อมูลนักวิจัยโครงการ Talent Mobility</h2>
+        <p>
+        โปรดตรวจสอบรายชื่อเพื่อเชื่อมโยงบัญชีเข้าด้วยกันเพื่อความสะดวกในการเข้าใช้งานระบบทั้งสองระบบ ระบบจะส่งอีเมลเพื่อให้คุณยืนยันตัวตนก่อนทำการเชื่อมต่อข้อมูลตามอีเมลที่ปรากฏในรายการ</p>
+        <table class="table">
+            <thead>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+                <th></th>
+            </thead>
+            {% for r in matches %}
+                <tr>
+                    <td>{{ r.first_name_en }}</td>
+                    <td>{{ r.last_name_en }}</td>
+                    <td>{{ r.email }}</td>
+                    <td><a href="/account/verify_email/{{ new_user.id }}/{{ r.id }}/" class="btn btn-primary btn-round">Link</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% endif %}
     </div>
 </section>
 {% endblock %}

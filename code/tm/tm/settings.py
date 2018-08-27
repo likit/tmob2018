@@ -204,3 +204,9 @@ JWT_AUTH = {
     'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=1),
     'JWT_ALLOW_REFRESH': True,
 }
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'likit.pre@mahidol.edu'
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
+EMAIL_PORT = 587

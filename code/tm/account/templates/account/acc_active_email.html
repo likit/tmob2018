@@ -1,10 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% autoescape off %}
+Hi {{ user.first_name }} {{ user.last_name }},
+
+Please click on the link to confirm your registration,
+http://{{ domain }}{% url 'activate_link' uidb64=uid pidb64=pid token=token %}
+
+-- Talent Mobility Team
+{% endautoescape %}
