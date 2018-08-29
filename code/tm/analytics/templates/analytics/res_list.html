@@ -24,7 +24,8 @@
                    placeholder="Search for experts with keywords&hellip;" title="Search for: "/>
         </div>
     </form>
-    <h4>We've found someone who knows a thing or two about <strong>{{ search_term }}</strong>...</h4>
+    {% if results %}
+    <h4>We may have found someone who knows a thing or two about <strong>{{ search_term }}</strong>...</h4>
     <table class="table">
         <thead>
             <th>Name</th>
@@ -48,6 +49,23 @@
         {% endfor %}
     </table>
     <p>* Scholarship students are highlighted.</p>
+    {% else %}
+        <h4>We couldn't find any keyword that matches <strong>{{ search_term }}</strong></h4>
+    {% endif %}
+    <h4>Researchers whose name matches <strong>{{ search_term }}</strong></h4>
+    {% for author in authors %}
+    <table>
+        <tr>
+            <td>
+                <a href="/analytics/profile-by-name/?firstname={{author.1}}&lastname={{author.2}}">
+                    {{ author.1 }} {{ author.2 }}
+                </a>
+            </td>
+        </tr>
+    </table>
+    {% empty %}
+        No one with the name {{ search_term }} was found.
+    {% endfor %}
     <h4>Researchers whose research of interests may include <strong>{{ search_term }}</strong></h4>
     <ul>
         {% for username,profile in profiles.items %}

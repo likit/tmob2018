@@ -70,9 +70,16 @@ def res_list(request):
             field_of_interest = (f.strip() for f in p.field_of_interest.split(','))
             profiles[p.user.username] = (p.user.first_name, p.user.last_name, field_of_interest)
 
+    authors = []
+    query = ("select id, first_name,last_name from authors where "
+             "lower(first_name)=lower(%s) or lower(last_name)=lower(%s);")
+    for id, first_name, last_name in conn.execute(query, (search_term,search_term)):
+        authors.append((id,first_name,last_name))
+
     return render(request, template_name='analytics/res_list.html',
             context={'search_term': search_term, 'results': res_list,
-                        'nounchunks': nounchunks, 'profiles': profiles})
+                        'nounchunks': nounchunks, 'profiles': profiles,
+                     'authors': authors})
 
 def noun_chunk_detail(request):
     nc_id = request.GET.get('ncid')
