@@ -16,12 +16,15 @@ $.when($.getJSON('/analytics/num_abstract_person')).then(function(data) {
                 'กำลังศึกษาอยู่',
                 'จบการศึกษาแล้ว'
             ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false
         }
     });
 });
 
 $.when($.getJSON('/analytics/get_num_active_scholar_studs')).then(function(data) {
-    console.log(data)
     var activeScholar = new Chart(ctxSchoPerAffilChart, {
         type: 'bar',
         data: {
@@ -47,7 +50,6 @@ $.when($.getJSON('/analytics/get_num_active_scholar_studs')).then(function(data)
 });
 
 $.when($.getJSON('/analytics/get_abstract_field')).then(function(data) {
-    console.log(data)
     var paperPerField = new Chart(ctxPaperPerField, {
         type: 'bar',
         data: {
@@ -67,7 +69,6 @@ $.when($.getJSON('/analytics/get_abstract_field')).then(function(data) {
 });
 
 $.when($.getJSON('/analytics/get_researcher_by_field')).then(function(data) {
-    console.log(data)
     var paperPerField = new Chart(ctxResearcherPerField, {
         type: 'bar',
         data: {
