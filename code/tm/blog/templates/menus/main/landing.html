@@ -1,4 +1,4 @@
-{% load static %}
+{% load static blogapp_tags %}
 <nav class="navbar navbar-expand-lg bg-primary fixed-top navbar-transparent" color-on-scroll="40">
     <div class="container">
         <button class="navbar-toggler" type="button" data-toggle="collapse"
@@ -10,13 +10,6 @@
         </button>
         <div class="collapse navbar-collapse" data-color="orange" data-nav-image="{% static 'blog/assets/img/blurred-image-1.jpg' %}">
             <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <h6>
-                        <a class="nav-link" href="/analytics/database">
-                            <strong>Database</strong>
-                        </a>
-                    </h6>
-                </li>
                 {% for item in menu_items %}
                 <li class="nav-item">
                     <h6>
@@ -29,7 +22,16 @@
                 <li class="nav-item">
                     <h6>
                         <a class="nav-link" href="http://203.151.187.32/tm3/talentmobility/public/#">
+                            <i class="now-ui-icons objects_spaceship"></i>
                             <strong>Project Management System</strong>
+                        </a>
+                    </h6>
+                </li>
+                <li class="nav-item">
+                    <h6>
+                        <a class="nav-link" href="/analytics/database">
+                            <i class="now-ui-icons design_app"></i>
+                            <strong>Database</strong>
                         </a>
                     </h6>
                 </li>
@@ -37,22 +39,34 @@
                 <li class="nav-item">
                     <h6>
                         <a class="nav-link" href="{{ user.get_absolute_url }}">
-                            <i class="fa fa-user-circle"></i>
+                            <i class="now-ui-icons users_circle-08"></i>
                             <strong>Profile</strong>
                         </a>
                     </h6>
                 </li>
                 {% endif %}
+                {% if user.is_authenticated and user|has_group:"talent_staff" %}
+                    <li class="nav-item">
+                        <h6>
+                            <a class="nav-link" href="/analytics/scholar-dashboard">
+                                <i class="now-ui-icons business_chart-pie-36"></i>
+                                <strong>Analytics</strong>
+                            </a>
+                        </h6>
+                    </li>
+                {% endif %}
                 <li class="nav-item">
                     {% if request.user.is_authenticated %}
                     <h6>
                         <a class="nav-link" href="/account/logout">
+                            <i class="now-ui-icons ui-1_lock-circle-open"></i>
                             <strong>Log out</strong>
                         </a>
                     </h6>
                     {% else %}
                     <h6>
                         <a class="nav-link" href="/account/login">
+                            <i class="now-ui-icons objects_key-25"></i>
                             <strong>Log in</strong>
                         </a>
                     </h6>

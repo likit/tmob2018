@@ -1,4 +1,5 @@
 from django.template import Library, loader
+from django.contrib.auth.models import Group
 from django.urls import resolve
 
 register = Library()
@@ -16,3 +17,8 @@ def post_date_url(post, blog_page):
         )
     )
     return url
+
+@register.filter(name="has_group")
+def has_group(user, group_name):
+    group = Group.objects.get(name=group_name)
+    return group in user.groups.all()
