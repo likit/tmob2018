@@ -28,5 +28,6 @@ urlpatterns = [
     path('get_tm_researchers_graph_data/', views.get_tm_researchers_graph_data,
          name='get_tm_researchers_graph_data'),
     path('scholar-dashboard/', views.show_scholar_dashboard, name='scholar-dashboard'),
-    path('tm-dashboard/', views.show_tm_dashboard, name='tm-dashboard')
+    path('tm-dashboard/', views.show_tm_dashboard, name='tm-dashboard'),
+    path('network-dashboard/', views.show_network_dashboard, name='network-dashboard')
 ]

@@ -548,3 +548,7 @@ def show_scholar_dashboard(request):
 def show_tm_dashboard(request):
     return render(request, template_name="analytics/tm-dashboard.html",
                   context={'board': 'tm'})
+
+def show_network_dashboard(request):
+    return render(request, template_name="analytics/network-dashboard.html",
+                  context={'board': 'network'})
