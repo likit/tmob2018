@@ -78,11 +78,11 @@ $.when($.getJSON('/analytics/get_researcher_by_field')).then(function(data) {
                 data: data['inactives'],
                 backgroundColor: data['inactivecolors']
             },
-                {
-                    label: 'มีผลงานวิจัยในรอบห้าปี',
-                    data: data['actives'],
-                    backgroundColor: data['activecolors']
-                }]
+            {
+                label: 'มีผลงานวิจัยในรอบห้าปี',
+                data: data['actives'],
+                backgroundColor: data['activecolors']
+            }]
         },
         options: {
             scales: {
