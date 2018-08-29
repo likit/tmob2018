@@ -30,12 +30,12 @@ $.when($.getJSON('/analytics/get_num_active_scholar_studs')).then(function(data)
         data: {
             labels: data['labels'],
             datasets: [{
-                label: 'ยังไม่มีผลงานวิจัยในรอบห้าปี',
+                label: 'ยังไม่มีผลงานวิจัยใน 2013-2018',
                 data: data['inactives'],
                 backgroundColor: data['inactivecolors']
             },
             {
-                label: 'มีผลงานวิจัยในรอบห้าปี',
+                label: 'มีผลงานวิจัยใน 2013-2018',
                 data: data['actives'],
                 backgroundColor: data['activecolors']
             }]
@@ -74,12 +74,12 @@ $.when($.getJSON('/analytics/get_researcher_by_field')).then(function(data) {
         data: {
             labels: data['labels'],
             datasets: [{
-                label: 'ยังไม่มีผลงานวิจัยในรอบห้าปี',
+                label: 'ยังไม่มีผลงานวิจัยใน 2013-2018',
                 data: data['inactives'],
                 backgroundColor: data['inactivecolors']
             },
             {
-                label: 'มีผลงานวิจัยในรอบห้าปี',
+                label: 'มีผลงานวิจัยใน 2013-2018',
                 data: data['actives'],
                 backgroundColor: data['activecolors']
             }]
