@@ -296,6 +296,39 @@ def get_abstract_fields(request):
     return JsonResponse({'data': data, 'labels': labels, 'backgroundColors': backgroundColors})
 
 
+def get_researcher_by_field(request):
+    all_auth_counts = defaultdict(set)
+    active_auth_counts = defaultdict(set)
+    sqlquery = ('select authors.id,research_fields.abbr from field_has_abstract inner join research_fields on field_has_abstract.field_id=research_fields.id '
+                'inner join abstract_has_author on abstract_has_author.abstract_id=field_has_abstract.abstract_id '
+                'inner join authors on authors.id=abstract_has_author.author_id where authors.scholarship_info_id is not null')
+    for auth_id, field_abbr in conn.execute(sqlquery):
+        all_auth_counts[field_abbr].add(auth_id)
+
+    sqlquery = ('select active_scholar_students.author_id,research_fields.abbr from field_has_abstract inner join research_fields on field_has_abstract.field_id=research_fields.id '
+                'inner join abstract_has_author on abstract_has_author.abstract_id=field_has_abstract.abstract_id '
+                'inner join active_scholar_students on active_scholar_students.author_id=abstract_has_author.author_id')
+    for auth_id, field_abbr in conn.execute(sqlquery):
+        active_auth_counts[field_abbr].add(auth_id)
+
+    actives = []
+    inactives = []
+    labels = []
+    inactivecolors = []
+    activecolors = []
+    data = [(k,len(v)) for k,v in active_auth_counts.items()]
+    sorted_fields = [k for k,v in sorted(data,key=lambda x: x[1], reverse=True)]
+    for field in sorted_fields:
+        actives.append(len(active_auth_counts[field]))
+        inactives.append(len(all_auth_counts[field]-active_auth_counts[field]))
+        labels.append(field)
+        activecolors.append('rgb(199,0,57)')
+        inactivecolors.append('rgb(100,116,164)')
+
+    return JsonResponse({'inactives': inactives, 'actives': actives, 'labels': labels,
+                         'activecolors': activecolors, 'inactivecolors': inactivecolors})
+
+
 def get_scholar_joined_tm_ratio(request):
     sqlquery = ('select count(*) as c from tm_researcher_profile;')
     total_tm = conn.execute(sqlquery).scalar()

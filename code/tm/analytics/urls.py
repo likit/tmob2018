@@ -17,6 +17,8 @@ urlpatterns = [
             name='get_num_active_scholar_studs'),
     path('get_abstract_field/', views.get_abstract_fields,
             name='get_abstract_field'),
+    path('get_researcher_by_field/', views.get_researcher_by_field,
+         name='get_researcher_by_field'),
     path('get_scholar_joined_tm_ratio/', views.get_scholar_joined_tm_ratio,
          name='get_scholar_joined_tm_ratio'),
     path('get_num_active_scholar_tm/', views.get_num_active_scholar_tm,
