@@ -25,6 +25,8 @@ urlpatterns = [
          name='get_num_active_scholar_tm'),
     path('get_activeness_scholar_tm/', views.get_activeness_scholar_tm,
          name='get_activeness_scholar_tm'),
+    path('get_tm_researchers_graph_data/', views.get_tm_researchers_graph_data,
+         name='get_tm_researchers_graph_data'),
     path('scholar-dashboard/', views.show_scholar_dashboard, name='scholar-dashboard'),
     path('tm-dashboard/', views.show_tm_dashboard, name='tm-dashboard')
 ]

@@ -284,6 +284,8 @@ def get_num_active_scholar_studs(request):
 def get_abstract_fields(request):
     sqlquery = ('select abbr,count(*) as c from field_has_abstract '
                 'inner join research_fields on research_fields.id=field_has_abstract.field_id '
+                'inner join abstracts on field_has_abstract.abstract_id=abstracts.id '
+                'where abstracts.pub_date>\'2013-01-01\' '
                 'group by abbr order by c desc;')
     data = []
     labels = []
@@ -431,6 +433,111 @@ def get_activeness_scholar_tm(request):
                          'activecolors': activecolors,
                          'inactivecolors': inactivecolors,
                          'labels': labels})
+
+
+def get_tm_researchers_graph_data(request):
+    sqlquery = ('select authors.id from authors '
+                'inner join scholarship_info on authors.scholarship_info_id=scholarship_info.id '
+                'where scholarship_info.status=true')
+
+    scholars = set()
+    for row in conn.execute(sqlquery):
+        scholars.add(row[0])
+
+
+    sqlquery = ('select authors.id, abstracts.id from scholarship_info '
+                'inner join tm_researcher_profile on tm_researcher_profile.scholarship_info_id=scholarship_info.id '
+                'inner join authors on scholarship_info.id=authors.scholarship_info_id '
+                'inner join abstract_has_author on abstract_has_author.author_id=authors.id '
+                'inner join abstracts on abstract_has_author.abstract_id=abstracts.id '
+                'where scholarship_info.status=true '
+                )
+
+    tm_abstracts = set()
+    tm_authors = set()
+    for author_id, abstract_id in conn.execute(sqlquery):
+        tm_abstracts.add(abstract_id)
+        tm_authors.add(author_id)
+
+    sqlquery = ('select authors.id,authors.first_name, authors.last_name,abstracts.id from abstracts '
+                'inner join abstract_has_author on abstract_has_author.abstract_id=abstracts.id '
+                'inner join authors on abstract_has_author.author_id=authors.id;'
+                )
+    abstracts = {}
+    for author_id, first_name, last_name, abstract_id in conn.execute(sqlquery):
+        if abstract_id in tm_abstracts:
+            if abstract_id in abstracts:
+                abstracts[abstract_id].append((author_id, '{} {}'.format(first_name, last_name)))
+            else:
+                abstracts[abstract_id] = [(author_id, '{} {}'.format(first_name, last_name))]
+
+    edges = {}
+    nodes = {}
+    n = 0
+    for abstract_id, authors in abstracts.items():
+        n += 1
+        first_author_id = authors[0][0]
+        if first_author_id not in nodes:
+            nodes[first_author_id] = {'name': authors[0][1], 'papers': 1}
+        else:
+            nodes[first_author_id]['papers'] += 1
+        if first_author_id not in edges:
+            edges[first_author_id] = {}
+        if len(authors) > 1:
+            for author in authors[1:]:
+                if author[0] not in nodes:
+                    nodes[author[0]] = {'name': author[1], 'papers': 1}
+                else:
+                    nodes[author[0]]['papers'] += 1
+                if author[0] in edges and edges[author[0]].get(first_author_id, None):
+                    continue
+                else:
+                    edges[first_author_id][author[0]] = edges[first_author_id].get(author[0], 0) + 1
+
+    nodes_data = []
+    edges_data = []
+    flt_nodes = set()
+    for n in nodes:
+        if nodes[n]['papers'] > 2:
+            flt_nodes.add(n)
+            if n in tm_authors:
+                color = '#ff9900'
+            elif n in scholars:
+                color = '#33cc33'
+            else:
+                color = '#0099ff'
+            nodes_data.append({
+                'id': n,
+                'value': nodes[n]['papers'],
+                'label': nodes[n]['name'],
+                'color': color
+            })
+    for _from in list(flt_nodes):
+        for _to in edges.get(_from, []):
+            if edges[_from][_to] >= 1:
+                edges_data.append({
+                    'from': _from,
+                    'to': _to,
+                    'value': edges[_from][_to],
+                    'title': '{} publications'.format(edges[_from][_to])
+                })
+            if _to not in flt_nodes:
+                if _to in tm_authors:
+                    color = '#ff9900'
+                elif n in scholars:
+                    color = '#33cc33'
+                else:
+                    color = '#0099ff'
+                nodes_data.append({
+                    'id': _to,
+                    'value': nodes[_to]['papers'],
+                    'label': nodes[_to]['name'],
+                    'color': color
+                })
+                flt_nodes.add(_to)
+
+
+    return JsonResponse({'edges': edges_data, 'nodes': nodes_data})
 
 
 def show_scholar_dashboard(request):

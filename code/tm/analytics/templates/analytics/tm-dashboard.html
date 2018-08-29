@@ -10,7 +10,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <canvas id="scholarshipRatio"></canvas>
+                    <canvas id="scholarshipRatio" width="300" height="300"></canvas>
                 </div>
             </div>
         </div>
@@ -38,8 +38,21 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-category">
+                        เครือข่ายนักวิจัยจากข้อมูลผลงานวิจัยร่วมของนักเรียนทุนกระทรวงวิทยาศาสตร์ที่มีข้อมูลในฐานข้อมูล TM
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="mynetwork"></div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
 {% block scripts %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js"></script>
     <script src="{% static 'analytics/assets/app/tm-dashboard.js' %}" type="text/javascript"></script>
 {% endblock %}
