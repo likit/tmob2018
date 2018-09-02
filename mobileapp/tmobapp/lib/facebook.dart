@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'package:url_launcher/url_launcher.dart';
 
+
 const String appId = "338188326664223";
 const String appSecret = "860a22b9b251e96a774e6834952c63b9";
 
@@ -69,7 +70,7 @@ Future<Stream<String>> _server() async {
     request.response
       ..statusCode = 200
       ..headers.set('Content-Type', ContentType.HTML.mimeType)
-      ..write("<html><h1>You can now close this window</h1></html>");
+      ..write("<html><h3>You can now close this window</h3><script type='text/javascript'>window.close();</script></html>");
     await request.response.close();
     await server.close(force: true);
     onCode.add(code);
@@ -81,10 +82,11 @@ Future<Token> getToken(String appId, String appSecret) async {
   Stream<String> onCode = await _server();
   String url =
       "https://www.facebook.com/dialog/oauth?client_id=$appId&redirect_uri=http://localhost:8080/&scope=public_profile";
-  launch(url);
+  launch(url, forceWebView: true);
   final String code = await onCode.first;
   final http.Response response = await http.get(
       "https://graph.facebook.com/v2.8/oauth/access_token?client_id=$appId&redirect_uri=http://localhost:8080/&client_secret=$appSecret&code=$code"
   );
   return new Token.fromMap(JSON.decode(response.body));
 }
+

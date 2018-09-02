@@ -7,6 +7,14 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_html_view/flutter_html_view.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:intl/intl.dart';
+import 'facebook.dart' as fb;
+
+String jwt_token;
+bool isLoggedIn = false;
+String profileCover;
+int userId;
+const host = '209.97.174.132';
+
 
 final flutterWebViewPlugin = new FlutterWebviewPlugin();
 
@@ -47,14 +55,19 @@ class MainPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+      routes: {
+        '/': (context) => PostsList(),
+        '/login': (context) => FacebookLoginPage(),
+        '/profile': (context)=>AccountPage(),
+      },
+
       title: 'Talent Mobility App',
       theme: ThemeData(
+        fontFamily: 'Prompt',
         brightness: Brightness.light,
         primaryColor: Colors.deepOrangeAccent,
         accentColor: Colors.blueGrey,
-      ),
-      home: Scaffold(
-        body: PostsList(),
       ),
     );
   }
@@ -111,6 +124,7 @@ class _PostsListState extends State<PostsList> {
               itemBuilder: (BuildContext context, index) {
                 return Column(children: <Widget>[
                   Card(
+                    elevation: 0.0,
                     child: Container(
                       padding: EdgeInsets.all(16.0),
                       child: Column(
@@ -156,10 +170,10 @@ class _PostsListState extends State<PostsList> {
           title: new Text('Recent Posts'),
           actions: <Widget>[
             new IconButton(
-              icon: new Icon(Icons.search),
+              icon: new Icon(Icons.account_circle),
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SearchPostForm()));
+                    MaterialPageRoute(builder: (context) => AccountPage()));
               },
             )
           ]),
@@ -323,5 +337,337 @@ class _SearchPostFormState extends State<SearchPostForm> {
         child: Icon(Icons.text_fields),
       ),
     );
+  }
+}
+
+class UserProfile {
+  String name = '';
+  String name_th = '';
+  String currentAffiliation = '';
+  String currentPosition = '';
+  String contact = '';
+  int id = null;
+
+  UserProfile({this.id, this.name,
+    this.name_th,
+    this.currentAffiliation,
+    this.currentPosition,
+    this.contact});
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    if (json['profile'] != null) {
+      return UserProfile(
+        id: json['id'],
+        name: "${json['first_name']} ${json['last_name']}",
+        name_th: "${json['profile']['first_name_th']} ${json['profile']['last_name_th']}",
+        contact: json['email'],
+        currentAffiliation: json['profile']['current_affiliation'],
+        currentPosition: json['profile']['current_position'],
+      );
+    } else {
+      return UserProfile(
+        id: json['id'],
+        name: "${json['first_name']} ${json['last_name']}",
+        contact: json['email'],
+        currentAffiliation: '',
+        currentPosition: '',
+      );
+    }
+  }
+}
+
+
+class AccountPage extends StatelessWidget {
+
+  HttpClient httpClient = new HttpClient();
+
+  Future<UserProfile> fetchProfile(int userId) async {
+    var uri = Uri.http(host, '/account/api/users/${userId}');
+    var request = await httpClient.getUrl(uri);
+    var response = await request.close();
+    var responseBody = await response.transform(UTF8.decoder).join();
+    // final response = await http.get('http://209.97.174.132/api/v2/pages?type=blog.PostPage&fields=feed_image_thumbnail,body');
+    if (response.statusCode == 200) {
+      // setState(() {});
+      return UserProfile.fromJson(json.decode(responseBody));
+    } else {
+      throw Exception('Failed to load post');
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(!isLoggedIn) {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Please log in'),
+          elevation: 0.0,
+        ),
+        body: Center(
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(Icons.account_circle),
+                      iconSize: 96.0,
+                    ),
+                    Container(
+                      child: Text(
+                        'Log in using your social account.',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.0),
+                        textAlign: TextAlign.center,
+                      ),
+                      margin: const EdgeInsets.all(8.0),
+                    ),
+                    Container(
+                      child: RaisedButton(
+                        child: Text(
+                            'Facebook account',
+                            style: TextStyle(color: Colors.white)),
+                        shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(18.0)),
+                        color: Colors.blue[500],
+                        elevation: 0.0,
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/login');
+                        },
+                      ),
+                      margin: const EdgeInsets.all(8.0),
+                    ),
+                    Container(
+                      child: RaisedButton(
+                        child: Text(
+                            'Google account',
+                            style: TextStyle(color: Colors.white)),
+                        shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(18.0)),
+                        color: Colors.deepOrangeAccent[400],
+                        elevation: 0.0,
+                        onPressed: () {},
+                      ),
+                      margin: const EdgeInsets.all(8.0),
+                    ),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
+        appBar: AppBar(
+          title: Text('Profile'),
+          elevation: 1.0,
+        ),
+        body: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Center(
+            child: FutureBuilder<UserProfile>(
+              future: fetchProfile(userId),
+              builder: (context, snapshot){
+                if(snapshot.hasData) {
+                  return Column(
+                    children: <Widget>[
+                      CircleAvatar(
+                        backgroundImage: NetworkImage(profileCover),
+                        radius: 42.0,
+                      ),
+                      Text(''),
+                      Text(
+                        snapshot.data.name,
+                        style: TextStyle(fontSize: 18.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(top: 24.0),
+                        child: Column(
+                          children: <Widget>[
+                            Column(
+                              children: <Widget>[
+                                Text('Affiliation', style: TextStyle(fontSize: 18.0)),
+                                Text(snapshot.data.currentAffiliation),
+                                Text(''),
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Text('Position', style: TextStyle(fontSize: 18.0)),
+                                Text(snapshot.data.currentPosition),
+                                Text(''),
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Text('Contact', style: TextStyle(fontSize: 18.0)),
+                                Text(snapshot.data.contact),
+                                Text(''),
+                              ],
+                            ),
+                            Text('Research Interests', style: TextStyle(fontSize: 18.0),),
+                            Column(
+                              children: <Widget>[
+                                Text('Bioinformatics'),
+                                Text('Software Development'),
+                                Text('Data Engineering')
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  );
+                } else {
+                  return CircularProgressIndicator();
+                }
+              },
+            ),
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {
+            // code here
+          },
+          child: Icon(Icons.edit),
+        ),
+      );
+    }
+  }
+}
+
+class FacebookLoginPage extends StatefulWidget {
+  FacebookLoginPage({Key key}) : super(key: key);
+  @override
+  _FacebookLoginState createState() => new _FacebookLoginState();
+}
+
+class _FacebookLoginState extends State<FacebookLoginPage> {
+  fb.Token token;
+  fb.FacebookGraph graph;
+  fb.PublicProfile profile;
+
+  HttpClient httpClient = new HttpClient();
+
+  Future<String> authenticate(fb.Token token) async {
+    var uri = Uri.http(host,
+        '/account/register-by-token/facebook/',
+        {"access_token":token.access});
+    var request = await httpClient.getUrl(uri);
+    var response = await request.close();
+    var responseBody = await response.transform(UTF8.decoder).join();
+    if (response.statusCode==200) {
+      return responseBody;
+    } else {
+      throw Exception('Failed to authenticate.');
+    }
+  }
+
+  Future<Null> get_facebook_access_token() async {
+    fb.Token _token = await fb.getToken(fb.appId, fb.appSecret);
+    fb.FacebookGraph _graph = new fb.FacebookGraph(_token);
+    fb.PublicProfile _profile = await _graph.me(["name","picture.type(large)"]);
+    token = _token;
+    graph = _graph;
+    profile = _profile;
+  }
+
+  Future<Null> get_jwt_token(fb.Token fbToken) async {
+    var responseBody = await authenticate(fbToken);
+    var data = json.decode(responseBody);
+    jwt_token = data['token'];
+    userId = data['user_id'];
+  }
+
+  Future<Null> login() async {
+    await get_facebook_access_token();
+    await get_jwt_token(token);
+    if (jwt_token != '') {
+      isLoggedIn = true;
+      profileCover = profile.cover;
+    } else {
+      isLoggedIn = false;
+    }
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    login();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if(isLoggedIn) {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text('Facebook Log In'),
+            elevation: 0.0,
+          ),
+          body: Center(
+              child: Container(
+                  margin: EdgeInsets.all(16.0),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          'Login Succeeded.',
+                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 8.0),
+                        child: CircleAvatar(
+                          backgroundImage: NetworkImage(profile.cover),
+                          radius: 42.0,
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 8.0),
+                        child: Text(
+                          'Welcome ${profile.name}',
+                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(bottom: 8.0),
+                        child: RaisedButton(
+                          child: Text(
+                              'Your Profile',
+                              style: TextStyle(color: Colors.white)),
+                          shape: RoundedRectangleBorder(borderRadius: new BorderRadius.circular(18.0)),
+                          color: Colors.blue[500],
+                          elevation: 0.0,
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AccountPage()
+                              )
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  )
+              )
+          )
+      );
+    } else {
+      return Scaffold(
+          appBar: AppBar(
+            title: Text('Facebook Log In'),
+          ),
+          body: Container(
+            child: Center(
+              child: Text('Oops, something went wrong..'),
+            ),
+          )
+      );
+
+    }
   }
 }

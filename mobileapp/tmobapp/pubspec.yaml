@@ -62,3 +62,12 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.io/custom-fonts/#from-packages
+  fonts:
+      - family: Prompt
+        fonts:
+          - asset: fonts/Prompt-Bold.ttf
+          - asset: fonts/Prompt-SemiBold.ttf
+          - asset: fonts/Prompt-Light.ttf
+          - asset: fonts/Prompt-ExtraLight.ttf
+          - asset: fonts/Prompt-Medium.ttf
+          - asset: fonts/Prompt-Regular.ttf
