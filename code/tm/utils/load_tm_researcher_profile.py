@@ -47,6 +47,7 @@ for ix, row in df.iterrows():
         dob=row['birthday'],
         email=row['email'],
         isRegistered=row['isRegistered'],
+        profile_id=row['id']
     )
     scsession.add(profile)
     scsession.commit()
