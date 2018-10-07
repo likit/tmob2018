@@ -130,6 +130,13 @@ class ScholarshipInfo(Base):
     degree =Column(Integer())
     contact = Column(String())
 
+class TMResearchProject(Base):
+    __tablename__ = 'tm_researcher_project'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    title = Column(Text())
+    year = Column(Integer())
+    is_leader = Column(Boolean())
+    researcher_id = Column(Integer(), ForeignKey('tm_researcher_profile.id'))
 
 class TMResearcherProfile(Base):
     __tablename__ = 'tm_researcher_profile'
@@ -138,7 +145,7 @@ class TMResearcherProfile(Base):
     last_name_th = Column(String(255))
     first_name_en = Column(String(255))
     last_name_en = Column(String(255))
-    profile_id = Column(Integer())
+    profile_id = Column(Integer(), unique=True)
     gender = Column(String(1))
     dob = Column(Date())
     isRegistered = Column(Boolean())
@@ -146,3 +153,32 @@ class TMResearcherProfile(Base):
     scholarship_info_id = Column(Integer(), ForeignKey('scholarship_info.id'))
     scholarship_info = relationship("ScholarshipInfo",
                                     backref=backref('tm_researcher'), uselist=False)
+    project_id = Column(Integer(), ForeignKey('tm_researcher_project.id'))
+    projects = relationship("TMReseachProject", backref=backref('researcher'))
+
+
+class GJBResearcherProfile(Base):
+    __tablename__ = 'gjb_researcher_profile'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    title_th = Column(String(32))
+    title_en = Column(String(32))
+    first_name_th = Column(String(255))
+    last_name_th = Column(String(255))
+    first_name_en = Column(String(255))
+    last_name_en = Column(String(255))
+    profile_id = Column(Integer(), unique=True)
+    gender = Column(String(1))
+    email = Column(String(128))
+    major_th = Column(String(255))
+    faculty_th = Column(String(255))
+    university_th = Column(String(255))
+    theses = relationship('GJBThesis', backref='researcher')
+
+
+class GJBThesis(Base):
+    __tablename__ = 'gjb_theses'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    title_th = Column(Text())
+    title_en = Column(Text())
+    finished = Column(Boolean(), default=True)
+    researcher_id = Column(Integer, ForeignKey('gjb_researcher_profile.id'))
