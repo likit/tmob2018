@@ -54,7 +54,6 @@ class Tag(TaggitTag):
     class Meta:
         proxy = True
 
-#fb_page_access_token = 'EAAEzlJsTZBB8BABslGZBK5gquc526CvFhGcR4IvwDRzZC4pn7qVvgZAr7S0KJ2wqcZCcZCqdYoIWqHGWsNZCXVucU633gFiLSZCreekpUAHIzHgFW99bGlAT1028dmzbGZB41jP8Rf4PaAgS2oHx8LPxQOE43CoNweecYXuMBZBCLLcFslwXZBve8Le89xIZCMa4AP4ZD'
 fb_page_id = '241755426012824'
 fb_user_access_token = 'EAAEzlJsTZBB8BAFvEfLNZAQXzLV0V1YN3hWrOgW8VFZBCZBhelTWm9JphPEqkWvgjFustelwuLZBhNZAf67YmbW4kW80pYcUZCU5EwfzHT9JPuJhlv2cXEniP9w6NHMGx1XlmPAYTZAGcF8XZAHoDZB64yeeLcVPi1CTHiacerLhIPrAZDZD'
 
@@ -72,7 +71,7 @@ class HomePage(Page):
         return context
 
     def get_posts(self):
-        resp = requests.get('https://graph.facebook.com/v2.9/{}/posts?access_token={}'.format(fb_page_id, fb_user_access_token))
+        resp = requests.get('https://graph.facebook.com/v3.1/{}/posts?access_token={}'.format(fb_page_id, fb_user_access_token))
         posts = []
         activities = []
         for n,st in enumerate(resp.json()['data']):
