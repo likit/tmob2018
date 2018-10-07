@@ -152,9 +152,11 @@ class TMResearcherProfile(Base):
     email = Column(String(128))
     scholarship_info_id = Column(Integer(), ForeignKey('scholarship_info.id'))
     scholarship_info = relationship("ScholarshipInfo",
-                                    backref=backref('tm_researcher'), uselist=False)
+                            backref=backref('tm_researcher'), uselist=False,
+                            foreign_keys=[scholarship_info_id])
     project_id = Column(Integer(), ForeignKey('tm_researcher_project.id'))
-    projects = relationship("TMReseachProject", backref=backref('researcher'))
+    projects = relationship("TMResearchProject", backref=backref('researcher'),
+                            foreign_keys=[project_id])
 
 
 class GJBResearcherProfile(Base):
@@ -166,15 +168,13 @@ class GJBResearcherProfile(Base):
     last_name_th = Column(String(255))
     first_name_en = Column(String(255))
     last_name_en = Column(String(255))
-    profile_id = Column(Integer(), unique=True)
     gender = Column(String(1))
     email = Column(String(128))
     major_th = Column(String(255))
     faculty_th = Column(String(255))
     university_th = Column(String(255))
-    theses = relationship('GJBThesis', backref='researcher')
-    author_id = Column('author_id', Integer(),
-                        ForeignKey('authors.id'))
+    theses = relationship('GJBThesis', backref='gjb_researcher')
+    author_id = Column('author_id', Integer(), ForeignKey('authors.id'))
 
 
 class GJBThesis(Base):
