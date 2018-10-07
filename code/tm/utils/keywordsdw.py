@@ -173,6 +173,8 @@ class GJBResearcherProfile(Base):
     faculty_th = Column(String(255))
     university_th = Column(String(255))
     theses = relationship('GJBThesis', backref='researcher')
+    author_id = Column('author_id', Integer(),
+                        ForeignKey('authors.id'))
 
 
 class GJBThesis(Base):
