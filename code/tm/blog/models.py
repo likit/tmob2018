@@ -55,7 +55,8 @@ class Tag(TaggitTag):
         proxy = True
 
 fb_page_id = '241755426012824'
-fb_user_access_token = 'EAAEzlJsTZBB8BAFvEfLNZAQXzLV0V1YN3hWrOgW8VFZBCZBhelTWm9JphPEqkWvgjFustelwuLZBhNZAf67YmbW4kW80pYcUZCU5EwfzHT9JPuJhlv2cXEniP9w6NHMGx1XlmPAYTZAGcF8XZAHoDZB64yeeLcVPi1CTHiacerLhIPrAZDZD'
+fb_user_access_token = 'EAAEzlJsTZBB8BAD4RPo9Y6QANBm9nY2DHT4IdgJUixzhrxonZBFrlwkVRZCBs55I8Cv3ZArZCjV1KjQ4ZCfyCGP329cNy6MZCeLDP01TDnSWZB1GrZAxWUWjwatWR72vD0tCiqnj2v5yUE5ssrdigiAw10xviFXDB0YgZD'
+
 
 class HomePage(Page):
     description = models.CharField(max_length=255, blank=True)
@@ -74,6 +75,8 @@ class HomePage(Page):
         resp = requests.get('https://graph.facebook.com/v3.1/{}/posts?access_token={}'.format(fb_page_id, fb_user_access_token))
         posts = []
         activities = []
+        if 'data' not in resp.json():
+            return [fb_post(0,0,'Facebook posts not available.', 'Facebook posts cannot be loaded.', datetime.utcnow())]
         for n,st in enumerate(resp.json()['data']):
             _id = st.get('id', None)
             _page_id, _post_id = _id.split('_')
