@@ -1,5 +1,8 @@
 # Data warehouse TODO
 
+## Pubs
+* Make migration script for custom views
+
 ## Keywords
 
 ## Fields
