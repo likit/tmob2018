@@ -551,6 +551,9 @@ def show_scholar_dashboard(request):
     return render(request, template_name="analytics/scholar-dashboard.html",
                   context={'board': 'scholar'})
 
+def show_gjb_dashboard(request):
+    return render(request, template_name="analytics/gjb-dashboard.html",
+                  context={'board': 'gjb'})
 
 def show_tm_dashboard(request):
     return render(request, template_name="analytics/tm-dashboard.html",
@@ -559,3 +562,43 @@ def show_tm_dashboard(request):
 def show_network_dashboard(request):
     return render(request, template_name="analytics/network-dashboard.html",
                   context={'board': 'network'})
+
+def count_gjb_by_status(request):
+    data = []
+    sqlquery = ("select count(*), finished from gjb_researcher_profile inner join gjb_theses on gjb_researcher_profile.id=gjb_theses.researcher_id group by finished")
+    for rec in conn.execute(sqlquery):
+        data.append(rec[0])
+    return JsonResponse({'data': data})
+
+def count_gjb_by_status_affil(request):
+    data = []
+    sqlquery = ("select count(*),finished, university_th from gjb_researcher_profile as gp "
+                "inner join gjb_theses on gjb_theses.researcher_id=gp.id "
+                "group by finished,university_th order by university_th")
+    labels = []
+    unfinished_data = []
+    finished_data = []
+    finished_colors = []
+    unfinished_colors = []
+    finished_dict = defaultdict(int)
+    unfinished_dict = defaultdict(int)
+    for cnt, finished, affil in conn.execute(sqlquery):
+        if finished:
+            finished_dict[affil] += cnt
+        else:
+            unfinished_dict[affil] += cnt
+
+    sorted_finished_data = sorted([(k,v) for k,v in finished_dict.items()],
+                                key=lambda x: x[1], reverse=True)
+    for k,v in sorted_finished_data:
+        unfinished_data.append(unfinished_dict[k])
+        finished_data.append(finished_dict[k])
+        finished_colors.append('rgb(199,0,57)')
+        unfinished_colors.append('rgb(100,116,164)')
+        labels.append(k)
+
+    return JsonResponse({'actives': finished_data,
+                         'inactives': unfinished_data,
+                         'activecolors': finished_colors,
+                         'inactivecolors': unfinished_colors,
+                         'labels': labels})

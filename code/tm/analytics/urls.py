@@ -27,7 +27,12 @@ urlpatterns = [
          name='get_activeness_scholar_tm'),
     path('get_tm_researchers_graph_data/', views.get_tm_researchers_graph_data,
          name='get_tm_researchers_graph_data'),
+    path('count_gjb_by_status/', views.count_gjb_by_status,
+         name='count_gjb_by_status'),
+    path('count_gjb_by_status_affil/', views.count_gjb_by_status_affil,
+         name='$count_gjb_by_status_affil'),
     path('scholar-dashboard/', views.show_scholar_dashboard, name='scholar-dashboard'),
+    path('gjb-dashboard/', views.show_gjb_dashboard, name='gjb-dashboard'),
     path('tm-dashboard/', views.show_tm_dashboard, name='tm-dashboard'),
     path('network-dashboard/', views.show_network_dashboard, name='network-dashboard')
 ]

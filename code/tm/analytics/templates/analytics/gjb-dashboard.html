@@ -1,0 +1,35 @@
+{% extends "analytics/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="content">
+    <div class="row">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-category">
+                    สัดส่วนนักเรียนทุนโครงการปริญญาเอกกาญจนาภิเษก (คปก.)
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="statusChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="card">
+            <div class="card-header">
+                <div class="card-category">
+                    จำนวนนักเรียนทุนโครงการปริญญาเอกกาญจนาภิเษก (คปก.)
+                </div>
+            </div>
+            <div class="card-body">
+                <canvas id="statusAffilChart" width="400" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block scripts %}
+    <script src="{% static 'analytics/assets/app/gjb-dashboard.js' %}" type="text/javascript"></script>
+{% endblock %}
