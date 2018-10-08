@@ -2,6 +2,8 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from sqlalchemy import MetaData, create_engine
+from sqlalchemy.ext.automap import automap_base
+from sqlalchemy.orm import Session
 from collections import namedtuple, defaultdict
 from py2neo import Graph, Relationship, NodeMatcher, Node
 from django.contrib.postgres.search import SearchVector
@@ -15,6 +17,9 @@ graph = Graph(host='neo4j_db', password='_genius01_', scheme='bolt')
 meta = MetaData()
 engine = create_engine('postgresql+psycopg2://postgres:_genius01_@postgres_db/keywordsdw')
 conn = engine.connect()
+
+pub_engine = create_engine('postgresql+psycopg2://postgres:_genius01_@postgres_db/pubdw')
+pubconn = pub_engine.connect()
 
 Researcher = namedtuple('Researcher', ['id', 'firstname', 'lastname',
                                         'word_en', 'count', 'affiliation',
@@ -601,4 +606,42 @@ def count_gjb_by_status_affil(request):
                          'inactives': unfinished_data,
                          'activecolors': finished_colors,
                          'inactivecolors': unfinished_colors,
+                         'labels': labels})
+
+def count_active_gjb_researcher(request):
+    active_university_dict = defaultdict(int)
+    inactive_university_dict = defaultdict(int)
+    total_university_dict = defaultdict(int)
+    for res in conn.execute(
+        'select * from gjb_researcher_profile as gp inner join gjb_theses on gjb_theses.researcher_id=gp.id where gjb_theses.finished=TRUE'):
+        uni = res[11]
+        total_university_dict[uni] += 1
+        if res[5] and res[6]:
+            first_name, last_name = res[5].lower(), res[6].lower()
+            sqlquery = "select * from recent_pubs where lower(first_name)='%s' and lower(last_name)='%s'" % (
+            first_name, last_name)
+            total_pubs = list(pubconn.execute(sqlquery))
+            if len(total_pubs) > 0:
+                active_university_dict[uni] += 1
+    for uni in total_university_dict:
+        inactive_university_dict[uni] = total_university_dict[uni] - active_university_dict[uni]
+
+    sorted_active_data = sorted([(k,v) for k,v in active_university_dict.items()],
+                                  key=lambda x: x[1], reverse=True)
+    active_data = []
+    inactive_data = []
+    active_colors = []
+    inactive_colors = []
+    labels = []
+    for k,v in sorted_active_data:
+        active_data.append(inactive_university_dict[k])
+        inactive_data.append(active_university_dict[k])
+        active_colors.append('rgb(199,0,57)')
+        inactive_colors.append('rgb(100,116,164)')
+        labels.append(k)
+
+    return JsonResponse({'actives': active_data,
+                         'inactives': inactive_data,
+                         'activecolors': active_colors,
+                         'inactivecolors': inactive_colors,
                          'labels': labels})

@@ -46,3 +46,29 @@ $.when($.getJSON('/analytics/count_gjb_by_status_affil')).then(function(data) {
         }
     });
 });
+
+var ctxActiveChart = document.getElementById("activeChart").getContext('2d');
+$.when($.getJSON('/analytics/count_active_gjb_researcher')).then(function(data) {
+    var activeScholar = new Chart(ctxActiveChart, {
+        type: 'bar',
+        data: {
+            labels: data['labels'],
+            datasets: [{
+                label: 'ไม่มีผลงานวิจัยตั้งแต่ปี 2015-ปัจจุบัน',
+                data: data['inactives'],
+                backgroundColor: data['inactivecolors']
+            },
+                {
+                    label: 'มีผลงานวิจัยในปี 2015-ปัจจุบัน',
+                    data: data['actives'],
+                    backgroundColor: data['activecolors']
+                }]
+        },
+        options: {
+            scales: {
+                xAxes: [{ stacked: true, ticks: { autoSkip: false }}],
+                yAxes: [{ stacked: true }]
+            }
+        }
+    });
+});
