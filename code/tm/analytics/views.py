@@ -645,3 +645,38 @@ def count_active_gjb_researcher(request):
                          'activecolors': active_colors,
                          'inactivecolors': inactive_colors,
                          'labels': labels})
+
+def count_gjb_pub_by_field(request):
+    fields = defaultdict(int)
+    sc_fields = defaultdict(int)
+    for res in conn.execute("select * from gjb_researcher_profile as gp "
+                            "inner join gjb_theses on gjb_theses.researcher_id=gp.id "
+                            "where gjb_theses.finished=TRUE"):
+        if res[5] and res[6]:
+            first_name, last_name = res[5].lower(), res[6].lower()
+            sqlquery = ("select * from recent_pubs where lower(first_name)='%s' "
+                        "and lower(last_name)='%s'") % (first_name, last_name)
+            for rec in pubconn.execute(sqlquery):
+                field = rec[3]
+                fields[field] += 1
+
+
+    gjb_counts = []
+    sqlquery = ('select abbr,count(*) as c from field_has_abstract '
+                'inner join research_fields on research_fields.id=field_has_abstract.field_id '
+                'inner join abstracts on field_has_abstract.abstract_id=abstracts.id '
+                'where abstracts.pub_date>\'2013-01-01\' '
+                'group by abbr order by c desc;')
+    sc_counts = []
+    labels = []
+    for f,n in conn.execute(sqlquery):
+        sc_fields[f] += n
+
+    for field in fields:
+        labels.append(field)
+        gjb_counts.append(fields[field])
+        sc_counts.append(sc_fields[field])
+
+
+    return JsonResponse({'gjb_counts': gjb_counts, 'labels': labels, 'sc_counts': sc_counts})
+

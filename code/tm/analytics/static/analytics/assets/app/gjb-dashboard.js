@@ -54,12 +54,12 @@ $.when($.getJSON('/analytics/count_active_gjb_researcher')).then(function(data) 
         data: {
             labels: data['labels'],
             datasets: [{
-                label: 'ไม่มีผลงานวิจัยตั้งแต่ปี 2015-ปัจจุบัน',
+                label: 'ไม่มีผลงานวิจัยตั้งแต่ปี 2013-ปัจจุบัน',
                 data: data['inactives'],
                 backgroundColor: data['inactivecolors']
             },
                 {
-                    label: 'มีผลงานวิจัยในปี 2015-ปัจจุบัน',
+                    label: 'มีผลงานวิจัยในปี 2013-ปัจจุบัน',
                     data: data['actives'],
                     backgroundColor: data['activecolors']
                 }]
@@ -68,6 +68,32 @@ $.when($.getJSON('/analytics/count_active_gjb_researcher')).then(function(data) 
             scales: {
                 xAxes: [{ stacked: true, ticks: { autoSkip: false }}],
                 yAxes: [{ stacked: true }]
+            }
+        }
+    });
+});
+
+var ctxFieldRadarChart = document.getElementById("fieldRadarChart").getContext('2d');
+$.when($.getJSON('/analytics/count_gjb_pub_by_field')).then(function(data) {
+    var activeScholar = new Chart(ctxFieldRadarChart, {
+        type: 'radar',
+        data: {
+            labels: data['labels'],
+            datasets: [{
+                data: data['gjb_counts'],
+                label: 'GJB',
+                fill: false,
+                borderColor: 'rgb(199, 0, 57)'
+            },
+                {
+                    data: data['sc_counts'],
+                    label: 'SCI',
+                    fill: false,
+                    borderColor: 'rgb(100,116,164)'
+                }]
+        },
+        options: {
+            scales: {
             }
         }
     });

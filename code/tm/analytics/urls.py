@@ -33,6 +33,8 @@ urlpatterns = [
          name='count_gjb_by_status_affil'),
     path('count_active_gjb_researcher/', views.count_active_gjb_researcher,
          name='count_active_gjb_researcher'),
+    path('count_gjb_pub_by_field/', views.count_gjb_pub_by_field,
+         name='count_gjb_pub_by_field'),
     path('scholar-dashboard/', views.show_scholar_dashboard, name='scholar-dashboard'),
     path('gjb-dashboard/', views.show_gjb_dashboard, name='gjb-dashboard'),
     path('tm-dashboard/', views.show_tm_dashboard, name='tm-dashboard'),
