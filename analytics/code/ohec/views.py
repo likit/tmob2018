@@ -1,5 +1,5 @@
 from . import ohec
-from flask import jsonify
+from flask import jsonify, render_template
 import pandas as pd
 
 YEARS = [2559, 2560, 2561, 2562]
@@ -113,3 +113,8 @@ def get_students():
         data.append(_d)
     labels = [unis[u] for u in df['University']]
     return jsonify({'data': data, 'labels': labels})
+
+
+@ohec.route('/')
+def index():
+    return render_template('ohec/index.html')
