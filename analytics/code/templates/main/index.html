@@ -5,10 +5,230 @@
 {% endblock %}
 
 {% block page_content %}
-    <section>
-        <div class="container">
-            <h1 class="title">Welcome to Analytics Index.</h1>
-
+    <section class="hero is-info">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title">สรุปข้อมูลโครงการ Talent Mobility สำนักงานคณะกรรมการการอุดมศึกษา</h1>
+            </div>
         </div>
     </section>
+    <section class="section">
+        <div class="container">
+            <section class="section">
+                <h1 class="title">
+                    <span class="icon">
+                        <i class="fab fa-bitcoin"></i>
+                    </span>&nbsp;
+                    ด้านงบประมาณ</h1>
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">งบประมาณ Operation</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="operBudget" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">งบประมาณ Training</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="trainBudget" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <h1 class="title">
+                    <span class="icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </span>&nbsp;
+                    ด้านโครงการวิจัย นักวิจัยและนักศึกษา</h1>
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนโครงการ</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="projects" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนนักวิจัย</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="researchers" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนนักศึกษา</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="students" width="400" height="200"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+{% endblock %}
+
+{% block scripts %}
+    {{ super() }}
+    <script>
+        var operChart;
+        var operCtx = document.getElementById("operBudget").getContext('2d');
+
+        var trainChart;
+        var trainCtx = document.getElementById("trainBudget").getContext('2d');
+
+        var projChart;
+        var projCtx = document.getElementById("projects").getContext('2d');
+
+        var resChart;
+        var resCtx = document.getElementById("researchers").getContext('2d');
+
+        var studChart;
+        var studCtx = document.getElementById("students").getContext('2d');
+
+        axios.get('/ohec/api/v0.1/oper-budget').then(resp => {
+            var data = JSON.parse(JSON.stringify(resp.data));
+            trainChart = new Chart(operCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+
+        axios.get('/ohec/api/v0.1/train-budget').then(resp => {
+            var data = JSON.parse(JSON.stringify(resp.data));
+            trainChart = new Chart(trainCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+
+        axios.get('/ohec/api/v0.1/projects').then(resp => {
+            var data = JSON.parse(JSON.stringify(resp.data));
+            projChart = new Chart(projCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+
+        axios.get('/ohec/api/v0.1/researchers').then(resp => {
+            var data = JSON.parse(JSON.stringify(resp.data));
+            resChart = new Chart(resCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+
+        axios.get('/ohec/api/v0.1/students').then(resp => {
+            var data = JSON.parse(JSON.stringify(resp.data));
+            studChart = new Chart(studCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    }
+                }
+            });
+        });
+    </script>
 {% endblock %}
