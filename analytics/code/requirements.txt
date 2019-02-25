@@ -1,0 +1,15 @@
+Click==7.0
+Flask==1.0.2
+Flask-Login==0.4.1
+Flask-SQLAlchemy==2.3.2
+itsdangerous==1.1.0
+Jinja2==2.10
+MarkupSafe==1.1.1
+numpy==1.16.1
+pandas==0.24.1
+psycopg2==2.7.7
+python-dateutil==2.8.0
+pytz==2018.9
+six==1.12.0
+SQLAlchemy==1.2.18
+Werkzeug==0.14.1
