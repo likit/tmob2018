@@ -55,6 +55,7 @@ services:
     environment:
       - FLASK_APP
       - FLASK_DEBUG
+    command: gunicorn --bind 0.0.0.0:5500 -w 2 app:app --threads=2
     volumes:
       - ./analytics/code:/code
     ports:
