@@ -1,3 +1,7 @@
+"""Database models for the publication database.
+
+"""
+
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import (create_engine, Table, Column, Text, Date,
                         Integer, String, ForeignKey, Boolean)
@@ -113,3 +117,22 @@ class AuthorList(Base):
     author_id = Column(Integer, ForeignKey('authors.id'))
     affil_id = Column(Integer, ForeignKey('affils.id'))
     field_pub_id = Column(Integer, ForeignKey('field_pubs.id'))
+
+
+class GJBResearcherProfile(Base):
+    __tablename__ = 'gjb_researcher_profile'
+    id = Column(Integer(), primary_key=True, autoincrement=True)
+    title_th = Column(String(32))
+    title_en = Column(String(32))
+    first_name_th = Column(String(255))
+    last_name_th = Column(String(255))
+    first_name_en = Column(String(255))
+    last_name_en = Column(String(255))
+    gender = Column(String(1))
+    email = Column(String(128))
+    major_th = Column(String(255))
+    faculty_th = Column(String(255))
+    university_th = Column(String(255))
+    thesis_title_th = Column(Text())
+    thesis_title_en = Column(Text())
+    thesis_finished = Column(Boolean(), default=True)
