@@ -130,6 +130,11 @@ class ScholarshipInfo(Base):
     specialty = Column(String())
     degree =Column(Integer())
     contact = Column(String())
+    dob = Column(Date())
+    graduated_date = Column(Date())
+    university = Column(String())
+    email = Column(String())
+
 
 class TMResearchProject(Base):
     __tablename__ = 'tm_researcher_project'
