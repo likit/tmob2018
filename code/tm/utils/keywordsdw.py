@@ -118,6 +118,7 @@ class Author(Base):
 class ScholarshipInfo(Base):
     __tablename__ = 'scholarship_info'
     id = Column(Integer(), primary_key=True, autoincrement=True)
+    student_id = Column(Integer(), unique=True)
     first_name_en = Column(String(255))
     last_name_en = Column(String(255))
     first_name_th = Column(String(255))
@@ -173,9 +174,6 @@ class GJBResearcherProfile(Base):
     major_th = Column(String(255))
     faculty_th = Column(String(255))
     university_th = Column(String(255))
-    theses = relationship('GJBThesis', backref='gjb_researcher')
-    author_id = Column('author_id', Integer(), ForeignKey('authors.id'))
-
 
 class GJBThesis(Base):
     __tablename__ = 'gjb_theses'
