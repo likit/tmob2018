@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    Analytics Index Page
+{% endblock %}
+
+{% block page_content %}
+    <section class="hero is-info">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title has-text-centered">สรุปข้อมูลการวิเคราะห์ภาพรวมงานวิจัยทางด้าน Robotics and Automation</h1>
+            </div>
+        </div>
+    </section>
+    <section class="section">
+        <div class="card">
+            <div class="card-header">
+                <p class="card-header-title">จำนวนผลงานวิจัยทั้งหมด</p>
+            </div>
+            <div class="card-body">
+                <canvas id="totalChart" height="50"></canvas>
+            </div>
+        </div>
+    </section>
+    <section class="section">
+        <div class="card">
+            <div class="card-header">
+                <p class="card-header-title">จำนวนผลงานวิจัยประเภท Research Article</p>
+            </div>
+            <div class="card-body">
+                <canvas id="articleChart" height="120"></canvas>
+            </div>
+        </div>
+    </section>
+    <section class="section">
+        <div class="card">
+            <div class="card-header">
+                <p class="card-header-title">จำนวนผลงานวิจัยประเภท Research Article</p>
+            </div>
+            <div class="card-body">
+                <canvas id="procChart" height="120"></canvas>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script>
+        var articleChart;
+        var articleCtx = document.getElementById("articleChart").getContext('2d');
+
+        var procChart;
+        var procCtx = document.getElementById("procChart").getContext('2d');
+
+        var totalChart;
+        var totalCtx = document.getElementById("totalChart").getContext('2d');
+
+        axios.get('/domain/api/v1.0/pub-per-year?doctype=ar').then(resp => {
+            let data = JSON.parse(JSON.stringify(resp.data));
+            articleChart = new Chart(articleCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    },
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'tableau.Tableau20'
+                        }
+                    }
+                }
+            });
+        });
+
+        axios.get('/domain/api/v1.0/pub-per-year?doctype=cp').then(resp => {
+            let data = JSON.parse(JSON.stringify(resp.data));
+            procChart = new Chart(procCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    },
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'tableau.Tableau20'
+                        }
+                    }
+                }
+            });
+        });
+
+        axios.get('/domain/api/v1.0/total-pub-per-year').then(resp => {
+            let data = JSON.parse(JSON.stringify(resp.data));
+            totalChart = new Chart(totalCtx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data
+                    }]
+                },
+                options: {
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'office.WoodType6'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
