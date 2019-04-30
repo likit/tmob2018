@@ -10,6 +10,10 @@ engine = create_engine('postgresql+psycopg2://postgres:{}@postgres_db/scopuspubs
 metadata = MetaData()
 conn = engine.connect()
 
+kwengine = create_engine('postgresql+psycopg2://postgres:{}@postgres_db/keywordsdw'.format(POSTGRES_PASSWORD))
+kwmetadata = MetaData()
+kwconn = kwengine.connect()
+
 from ohec import ohec as ohec_blueprint
 from domain_scan import domain as domain_blueprint
 
