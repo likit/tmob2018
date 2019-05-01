@@ -1,9 +1,20 @@
 from . import domain
+from io import BytesIO
 from pandas import read_excel, isna
-from flask import render_template, jsonify, request, url_for
+from flask import render_template, jsonify, request, url_for, send_file
 from sqlalchemy import Table, select
 from app import conn, engine, metadata, kwengine, kwmetadata, kwconn
 from collections import defaultdict, Counter
+import re
+import nltk
+from nltk.corpus import stopwords
+from nltk.stem.porter import PorterStemmer
+from nltk import regexp_tokenize, word_tokenize
+from nltk.stem.wordnet import WordNetLemmatizer
+from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
+import matplotlib.pyplot as plt
+
+stop_words = set(stopwords.words("english"))
 
 @domain.route('/')
 def index():
@@ -261,3 +272,95 @@ def get_scholar_academic_position(ntop=20, nyears=20):
         plot_data['labels'].append(k)
 
     return jsonify(plot_data)
+
+
+@domain.route('/api/v1.0/wordcloud')
+def get_wordcloud():
+    year = int(request.args.get('year'))
+    PubTable = Table('pubs', metadata, autoload=True, autoload_with=engine)
+    abstracts = []
+
+    s = select([PubTable])
+    for row in conn.execute(s):
+        if row.pub_date.year == year:
+            try:
+                abstract = row.data['abstracts-retrieval-response']['coredata']['dc:description']
+            except KeyError:
+                continue
+            abstract = [token.lower() for token in regexp_tokenize(abstract, '[^\d\W\s]{3,}') if token.lower() not in stop_words]
+            abstracts.append(' '.join(abstract))
+
+    img = BytesIO()
+    wordcloud = WordCloud(
+                    background_color='white',
+                    stopwords=stop_words,
+                    max_words=200,
+                    max_font_size=40, 
+                    random_state=42,
+                    width=800,
+                    height=400
+                    ).generate(str(abstracts))
+    wordcloud.to_image().save(img, 'png')
+    img.seek(0)
+    return send_file(img, mimetype='image/png')
+
+
+@domain.route('/api/v1.0/wordcloud-field')
+def get_wordcloud_field():
+    area = request.args.get('area', 'all')
+    PubTable = Table('pubs', metadata, autoload=True, autoload_with=engine)
+    s = select([PubTable])
+    abstracts = []
+    for row in conn.execute(s):
+        if area == 'all':
+            try:
+                abstract = row.data['abstracts-retrieval-response']['coredata']['dc:description']
+            except KeyError:
+                continue
+            abstract = [token.lower() for token in regexp_tokenize(abstract, '[^\d\W\s]{3,}') if token.lower() not in stop_words]
+            abstracts.append(' '.join(abstract))
+
+        else:
+            for sbj in row.data['abstracts-retrieval-response']['subject-areas']['subject-area']:
+                if sbj['@abbrev'] == area:
+                    try:
+                        abstract = row.data['abstracts-retrieval-response']['coredata']['dc:description']
+                    except KeyError:
+                        continue
+                    abstract = [token.lower() for token in regexp_tokenize(abstract, '[^\d\W\s]{3,}') if token.lower() not in stop_words]
+                    abstracts.append(' '.join(abstract))
+
+    img = BytesIO()
+    wordcloud = WordCloud(
+                    background_color='white',
+                    stopwords=stop_words,
+                    max_words=200,
+                    max_font_size=40, 
+                    random_state=42,
+                    width=800,
+                    height=400
+                    ).generate(str(abstracts))
+    wordcloud.to_image().save(img, 'png')
+    img.seek(0)
+    return send_file(img, mimetype='image/png')
+
+
+@domain.route('/topics')
+@domain.route('/topics/')
+def topics(year=None):
+    year = request.args.get('year', 0)
+    area = request.args.get('area', 'all')
+    years = set()
+    PubTable = Table('pubs', metadata, autoload=True, autoload_with=engine)
+    s = select([PubTable])
+    abstracts = []
+    areas = set()
+    for row in conn.execute(s):
+        years.add(row.pub_date.year)
+        for sbj in row.data['abstracts-retrieval-response']['subject-areas']['subject-area']:
+            areas.add(sbj['@abbrev'])
+    if year == 0:
+        year = sorted(years)[-1]
+
+    return render_template('domain/topics.html', years=sorted(years),
+                                year=year, areas=sorted(areas), area=area)

@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    Analytics Index Page
+{% endblock %}
+
+{% block page_content %}
+    <section class="hero is-info">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title has-text-centered">สรุปข้อมูลการวิเคราะห์ภาพรวมงานวิจัยทางด้าน Robotics and Automation</h1>
+            </div>
+        </div>
+    </section>
+    <section class="section">
+        <div class="container">
+            <section class="section">
+                <div class="tabs">
+                    <ul>
+                        <li><a href="{{ url_for('domain.index') }}">Overall</a></li>
+                        <li class="is-active"><a href="{{ url_for('domain.topics') }}">Topics</a></li>
+                    </ul>
+                </div>
+            </section>
+            <section class="section">
+                <p class="title">Word Cloud of {{ year }}</p>
+                <p class="notification">
+                    {% for yr in years %}
+                    <a href="{{ url_for('domain.topics', year=yr, area=area) }}" class="button is-text">{{ yr }}</a>
+                    {% endfor %}
+                </p>
+                <div class="has-text-centered">
+                    <img src="/domain/api/v1.0/wordcloud?year={{ year }}" width="800">
+                </div>
+            </section>
+            <section class="section">
+                <p class="title">Word Cloud of {{ area.upper() }}</p>
+                <p class="notification">
+                    {% for area in areas %}
+                    <a href="{{ url_for('domain.topics', area=area, year=year) }}" class="button is-text">{{ area }}</a>
+                    {% endfor %}
+                    <a href="{{ url_for('domain.topics', area='all', year=year) }}" class="button is-text">ALL</a>
+                </p>
+                <div class="has-text-centered">
+                    <img src="/domain/api/v1.0/wordcloud-field?area={{ area }}" width="800">
+                </div>
+            </section>
+        </div>
+    </section>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+{% endblock %}
