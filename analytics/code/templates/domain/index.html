@@ -13,63 +13,85 @@
         </div>
     </section>
     <section class="section">
-        <div class="card">
-            <div class="card-header">
-                <p class="card-header-title">จำนวนผลงานวิจัยทั้งหมดในแต่ละปี</p>
-            </div>
-            <div class="card-body">
-                <canvas id="totalChart" height="50"></canvas>
-            </div>
-        </div>
-    </section>
-    <section class="section">
-        <div class="card">
-            <div class="card-header">
-                <p class="card-header-title">จำนวนผลงานวิจัยทั้งหมดคิดเป็นอัตราส่วนตามสถาบัน</p>
-            </div>
-            <div class="card-body">
-                <canvas id="percentTotalChart" width="50"></canvas>
-            </div>
-        </div>
-    </section>
-    <section class="section">
-        <div class="card">
-            <div class="card-header">
-                <p class="card-header-title">จำนวนผลงานวิจัยประเภท Research Article</p>
-            </div>
-            <div class="card-body">
-                <canvas id="articleChart" height="120"></canvas>
-            </div>
-        </div>
-    </section>
-    <section class="section">
-        <div class="card">
-            <div class="card-header">
-                <p class="card-header-title">จำนวนผลงานวิจัยประเภท Proceedings</p>
-            </div>
-            <div class="card-body">
-                <canvas id="procChart" height="120"></canvas>
-            </div>
-        </div>
-    </section>
-    <section class="section">
-        <div class="card">
-            <div class="card-header">
-                <p class="card-header-title">จำนวนนักวิจัยตามมหาวิทยาลัยต่อปี</p>
-            </div>
-            <div class="card-body">
-                <canvas id="authorChart" height="120"></canvas>
-            </div>
-        </div>
-    </section>
-    <section class="section">
-        <div class="card">
-            <div class="card-header">
-                <p class="card-header-title">จำนวนนักวิจัยที่เป็นนักเรียนทุนรัฐบาล</p>
-            </div>
-            <div class="card-body">
-                <canvas id="scholarAuthorChart" height="120"></canvas>
-            </div>
+        <div class="container">
+            <section class="section">
+                <div class="tabs">
+                    <ul>
+                        <li class="is-active"><a>Overall</a></li>
+                        <li><a>Topics</a></li>
+                    </ul>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนผลงานวิจัยทั้งหมดในแต่ละปี</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="totalChart" height="50"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนผลงานวิจัยทั้งหมดคิดเป็นอัตราส่วนตามสถาบัน</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="percentTotalChart" width="50"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนผลงานวิจัยประเภท Research Article</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="articleChart" height="120"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนผลงานวิจัยประเภท Proceedings</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="procChart" height="120"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนนักวิจัยตามมหาวิทยาลัยต่อปี</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="authorChart" height="120"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนนักวิจัยที่เป็นนักเรียนทุนรัฐบาล</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="scholarAuthorChart" height="120"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">สัดส่วนนักเรียนทุนที่มีตำแหน่งอาจารย์ในมหาวิทยาลัย</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="scholarAcadChart" height="120"></canvas>
+                    </div>
+                </div>
+            </section>
         </div>
     </section>
 {% endblock %}
@@ -90,6 +112,9 @@
 
         var scholarAuthorChart;
         var scholarAuthorCtx = document.getElementById("scholarAuthorChart").getContext('2d');
+
+        var scholarAcadChart;
+        var scholarAcadCtx = document.getElementById("scholarAcadChart").getContext('2d');
 
         var percentTotalChart;
         var percentTotalCtx = document.getElementById("percentTotalChart").getContext('2d');
@@ -253,6 +278,26 @@
                             }
                         }]
                     },
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'tableau.Tableau20'
+                        }
+                    }
+                }
+            });
+        });
+
+        axios.get('/domain/api/v1.0/scholar-academic-position').then(resp => {
+            let data = JSON.parse(JSON.stringify(resp.data));
+            scholarAcadChart = new Chart(scholarAcadCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.data
+                    }]
+                },
+                options: {
                     plugins: {
                         colorschemes: {
                             scheme: 'tableau.Tableau20'

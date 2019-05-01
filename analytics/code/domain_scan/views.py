@@ -1,5 +1,6 @@
 from . import domain
-from flask import render_template, jsonify, request
+from pandas import read_excel, isna
+from flask import render_template, jsonify, request, url_for
 from sqlalchemy import Table, select
 from app import conn, engine, metadata, kwengine, kwmetadata, kwconn
 from collections import defaultdict, Counter
@@ -220,5 +221,43 @@ def get_num_scholarship_studs(ntop=20, nyears=20):
         'data': newss,
         'label': 'New Scholars'
     })
+
+    return jsonify(plot_data)
+
+
+@domain.route('/api/v1.0/scholar-academic-position')
+def get_scholar_academic_position(ntop=20, nyears=20):
+    PubTable = Table('scholarship_info', kwmetadata, autoload=True, autoload_with=kwengine)
+    s = select([PubTable.c.first_name_en, PubTable.c.last_name_en])
+    scholars = set()
+    for rec in kwconn.execute(s):
+        firstname, lastname = rec
+        firstname = firstname.lower()\
+                        .replace('mrs.', '')\
+                        .replace('mr.', '')\
+                        .replace('ms.', '')\
+                        .replace('dr.','')
+        if firstname and lastname:
+            scholars.add('{}.'.format(' '.join([lastname.lower(), firstname.lower()[0]])))
+
+    df = read_excel('static/data/nap_2562-04-02.xlsx')
+    academics = defaultdict(set)
+
+    for _, row in df.iterrows():
+        if not isna(row.Name_Eng):
+            try:
+                firstname, lastname = row.Name_Eng.split()
+            except ValueError:
+                continue
+            else:
+                if firstname and lastname:
+                    name = '{}.'.format(' '.join([lastname.lower(), firstname.lower()[0]]))
+                    if name in scholars:
+                        academics[row.Academic_Position].add(name) 
+
+    plot_data = {'data': [], 'labels': []}
+    for k in academics:
+        plot_data['data'].append(len(academics[k]))
+        plot_data['labels'].append(k)
 
     return jsonify(plot_data)
