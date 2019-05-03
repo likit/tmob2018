@@ -47,6 +47,22 @@
             </section>
         </div>
     </section>
+    <section class="section">
+        <table class="table">
+            <thead>
+                <th>Words</th>
+                <th>TF-IDF</th>
+            </thead>
+            <tbody>
+                {% for word, score in highlights %}
+                <tr>
+                    <td>{{ word }}</td>
+                    <td>{{ score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
 {% endblock %}
 {% block scripts %}
     {{ super() }}

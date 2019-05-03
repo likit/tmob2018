@@ -13,6 +13,7 @@ from nltk import regexp_tokenize, word_tokenize
 from nltk.stem.wordnet import WordNetLemmatizer
 from wordcloud import WordCloud, STOPWORDS, ImageColorGenerator
 import matplotlib.pyplot as plt
+from sklearn.feature_extraction.text import TfidfTransformer, TfidfVectorizer
 
 stop_words = set(stopwords.words("english"))
 
@@ -348,19 +349,80 @@ def get_wordcloud_field():
 @domain.route('/topics')
 @domain.route('/topics/')
 def topics(year=None):
-    year = request.args.get('year', 0)
+    year = int(request.args.get('year', 0))
     area = request.args.get('area', 'all')
     years = set()
     PubTable = Table('pubs', metadata, autoload=True, autoload_with=engine)
     s = select([PubTable])
     abstracts = []
+    bigram_set = defaultdict(int)
     areas = set()
     for row in conn.execute(s):
         years.add(row.pub_date.year)
         for sbj in row.data['abstracts-retrieval-response']['subject-areas']['subject-area']:
             areas.add(sbj['@abbrev'])
+
+        try:
+            abstract = row.data['abstracts-retrieval-response']['coredata']['dc:description']
+        except KeyError:
+            continue
+        #abstract = [token.lower() for token in regexp_tokenize(abstract, '[^\d\W\s]{3,}') if token.lower() not in stop_words]
+        #abstracts.append(' '.join(abstract))
+        abstract = abstract.lower()
+        abstracts.append(abstract)
+        if row.pub_date.year == year:
+            for bg in nltk.ngrams(abstract.split(),2):
+                bigram_set[' '.join(bg)] += 1
+
+    vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(2,2),
+                                    analyzer='word', min_df=10, max_df=0.8)
+    vectorizer.fit(abstracts)
+    highlights = {}
+    for k in bigram_set:
+        highlights[k] = float(vectorizer.vocabulary_.get(k, 0))
+
+    highlights = sorted(highlights.items(), key=lambda x: x[1], reverse=True)[:100]
+
     if year == 0:
         year = sorted(years)[-1]
 
+    print(highlights)
+
     return render_template('domain/topics.html', years=sorted(years),
-                                year=year, areas=sorted(areas), area=area)
+                                year=year, areas=sorted(areas), area=area,
+                                highlights=highlights)
+
+
+@domain.route('/api/v1.0/bigram-tdif')
+def calculate_tdif():
+    year = int(request.args.get('year', 0))
+    PubTable = Table('pubs', metadata, autoload=True, autoload_with=engine)
+    abstracts = []
+
+    bigram_set = defaultdict(int)
+
+    s = select([PubTable])
+    for row in conn.execute(s):
+        try:
+            abstract = row.data['abstracts-retrieval-response']['coredata']['dc:description']
+        except KeyError:
+            continue
+        abstract = [token.lower() for token in regexp_tokenize(abstract, '[^\d\W\s]{3,}') if token.lower() not in stop_words]
+        abstracts.append(' '.join(abstract))
+        if row.pub_date.year == year:
+            for bg in nltk.ngrams(abstract,2):
+                bigram_set[' '.join(bg)] += 1
+
+    vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(2,2),
+                                    analyzer='word', min_df=10, max_df=0.8)
+    vectorizer.fit(abstracts)
+    highlights = {}
+    for k in bigram_set:
+        highlights[k] = float(vectorizer.vocabulary_.get(k, 0))
+
+    plot_data = {'data': [], 'labels': []}
+    for k,v in sorted(highlights.items(), key=lambda x: x[1], reverse=True)[:100]:
+        plot_data['data'].append(v)
+        plot_data['labels'].append(k)
+
+    return jsonify(plot_data)
