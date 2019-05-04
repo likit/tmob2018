@@ -6,10 +6,15 @@ import os
 import sys
 
 sys.path.append(os.getcwd())
+POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
+
+uri = 'postgresql+psycopg2://postgres:{}@postgres_db/keywordsdw'.format(POSTGRES_PASSWORD)
+
+config.set_main_option('sqlalchemy.url', uri)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

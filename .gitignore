@@ -5,3 +5,5 @@
 __pycache__/
 pg_data
 neo_data
+*.log
+*.bak
