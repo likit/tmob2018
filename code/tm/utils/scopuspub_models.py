@@ -17,6 +17,8 @@ session = Session()
 class Pub(Base):
     __tablename__ = 'pubs'
     id = Column('id', Integer, primary_key=True)
+    scopus_id = Column('scopus_id', String(32), index=True)
+    doctype = Column('doctype', String(8))
     pub_date = Column('pub_date', Date())
     cited_count = Column('cited_count', Integer(), default=0)
     data = Column('data', JSON())
