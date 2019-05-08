@@ -38,7 +38,7 @@ neotime==1.0.0
 oauthlib==2.1.0
 Pillow==5.4.1
 pluggy==0.6.0
-prompt-toolkit==1.0.15
+#prompt-toolkit==1.0.15
 psycopg2==2.7.5
 ipykernel==5.1.0
 ipython==7.4.0
@@ -51,10 +51,7 @@ jupyter-core==4.4.0
 jupyterlab==0.35.4
 jupyterlab-server==0.2.0
 l18n==2018.5
-Mako==1.0.8
-MarkupSafe==1.1.1
 mistune==0.8.4
-more-itertools==6.0.0
 murmurhash==1.0.2
 nbconvert==5.4.1
 nbformat==4.4.0
@@ -110,8 +107,6 @@ tqdm==4.31.1
 traitlets==4.3.2
 Unidecode==0.4.21
 urllib3==1.23
-wagtail==2.1
-wagtailmenus==2.10
 wasabi==0.2.1
 wcwidth==0.1.7
 webencodings==0.5.1
