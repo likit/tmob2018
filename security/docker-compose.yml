@@ -1,0 +1,5 @@
+version: "3.7"
+services:
+  kali:
+    image: likitpre/kali-linux
+    command: /bin/bash
