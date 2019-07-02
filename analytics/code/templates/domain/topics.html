@@ -63,6 +63,20 @@
             </tbody>
         </table>
     </section>
+    <section class="section">
+        <table class="table">
+            <thead>
+            <th>Affiliation</th>
+            </thead>
+            <tbody>
+            {% for aff in affiliations %}
+            <tr>
+                <td><a href="{{ url_for('domain.get_wordcloud_affil', affil=aff) }}">{{ aff }}</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
 {% endblock %}
 {% block scripts %}
     {{ super() }}
