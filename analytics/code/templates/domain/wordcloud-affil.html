@@ -1,10 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
 
-</body>
-</html>
+{% block page_title %}
+    Analytics Index Page
+{% endblock %}
+
+{% block page_content %}
+    <section class="hero is-info">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title has-text-centered">สรุปข้อมูลการวิเคราะห์ภาพรวมงานวิจัยทางด้าน Robotics and Automation</h1>
+            </div>
+        </div>
+    </section>
+    <section class="section">
+        <div class="container">
+            <section class="section">
+                <div class="tabs">
+                    <ul>
+                        <li><a href="{{ url_for('domain.index') }}">Overall</a></li>
+                        <li class="is-active"><a href="{{ url_for('domain.topics') }}">Topics</a></li>
+                    </ul>
+                </div>
+            </section>
+            <section class="section">
+                <p class="title">Word Cloud of {{ affil }}</p>
+                <div class="has-text-centered">
+                    <img src="/domain/api/v1.0/wordcloud-affil?affil={{ affil }}" width="800">
+                </div>
+            </section>
+        </div>
+    </section>
+    <section class="section">
+        <table class="table">
+            <thead>
+            <th>Affiliation</th>
+            </thead>
+            <tbody>
+            {% for aff in affils %}
+            <tr>
+                <td><a href="{{ url_for('domain.get_wordcloud_affil', affil=aff) }}">{{ aff }}</a></td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </section>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+{% endblock %}
