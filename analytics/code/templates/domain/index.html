@@ -85,6 +85,36 @@
             <section class="section">
                 <div class="card">
                     <div class="card-header">
+                        <p class="card-header-title">จำนวนนักวิจัยที่เป็นนักเรียนทุนรัฐบาลและเป็น First author</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="scholarFirstAuthorChart" height="120"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนนักวิจัยที่เป็นนักเรียนทุนรัฐบาลที่มีผลงานวิจัยอย่างน้อยในระยะห้าปี</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="scholarActiveAuthorChart" height="120"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนปีที่นักเรียนทุนรัฐบาลมีผลงานวิจัยแรกหลังจบการศึกษา</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="scholarActiveAuthorGraduateChart" height="120"></canvas>
+                    </div>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
                         <p class="card-header-title">สัดส่วนนักเรียนทุนที่มีตำแหน่งอาจารย์ในมหาวิทยาลัย</p>
                     </div>
                     <div class="card-body">
@@ -112,6 +142,15 @@
 
         var scholarAuthorChart;
         var scholarAuthorCtx = document.getElementById("scholarAuthorChart").getContext('2d');
+
+        var scholarFirstAuthorChart;
+        var scholarFirstAuthorCtx = document.getElementById("scholarFirstAuthorChart").getContext('2d');
+
+        var scholarActiveAuthorChart;
+        var scholarActiveAuthorCtx = document.getElementById("scholarActiveAuthorChart").getContext('2d');
+
+        var scholarActiveAuthorGraduateChart;
+        var scholarActiveAuthorGraduateCtx = document.getElementById("scholarActiveAuthorGraduateChart").getContext('2d');
 
         var scholarAcadChart;
         var scholarAcadCtx = document.getElementById("scholarAcadChart").getContext('2d');
@@ -281,6 +320,102 @@
                     plugins: {
                         colorschemes: {
                             scheme: 'tableau.Tableau20'
+                        }
+                    }
+                }
+            });
+        });
+
+        axios.get('/domain/api/v1.0/scholar-first-author').then(resp => {
+            let data = JSON.parse(JSON.stringify(resp.data));
+            scholarFirstAuthorChart = new Chart(scholarFirstAuthorCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    },
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'tableau.Tableau20'
+                        }
+                    }
+                }
+            });
+        });
+
+        axios.get('/domain/api/v1.0/active-scholar-author').then(resp => {
+            let data = JSON.parse(JSON.stringify(resp.data));
+            scholarActiveAuthorChart = new Chart(scholarActiveAuthorCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    },
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'brewer.RdBu3'
+                        }
+                    }
+                }
+            });
+        });
+
+        axios.get('/domain/api/v1.0/active-scholar-author-graduate').then(resp => {
+            let data = JSON.parse(JSON.stringify(resp.data));
+            scholarActiveAuthorGraduateChart = new Chart(scholarActiveAuthorGraduateCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: true,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: true,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    },
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'brewer.RdBu3'
                         }
                     }
                 }
