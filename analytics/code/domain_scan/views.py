@@ -2,7 +2,7 @@ from . import domain
 from io import BytesIO
 from pandas import read_excel, isna
 from flask import render_template, jsonify, request, url_for, send_file
-from sqlalchemy import Table, select
+from sqlalchemy import Table, select, extract
 from app import conn, engine, metadata, kwengine, kwmetadata, kwconn
 from collections import defaultdict, Counter
 import re
@@ -23,10 +23,26 @@ def index():
     return render_template('domain/index.html')
 
 
+@domain.route('/collaboration')
+def collab_view():
+    return render_template('domain/collab.html')
+
+
+@domain.route('/workforce')
+def workforce_view():
+    return render_template('domain/workforce.html')
+
+
+@domain.route('/others')
+def others_view():
+    return render_template('domain/others.html')
+
+
 @domain.route('/api/v1.0/pub-per-year')
-def get_pub_per_year(ntop=20, nyears=15):
+def get_pub_per_year(ntop=20, begin_yr=2006, end_yr=2018):
     PubTable = Table('pubs', metadata, autoload=True, autoload_with=engine)
-    s = select([PubTable])
+    s = select([PubTable]).where(extract('year', PubTable.c.pub_date)>=begin_yr)
+    s = s.where(extract('year', PubTable.c.pub_date)<=end_yr)
     doctype = request.args.get('doctype', None)
     if doctype:
         s = s.where(PubTable.c.doctype == doctype)
@@ -37,15 +53,25 @@ def get_pub_per_year(ntop=20, nyears=15):
         if isinstance(affil_data, list):
             for af in affil_data:
                 if af['affiliation-country'] == 'Thailand':
-                    affil_set.add(af['affilname'])
+                    affilname = af['affilname']
+                    if 'Thammasat' in af['affilname']:
+                        affilname = 'Thammasat Univeristy'
+                    if 'University of Technology Thonburi' in af['affilname']:
+                        affilname = "King Mongkut's University of Technology Thonburi"
+                        affil_set.add(affilname)
             all_affiliations[rec.pub_date.year] += list(affil_set)
         elif isinstance(affil_data, dict):
             if affil_data['affiliation-country'] == 'Thailand':
-                all_affiliations[rec.pub_date.year].append(affil_data['affilname'])
+                affilname = affil_data['affilname']
+                if 'Thammasat' in affil_data['affilname']:
+                    affilname = 'Thammasat Univeristy'
+                if 'University of Technology Thonburi' in affil_data['affilname']:
+                    affilname = "King Mongkut's University of Technology Thonburi"
+                all_affiliations[rec.pub_date.year].append(affilname)
 
     total_pub_per_affils = defaultdict(int)
     years = sorted(all_affiliations.keys())
-    for year in years[-nyears:]:
+    for year in range(begin_yr, end_yr+1):
         for af, pubs in Counter(all_affiliations[year]).items():
             total_pub_per_affils[af] += pubs
 
@@ -53,7 +79,7 @@ def get_pub_per_year(ntop=20, nyears=15):
         total_pub_per_affils.items(), key=lambda x: x[1], reverse=True)[:ntop]
 
     pub_per_years = {'data': [], 'labels': []}
-    for year in years[-nyears:]:
+    for year in range(begin_yr, end_yr+1):
         item = {'label': year, 'data': []}
         for af, _ in top_affil_items:
             item['data'].append(Counter(all_affiliations[year]).get(af, 0))
@@ -66,9 +92,10 @@ def get_pub_per_year(ntop=20, nyears=15):
 
 
 @domain.route('/api/v1.0/total-pub-per-year')
-def get_total_pub_per_year(ntop=20, nyears=15):
+def get_total_pub_per_year(ntop=20, begin_yr=2006, end_yr=2018):
     PubTable = Table('pubs', metadata, autoload=True, autoload_with=engine)
-    s = select([PubTable])
+    s = select([PubTable]).where(extract('year', PubTable.c.pub_date)>=begin_yr)
+    s = s.where(extract('year', PubTable.c.pub_date)<=end_yr)
     doctype = request.args.get('doctype', None)
     if doctype:
         s = s.where(PubTable.c.doctype == doctype)
@@ -78,7 +105,7 @@ def get_total_pub_per_year(ntop=20, nyears=15):
         pubs[year] += 1
 
     data = {'data': [], 'labels': []}
-    for y in sorted(pubs.keys())[-nyears:]:
+    for y in range(begin_yr, end_yr+1):
         data['data'].append(pubs[y])
         data['labels'].append(str(y))
 
@@ -324,6 +351,114 @@ def get_scholarship_studs_main_author(ntop=20, nyears=20):
     return jsonify(plot_data)
 
 
+@domain.route('/api/v1.0/collaboration-author')
+def get_researcher_collaboration(ntop=15, begin_yr=2006, end_yr=2018):
+    PubTable = Table('pubs', metadata, autoload=True, autoload_with=engine)
+    s = select([PubTable]).where(extract('year', PubTable.c.pub_date)>=begin_yr)
+    s = s.where(extract('year', PubTable.c.pub_date)<=end_yr)
+    uni_first_authors = defaultdict(int)
+    uni_other_authors = defaultdict(int)
+    uni_foreign_authors = defaultdict(int)
+    all_affiliations = {}
+    total_pubs = defaultdict(int)
+    thai_affils = set()
+    for rec in conn.execute(s):
+        affil_data = rec.data['abstracts-retrieval-response'].get('affiliation', [])
+        if isinstance(affil_data, list):
+            for af in affil_data:
+                all_affiliations[af['@id']] = (af['affilname'],
+                                               af['affiliation-country'])
+        elif isinstance(affil_data, dict):
+            all_affiliations[affil_data['@id']] = (affil_data['affilname'],
+                                                   affil_data['affiliation-country'])
+        authors = rec.data['abstracts-retrieval-response']['authors']['author']
+        if isinstance(authors, list):
+            # For multiauthor paper, both the first author and others are counted.
+            has_first = False
+            has_foriegn = False
+            has_other = False
+            for author in authors:
+                idxname = author['ce:indexed-name'].lower()
+                affils = author.get('affiliation', {})
+                if isinstance(affils, list):
+                    uni_id = affils[0].get('@id', '')
+                else:
+                    uni_id = author.get('affiliation', {}).get('@id', '')
+                if uni_id == '':
+                    continue
+
+                uniname, unicountry = all_affiliations[uni_id]
+                if 'Thammasat' in uniname:
+                    uniname = 'Thammasat Univeristy'
+                if 'University of Technology Thonburi' in uniname:
+                    uniname = "King Mongkut's University of Technology Thonburi"
+                if unicountry != 'Thailand':
+                    has_foriegn = True
+                else:
+                    thai_affils.add(uniname)
+
+                if author['@seq'] == '1':
+                    has_first = True
+                else:
+                    has_other = True
+                total_pubs[uniname] += 1
+
+            if has_first:
+                uni_first_authors[uniname] += 1
+            if has_other:
+                uni_other_authors[uniname] += 1
+            if has_foriegn:
+                uni_foreign_authors[uniname] += 1
+        else:
+            idxname = authors['ce:indexed-name'].lower()
+            affils = author.get('affiliation', {})
+            if isinstance(affils, list):
+                uni_id = affils[0].get('@id', '')
+            else:
+                uni_id = author.get('affiliation', {}).get('@id', '')
+            if uni_id == '':
+                continue
+
+            uniname, unicountry = all_affiliations[uni_id]
+            if unicountry != 'Thailand':
+                uni_foreign_authors[uniname] += 1
+            else:
+                thai_affils.add(uniname)
+
+            if author['@seq'] == '1':
+                uni_first_authors[uniname] += 1
+            else:
+                uni_other_authors[uniname] += 1
+            total_pubs[uniname] += 1
+
+    sorted_unis = sorted([k for k in total_pubs.keys() if k in thai_affils],
+                          key=lambda x: total_pubs[x],
+                         reverse=True)[:ntop]
+
+    plot_data = {'data': [], 'labels': sorted_unis}
+    first_authors = []
+    other_authors = []
+    foreign_authors = []
+    for u in sorted_unis[:ntop]:
+        first_authors.append(uni_first_authors[u])
+        other_authors.append(uni_other_authors[u])
+        foreign_authors.append(uni_foreign_authors[u])
+
+    plot_data['data'].append({
+        'data': first_authors,
+        'label': 'First Authors'
+    })
+    plot_data['data'].append({
+        'data': other_authors,
+        'label': 'Other Authors'
+    })
+    plot_data['data'].append({
+        'data': foreign_authors,
+        'label': 'Foreign Authors'
+    })
+
+    return jsonify(plot_data)
+
 @domain.route('/api/v1.0/active-scholar-author')
 def get_active_scholarship_studs_author(duration=5, nyears=20):
     ScholarTable = Table('scholarship_info', kwmetadata, autoload=True, autoload_with=kwengine)
@@ -446,10 +581,10 @@ def get_active_scholarship_studs_author_graduate(duration=5, nyears=20):
 
 @domain.route('/api/v1.0/scholar-academic-position')
 def get_scholar_academic_position(ntop=20, nyears=20):
-    PubTable = Table('scholarship_info', kwmetadata, autoload=True, autoload_with=kwengine)
-    s = select([PubTable.c.first_name_en, PubTable.c.last_name_en])
+    ScholarTable = Table('scholarship_info', kwmetadata, autoload=True, autoload_with=kwengine)
+    s = select([ScholarTable.c.first_name_en, ScholarTable.c.last_name_en])
     scholars = set()
-    for rec in kwconn.execute(s):
+    for rec in kwengine.execute(s):
         firstname, lastname = rec
         firstname = firstname.lower() \
             .replace('mrs.', '') \
@@ -478,6 +613,52 @@ def get_scholar_academic_position(ntop=20, nyears=20):
     for k in academics:
         plot_data['data'].append(len(academics[k]))
         plot_data['labels'].append(k)
+
+    total_rschrs = sum(plot_data['data'])
+    plot_data['data'] = [round(float(num)/total_rschrs,4)*100.0 for num in plot_data['data']]
+
+    return jsonify(plot_data)
+
+
+@domain.route('/api/v1.0/researcher-academic-position')
+def get_researcher_academic_position_period(begin_yr=2014, end_yr=2018):
+    PubTable = Table('pubs', metadata, autoload=True, autoload_with=engine)
+    s = select([PubTable]).where(extract('year', PubTable.c.pub_date)>=begin_yr)
+    s = s.where(extract('year', PubTable.c.pub_date)<=end_yr)
+    researchers = set()
+    for rec in conn.execute(s):
+        year = rec.pub_date.year
+        authors = rec.data['abstracts-retrieval-response']['authors']['author']
+        if isinstance(authors, list):
+            for author in authors:
+                idxname = author['ce:indexed-name'].lower()
+                researchers.add(idxname)
+        else:
+            idxname = authors['ce:indexed-name'].lower()
+            researchers.add(idxname)
+
+    df = read_excel('static/data/nap_2562-04-02.xlsx')
+    academics = defaultdict(set)
+
+    for _, row in df.iterrows():
+        if not isna(row.Name_Eng):
+            try:
+                firstname, lastname = row.Name_Eng.split()
+            except ValueError:
+                continue
+            else:
+                if firstname and lastname:
+                    name = '{}.'.format(' '.join([lastname.lower(), firstname.lower()[0]]))
+                    if name in researchers:
+                        academics[row.Academic_Position].add(name)
+
+    plot_data = {'data': [], 'labels': []}
+    for k in academics:
+        plot_data['data'].append(len(academics[k]))
+        plot_data['labels'].append(k)
+
+    total_rschrs = sum(plot_data['data'])
+    plot_data['data'] = [round(float(num)/total_rschrs*100,2) for num in plot_data['data']]
 
     return jsonify(plot_data)
 

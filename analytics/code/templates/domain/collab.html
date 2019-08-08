@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block page_title %}
+    Analytics Publication Page
+{% endblock %}
+
+{% block page_content %}
+    <section class="hero is-info">
+        <div class="hero-body">
+            <div class="container">
+                <h1 class="title has-text-centered">สรุปข้อมูลการวิเคราะห์ภาพรวมงานวิจัยทางด้าน Robotics and Automation</h1>
+            </div>
+        </div>
+    </section>
+    <section class="section">
+        <div class="container">
+            <section class="section">
+                <div class="tabs">
+                    <ul>
+                        <li class=""><a href="{{ url_for('domain.index') }}">ผลงานวิจัย</a></li>
+                        <li class="is-active"><a href="{{ url_for('domain.collab_view') }}">ความร่วมมือ</a></li>
+                        <li class=""><a href="{{ url_for('domain.workforce_view') }}">บุคลากรวทน.</a></li>
+                        <li class=""><a href="{{ url_for('domain.others_view') }}">บุคลากรวทน.</a></li>
+                        <li><a href="{{ url_for('domain.topics') }}">Topics</a></li>
+                    </ul>
+                </div>
+            </section>
+            <section class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <p class="card-header-title">จำนวนผลงานวิจัย/มหาวิทยาลัย/ผู้แต่ง (first author, co author, foreigners)</p>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="authorChart" height="180"></canvas>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </section>
+{% endblock %}
+{% block scripts %}
+    {{ super() }}
+    <script>
+        var authorChart;
+        var authorCtx = document.getElementById("authorChart").getContext('2d');
+
+        axios.get('/domain/api/v1.0/collaboration-author').then(resp => {
+            let data = JSON.parse(JSON.stringify(resp.data));
+            authorChart = new Chart(authorCtx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: data.data,
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            stacked: false,
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }],
+                        xAxes: [{
+                            stacked: false,
+                            ticks: {
+                                autoSkip: false,
+                            }
+                        }]
+                    },
+                    plugins: {
+                        colorschemes: {
+                            scheme: 'tableau.Tableau20'
+                        },
+                        datalabels: {
+                          display: false
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
