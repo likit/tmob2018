@@ -1,6 +1,25 @@
 version: '3'
 
 services:
+  wordpress:
+    image: wordpress
+    restart: always
+    ports:
+      - 8080:80
+    env_file:
+      - ./wordpress.env
+    volumes:
+      - ./wordpress:/var/www/html
+  wpdb:
+    image: mysql:5.7
+    restart: always
+    env_file:
+      - ./wordpress.env
+    environment:
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=talent
+    volumes:
+      - tm_wordpress:/var/lib/mysql
   mysql_db:
     image: mysql
     ports:
@@ -38,9 +57,17 @@ services:
       - ./pg_data:/var/lib/postgresql/data/
     ports:
       - "5434:5432"
+  warehouse:
+    build: ./warehouse
+    volumes:
+      - ./warehouse/app:/app
+    env_file:
+      - ./warehouse/variables.env
+    depends_on:
+      - postgres_db
   web:
     build: .
-    command: python tm/manage.py runserver 0.0.0.0:8000
+    command: gunicorn --bind 0.0.0.0:8000 -w 2 --threads=2  tm.wsgi
     environment:
       - EMAIL_PASSWORD=$EMAIL_PASSWORD
     volumes:
@@ -66,3 +93,4 @@ services:
 
 volumes:
   pg_data:
+  tm_wordpress:
