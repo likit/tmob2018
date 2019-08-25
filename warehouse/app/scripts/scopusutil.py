@@ -30,7 +30,8 @@ def load():
 @click.command()
 @click.option('-k', '--keyword',
                 help='search keyword or term',
-                required=True)
+                required=True,
+                multiple=True)
 @click.option('-y', '--year',
                 help='published year',
                 default=CURRENT_YEAR, show_default=True)
@@ -43,10 +44,16 @@ def load():
 @click.option('--scopus-api-key', envvar='SCOPUS_API_KEY')
 @click.option('--item-per-page', default=25, type=int)
 @click.option('--sleep-time', default=10, type=int)
-def by_keyword(keyword, year, doctype='ar'):
+def by_keyword(keyword, year, scopus_api_key,
+               item_per_page,
+               sleep_time,
+               doctype):
     query = 'TITLE-ABS-KEY({}) PUBYEAR = {} AFFILCOUNTRY(thailand) DOCTYPE({})'.format(keyword, year, doctype)
-    params = {'apiKey': SCOPUS_API_KEY, 'query': query, 'httpAccept': 'application/json', 'view': 'COMPLETE'}
+    params = {'apiKey': scopus_api_key, 'query': query, 'httpAccept': 'application/json', 'view': 'COMPLETE'}
     url = 'http://api.elsevier.com/content/search/scopus'
+    print(query)
+    print(scopus_api_key)
+    return
     r = requests.get(url, params).json()
 
     print('Total articles = {}'.format(r.get('search-results').get('opensearch:totalResults')))
