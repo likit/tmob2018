@@ -3,3 +3,5 @@ services:
   kali:
     image: likitpre/kali-linux
     command: /bin/bash
+    volumes:
+      - ./code:/app
