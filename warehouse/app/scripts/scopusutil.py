@@ -15,19 +15,29 @@ from sqlalchemy.sql import insert, update, select
 
 CURRENT_YEAR = datetime.today().year
 
-meta = MetaData()
-pub_engine = create_engine('postgresql+psycopg2://postgres@postgres_db/stagedb')
-
-pub_con = pub_engine.connect()
-pub_table = Table('pubs', meta, autoload=True, autoload_with=pub_engine)
-
 
 @click.group()
-def load():
-    pass
+# These db variables should be able to get from the environment.
+@click.option('--dbname', required=True)
+@click.option('--dbhost', required=True)
+@click.option('--dbport', default=5432, type=int, show_default=True)
+@click.option('--dbtable', default='pubs', show_default=True)
+@click.option('--dbuser', required=True)
+@click.option('--dbpass', default='', show_default=True)
+@click.pass_context
+def load(ctx, dbname, dbhost, dbuser, dbtable, dbpass, dbport):
+    click.echo(dbport)
+    ctx.ensure_object(dict)
+    click.echo('Initializing..')
+    meta, pub_engine, pub_table, pub_con = \
+            _init(dbname, dbhost, dbuser, dbtable, dbpass, dbport)
+    ctx.obj['meta'] = meta
+    ctx.obj['pub_engine'] = pub_engine
+    ctx.obj['pub_table'] = pub_table
+    ctx.obj['pub_con'] = pub_con
 
 
-@click.command()
+@load.command()
 @click.option('-k', '--keyword',
                 help='search keyword or term',
                 required=True,
@@ -41,27 +51,25 @@ def load():
                             'le', 'no', 'pr', 're', 'sh'
                             ]),
                             help='article types', default='ar')
-@click.option('--scopus-api-key', envvar='SCOPUS_API_KEY')
 @click.option('--item-per-page', default=25, type=int)
 @click.option('--sleep-time', default=10, type=int)
-def by_keyword(keyword, year, scopus_api_key,
-               item_per_page,
-               sleep_time,
-               doctype):
+@click.option('--dry', is_flag=True)
+@click.option('--scopus-api-key', envvar='SCOPUS_API_KEY', required=True)
+@click.pass_context
+def by_keyword(ctx, keyword, year, scopus_api_key,
+               item_per_page, sleep_time, doctype, dry):
     query = 'TITLE-ABS-KEY({}) PUBYEAR = {} AFFILCOUNTRY(thailand) DOCTYPE({})'.format(keyword, year, doctype)
     params = {'apiKey': scopus_api_key, 'query': query, 'httpAccept': 'application/json', 'view': 'COMPLETE'}
     url = 'http://api.elsevier.com/content/search/scopus'
     print(query)
-    print(scopus_api_key)
-    return
+    pub_table = ctx.obj['pub_table']
+    pub_con = ctx.obj['pub_con']
     r = requests.get(url, params).json()
 
     print('Total articles = {}'.format(r.get('search-results').get('opensearch:totalResults')))
 
-    stats['keyword'] = keyword
-    stats['year'] = year
+    stats = {'keyword': keyword, 'year': year, 'authors': []}
     stats['articles'] = r.get('search-results').get('entry')
-    stats['authors'] = []
 
     for article in r.get('search-results').get('entry'):
         identifier = article.get('dc:identifier', None)
@@ -70,7 +78,7 @@ def by_keyword(keyword, year, scopus_api_key,
         else:
             continue
 
-        params = {'apiKey': SCOPUS_API_KEY, 'query': query, 'httpAccept': 'application/json',
+        params = {'apiKey': scopus_api_key, 'query': query, 'httpAccept': 'application/json',
                   'view': 'FULL'}
         url = 'http://api.elsevier.com/content/abstract/scopus_id/' + scopus_id
         print('Downloading from {}'.format(url))
@@ -87,7 +95,10 @@ def by_keyword(keyword, year, scopus_api_key,
                 print('\tAlready loaded. Updating citation count..'.format(scopus_id))
                 u = update(pub_table).where(pub_table.c.scopus_id == scopus_id)
                 u = u.values(cited_count=int(citation_count))
-                _res = pub_con.execute(u)
+                if dry:
+                    print(str(u))
+                else:
+                    _res = pub_con.execute(u)
                 continue  # pub already loaded, move on!
             else:
                 ins = insert(pub_table).values(
@@ -97,7 +108,10 @@ def by_keyword(keyword, year, scopus_api_key,
                     data=result,
                     doctype=doctype
                 )
-                pub_con.execute(ins)
+                if dry:
+                    print(str(ins))
+                else:
+                    pub_con.execute(ins)
 
 
 @click.command()
@@ -115,7 +129,7 @@ def by_keyword(keyword, year, scopus_api_key,
 @click.option('--sleep-time', default=10, type=int)
 def by_year(year, doctype='ar'):
     query = 'PUBYEAR = {} AFFILCOUNTRY(thailand) DOCTYPE({})'.format(year, doctype)
-    params = {'apiKey': SCOPUS_API_KEY, 'query': query, 'httpAccept': 'application/json', 'view': 'COMPLETE'}
+    params = {'apiKey': scopus_api_key, 'query': query, 'httpAccept': 'application/json', 'view': 'COMPLETE'}
     search_url = 'http://api.elsevier.com/content/search/scopus'
     r = requests.get(search_url, params).json()
 
@@ -123,7 +137,7 @@ def by_year(year, doctype='ar'):
     print('Total articles = {}'.format(total_articles))
 
     for start in range(75, 200, item_per_page):
-        search_params = {'apiKey': SCOPUS_API_KEY,
+        search_params = {'apiKey': scopus_api_key,
                   'query': query,
                   'start': start,
                   'count': item_per_page,
@@ -146,7 +160,7 @@ def by_year(year, doctype='ar'):
             else:
                 continue
 
-            params = {'apiKey': SCOPUS_API_KEY, 'query': query, 'httpAccept': 'application/json',
+            params = {'apiKey': scopus_api_key, 'query': query, 'httpAccept': 'application/json',
                       'view': 'FULL'}
             url = 'http://api.elsevier.com/content/abstract/scopus_id/' + scopus_id
             print('Downloading from {}'.format(url))
@@ -180,9 +194,21 @@ def by_year(year, doctype='ar'):
         time.sleep(sleep_time)
 
 
-load.add_command(by_keyword)
-load.add_command(by_year)
+
+def _init(dbname, host, user, table='pubs', password=None, port=5432):
+    meta = MetaData()
+    if password:
+        cred = '{}:{}'.format(user, password)
+    else:
+        cred = user
+
+    pub_engine = create_engine(
+        'postgresql+psycopg2://{}@{}:{}/{}'.format(cred, host, port, dbname))
+
+    pub_con = pub_engine.connect()
+    pub_table = Table(table, meta, autoload=True, autoload_with=pub_engine)
+    return meta, pub_engine, pub_table, pub_con
 
 
 if __name__ == '__main__':
-    load()
+    load(obj={})

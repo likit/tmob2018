@@ -10,12 +10,13 @@ from alembic import context
 sys.path.insert(0, os.path.abspath(os.getcwd()))
 
 POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
+STAGING_DATABASE = os.environ.get('STAGING_DATABASE') or 'stagedb'
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 config.set_main_option('sqlalchemy.url',
-                       'postgresql+psycopg2://postgres@postgres_db/stagedb')
+                       'postgresql+psycopg2://postgres@postgres_db/{}'.format(STAGING_DATABASE))
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.
