@@ -201,4 +201,6 @@ class FactResearcher(db.Model):
     sc_university_id = db.Column('sc_university_id', db.ForeignKey('dim_sc_universities.id'))
     sc_field = db.Column('sc_field', db.String())
     sc_specialty = db.Column('sc_specialty', db.String())
+    sc_country = db.relationship('DimSCCountry', backref=db.backref('students'))
+    sc_university = db.relationship('DimSCUniversity', backref=db.backref('students'))
 
