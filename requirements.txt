@@ -36,7 +36,7 @@ more-itertools==6.0.0
 neo4j-driver==1.6.0
 neotime==1.0.0
 oauthlib==2.1.0
-Pillow==5.4.1
+Pillow==6.2.0
 pluggy==0.6.0
 #prompt-toolkit==1.0.15
 psycopg2==2.7.5
@@ -64,7 +64,7 @@ pandocfilters==1.4.2
 parso==0.3.4
 pexpect==4.6.0
 pickleshare==0.7.5
-Pillow==5.4.1
+Pillow==6.2.0
 plac==0.9.6
 pluggy==0.6.0
 preshed==2.0.1
