@@ -36,7 +36,14 @@ def create_app(config):
 # Models must be loaded before app creation
 import app.models
 
+admin.add_view(ModelView(app.models.DimEmail, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.DimEmailGroup, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.BridgeEmailGroup, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.FactResearcher, db.session, category='Facts'))
+admin.add_view(ModelView(app.models.DimAcademicPosition, db.session, category='Dimensions'))
 admin.add_view(ModelView(app.models.DimUniversity, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.DimUniversityGroup, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.BridgeUniversityGroup, db.session, category='Dimensions'))
 
 app = create_app(config)
 
