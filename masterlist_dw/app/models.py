@@ -1,6 +1,26 @@
 from app.wsgi import db
 
 
+class DimSCCountry(db.Model):
+    __tablename__ = 'dim_sc_countries'
+    id = db.Column('id', db.Integer,
+                   primary_key=True, autoincrement=True)
+    name = db.Column('name', db.String(), index=True)
+
+    def __str__(self):
+        return self.name
+
+
+class DimSCUniversity(db.Model):
+    __tablename__ = 'dim_sc_universities'
+    id = db.Column('id', db.Integer,
+                   primary_key=True, autoincrement=True)
+    name = db.Column('name', db.String(), index=True)
+
+    def __str__(self):
+        return self.name
+
+
 class DimUniversity(db.Model):
     __tablename__ = 'dim_universities'
     id = db.Column('id', db.Integer,
@@ -176,4 +196,9 @@ class FactResearcher(db.Model):
                                  db.ForeignKey('dim_eng_name_groups.id'))
     en_name_group = db.relationship('DimEngNameGroup',
                                     backref=db.backref('researcher', uselist=False))
+    sc_graduated_date = db.Column('sc_graduated_year', db.Date())
+    sc_country_id = db.Column('sc_country_id', db.ForeignKey('dim_sc_countries.id'))
+    sc_university_id = db.Column('sc_university_id', db.ForeignKey('dim_sc_universities.id'))
+    sc_field = db.Column('sc_field', db.String())
+    sc_specialty = db.Column('sc_specialty', db.String())
 
