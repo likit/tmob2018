@@ -1,7 +1,7 @@
 import os
 
 class Config(object):
-    pass
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class DevelopmentConfig(Config):
