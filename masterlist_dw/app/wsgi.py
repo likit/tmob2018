@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -54,6 +56,8 @@ admin.add_view(ModelView(BridgeThaiNameGroup, db.session, category='Dimensions')
 admin.add_view(ModelView(DimEngName, db.session, category='Dimensions'))
 admin.add_view(ModelView(DimEngNameGroup, db.session, category='Dimensions'))
 admin.add_view(ModelView(BridgeEngNameGroup, db.session, category='Dimensions'))
+admin.add_view(ModelView(DimSCUniversity, db.session, category='Dimensions'))
+admin.add_view(ModelView(DimSCCountry, db.session, category='Dimensions'))
 
 app = create_app(config)
 
@@ -62,7 +66,7 @@ app = create_app(config)
 @click.argument('jsonfile')
 def import_data(jsonfile):
     print('Loading data...')
-    df = pd.read_json(jsonfile)
+    df = pd.read_json(jsonfile).fillna('')
     num = 0
     for idx, row in df.iterrows():
         num += 1
@@ -70,9 +74,11 @@ def import_data(jsonfile):
         if not fact:
             fact = FactResearcher(old_id=idx)
         else:
+            print('ID {} already exists..'.format(idx))
             continue
+
         academic_title = row.updated_academic_title
-        if not pd.isna(academic_title):
+        if academic_title:
             _title = DimAcademicPosition.query.filter_by(title=academic_title).first()
             if not _title:
                 new_title = DimAcademicPosition(title=academic_title)
@@ -82,7 +88,7 @@ def import_data(jsonfile):
             else:
                 fact.academic_position = _title
         th_names = set([n for n in row[['Name_Thai', 'fullname_th_sc', 'fullname_th_m']]
-                        if n != '' and not pd.isna(n)])
+                        if n != ''])
         if th_names:
             th_name_group = DimThaiNameGroup()
             for t in th_names:
@@ -98,8 +104,9 @@ def import_data(jsonfile):
                 )
                 db.session.add(br_th_name)
             fact.th_name_group = th_name_group
-        en_names = set([n.lower() for n in row[['Name_Eng', 'sc_fullname_en', 'nr_fullname_en']]
-                        if n != '' and not pd.isna(n)])
+        en_names = set([n.lower()
+                        for n in row[['Name_Eng', 'sc_fullname_en', 'nr_fullname_en']]
+                        if n != ''])
         if en_names:
             en_name_group = DimEngNameGroup()
             for n in en_names:
@@ -121,11 +128,11 @@ def import_data(jsonfile):
             fact.en_name_group = en_name_group
         if row['email_sc']:
             emails = set([e for e in row['email_sc'].replace(';', ',').split(', ')
-                          if e != '' and not pd.isna(e)])
+                          if e != ''])
         else:
             emails = set()
         emails.update([e for e in row['email_m'].replace(';', ',').split(', ')
-                       if e != '' and not pd.isna(e)])
+                       if e != ''])
         if emails:
             email_group = DimEmailGroup()
             for e in emails:
@@ -138,7 +145,7 @@ def import_data(jsonfile):
             fact.email_group = email_group
 
         unis = set([u for u in row[['University', 'university_name_cleaned']]
-                    if u != '' and not pd.isna(u)])
+                    if u != ''])
         if unis:
             university_group = DimUniversityGroup()
             for u in unis:
@@ -151,9 +158,33 @@ def import_data(jsonfile):
                 )
                 db.session.add(br_university)
             fact.university_group = university_group
+
+        sc_country_name = row['country'].strip()
+        if sc_country_name:
+            sc_country = DimSCCountry.query.filter_by(name=sc_country_name).first()
+            if not sc_country:
+                sc_country = DimSCCountry(name=sc_country_name)
+                db.session.add(sc_country)
+                db.session.commit()
+            fact.sc_country = sc_country
+
+        sc_university_name = row['university'].strip()
+        if sc_university_name:
+            sc_university = DimSCUniversity.query.filter_by(name=sc_university_name).first()
+            if not sc_university:
+                sc_university = DimSCUniversity(name=sc_university_name)
+                db.session.add(sc_university)
+                db.session.commit()
+            fact.sc_university = sc_university
+
+        graduation = row['graduated_date']
+        if graduation != 'NaT' and graduation != '':
+            graduation = datetime.strptime(graduation, '%Y-%m-%d')
+            fact.sc_graduated_date = graduation
+
+        fact.sc_field = row['field_of_study'].strip()
+        fact.sc_specialty = row['specialty'].strip()
         db.session.add(fact)
         db.session.commit()
-        if num >= 50:
-            break
-        if num % 50 == 0:
+        if num % 1000 == 0:
             print('{}...'.format(num))
