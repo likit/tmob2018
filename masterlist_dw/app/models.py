@@ -25,6 +25,32 @@ class DimThaiName(db.Model):
     firstname = db.Column('firstname', db.String(), index=True)
     lastname = db.Column('lastname', db.String(), index=True)
 
+    @property
+    def fullname(self):
+        return '{} {}'.format(self.firstname, self.lastname)
+
+    def __str__(self):
+        return '{} {}'.format(self.firstname, self.lastname)
+
+
+class DimThaiNameGroup(db.Model):
+    __tablename__ = 'dim_thai_name_groups'
+    id = db.Column('id', db.Integer,
+                   primary_key=True, autoincrement=True)
+
+
+class BridgeThaiNameGroup(db.Model):
+    __tablename__ = 'br_thai_name_groups'
+    th_name_id = db.Column('thname_id',
+                          db.ForeignKey('dim_thai_names.id'),
+                          primary_key=True)
+    th_name_group_id = db.Column('thname_group_id',
+                                db.ForeignKey('dim_thai_name_groups.id'),
+                                primary_key=True)
+    th_name = db.relationship('DimThaiName')
+    th_name_group = db.relationship('DimThaiNameGroup',
+                                    backref=db.backref('names'))
+
 
 class DimEngName(db.Model):
     __tablename__ = 'dim_eng_names'
@@ -34,32 +60,32 @@ class DimEngName(db.Model):
     lastname = db.Column('lastname', db.String(), index=True)
     initial = db.Column('initial', db.String(), index=True)
 
-
-class DimEmail(db.Model):
-    __tablename__ = 'dim_email'
-    id = db.Column('id', db.Integer,
-                   primary_key=True, autoincrement=True)
-    email = db.Column('email', db.String(), index=True)
+    @property
+    def fullname(self):
+        return '{} {}'.format(self.firstname, self.lastname)
 
     def __str__(self):
-        return self.email
-
-'''
-class DimThaiNameGroup(db.Model):
-    __tablename__ = 'dim_thai_name_groups'
-    id = db.Column('id', db.Integer,
-                   primary_key=True, autoincrement=True)
-    thname_id = db.Column('thname_id', db.ForeignKey('dim_thai_names.id'))
-    thainame = db.relationship('DimThaiName')
+        return self.fullname
 
 
 class DimEngNameGroup(db.Model):
     __tablename__ = 'dim_eng_name_groups'
     id = db.Column('id', db.Integer,
                    primary_key=True, autoincrement=True)
-    enname_id = db.Column('enname_id', db.ForeignKey('dim_eng_names.id'))
-    engname = db.relationship('DimEngName')
-'''
+
+
+class BridgeEngNameGroup(db.Model):
+    __tablename__ = 'br_eng_name_groups'
+    en_name_id = db.Column('en_name_id',
+                          db.ForeignKey('dim_eng_names.id'),
+                          primary_key=True)
+    en_name_group_id = db.Column('en_name_group_id',
+                                db.ForeignKey('dim_eng_name_groups.id'),
+                                primary_key=True)
+    en_name = db.relationship('DimEngName')
+    en_name_group = db.relationship('DimEngNameGroup',
+                                    backref=db.backref('names'))
+
 
 class DimUniversityGroup(db.Model):
     __tablename__ = 'dim_university_groups'
@@ -75,8 +101,19 @@ class BridgeUniversityGroup(db.Model):
     university_id = db.Column('university_id',
                               db.ForeignKey('dim_universities.id'),
                               primary_key=True)
-    university_group = db.relationship('DimUniversityGroup')
+    university_group = db.relationship('DimUniversityGroup',
+                                       backref=db.backref('universities'))
     university = db.relationship('DimUniversity')
+
+
+class DimEmail(db.Model):
+    __tablename__ = 'dim_email'
+    id = db.Column('id', db.Integer,
+                   primary_key=True, autoincrement=True)
+    email = db.Column('email', db.String(), index=True)
+
+    def __str__(self):
+        return self.email
 
 
 class DimEmailGroup(db.Model):
@@ -93,7 +130,8 @@ class BridgeEmailGroup(db.Model):
     email_id = db.Column('email_id',
                          db.ForeignKey('dim_email.id'),
                          primary_key=True)
-    email_group = db.relationship('DimEmailGroup')
+    email_group = db.relationship('DimEmailGroup',
+                                  backref=db.backref('emails'))
     email = db.relationship('DimEmail')
 
 
@@ -113,6 +151,12 @@ class FactResearcher(db.Model):
                                     db.ForeignKey('dim_university_groups.id'))
     university_group = db.relationship('DimUniversityGroup',
                                        backref=db.backref('researcher', uselist=False))
+    th_name_group_id = db.Column('thname_group_id',
+                                db.ForeignKey('dim_thai_name_groups.id'))
+    th_name_group = db.relationship('DimThaiNameGroup',
+                                   backref=db.backref('researcher', uselist=False))
+    en_name_group_id = db.Column('en_name_group_id',
+                                 db.ForeignKey('dim_eng_name_groups.id'))
+    en_name_group = db.relationship('DimEngNameGroup',
+                                    backref=db.backref('researcher', uselist=False))
 
-    def __str__(self):
-        return self.academic_position.title

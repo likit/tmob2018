@@ -44,6 +44,12 @@ admin.add_view(ModelView(app.models.DimAcademicPosition, db.session, category='D
 admin.add_view(ModelView(app.models.DimUniversity, db.session, category='Dimensions'))
 admin.add_view(ModelView(app.models.DimUniversityGroup, db.session, category='Dimensions'))
 admin.add_view(ModelView(app.models.BridgeUniversityGroup, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.DimThaiName, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.DimThaiNameGroup, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.BridgeThaiNameGroup, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.DimEngName, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.DimEngNameGroup, db.session, category='Dimensions'))
+admin.add_view(ModelView(app.models.BridgeEngNameGroup, db.session, category='Dimensions'))
 
 app = create_app(config)
 
