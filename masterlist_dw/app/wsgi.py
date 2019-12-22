@@ -119,8 +119,13 @@ def import_data(jsonfile):
                 )
                 db.session.add(br_en_name)
             fact.en_name_group = en_name_group
-        emails = [e for e in set(row[['email_sc', 'email_m']])
-                  if e != '' and not pd.isna(e)]
+        if row['email_sc']:
+            emails = set([e for e in row['email_sc'].replace(';', ',').split(', ')
+                          if e != '' and not pd.isna(e)])
+        else:
+            emails = set()
+        emails.update([e for e in row['email_m'].replace(';', ',').split(', ')
+                       if e != '' and not pd.isna(e)])
         if emails:
             email_group = DimEmailGroup()
             for e in emails:
@@ -148,7 +153,7 @@ def import_data(jsonfile):
             fact.university_group = university_group
         db.session.add(fact)
         db.session.commit()
-        if num >= 300:
+        if num >= 50:
             break
         if num % 50 == 0:
             print('{}...'.format(num))
