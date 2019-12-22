@@ -7,6 +7,9 @@ class DimUniversity(db.Model):
                    primary_key=True, autoincrement=True)
     name = db.Column('name', db.String(), index=True)
 
+    def __str__(self):
+        return self.name
+
 
 class DimAcademicPosition(db.Model):
     __tablename__ = 'dim_academic_positions'
@@ -47,9 +50,13 @@ class BridgeThaiNameGroup(db.Model):
     th_name_group_id = db.Column('thname_group_id',
                                 db.ForeignKey('dim_thai_name_groups.id'),
                                 primary_key=True)
-    th_name = db.relationship('DimThaiName')
+    name = db.relationship('DimThaiName')
     th_name_group = db.relationship('DimThaiNameGroup',
                                     backref=db.backref('names'))
+
+    @property
+    def fullname(self):
+        return self.name.fullname
 
 
 class DimEngName(db.Model):
@@ -82,9 +89,13 @@ class BridgeEngNameGroup(db.Model):
     en_name_group_id = db.Column('en_name_group_id',
                                 db.ForeignKey('dim_eng_name_groups.id'),
                                 primary_key=True)
-    en_name = db.relationship('DimEngName')
+    name = db.relationship('DimEngName')
     en_name_group = db.relationship('DimEngNameGroup',
                                     backref=db.backref('names'))
+
+    @property
+    def fullname(self):
+        return self.name.fullname
 
 
 class DimUniversityGroup(db.Model):
@@ -104,6 +115,9 @@ class BridgeUniversityGroup(db.Model):
     university_group = db.relationship('DimUniversityGroup',
                                        backref=db.backref('universities'))
     university = db.relationship('DimUniversity')
+
+    def __str__(self):
+        return self.university.name
 
 
 class DimEmail(db.Model):
@@ -134,11 +148,14 @@ class BridgeEmailGroup(db.Model):
                                   backref=db.backref('emails'))
     email = db.relationship('DimEmail')
 
+    def __str__(self):
+        return self.email.email
 
 
 class FactResearcher(db.Model):
     __tablename__ = 'fact_researchers'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    old_id = db.Column('old_id', db.Integer)
     email_group_id = db.Column('email_group_id',
                                db.ForeignKey('dim_email_group.id'))
     email_group = db.relationship('DimEmailGroup',
