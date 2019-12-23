@@ -7,6 +7,11 @@ from app.models import *
 from app.wsgi import ma
 
 
+class AcademicPositionSchema(ma.ModelSchema):
+    class Meta:
+        model = DimAcademicPosition
+
+
 class UniversitySchema(ma.ModelSchema):
     class Meta:
         model = DimUniversity
@@ -106,6 +111,7 @@ class ResearcherSchema(ma.ModelSchema):
     th_name_group = Nested(ThaiNameGroupSchema, exclude=('researcher',))
     en_name_group = Nested(EngNameGroupSchema, exclude=('researcher',))
     university_group = Nested(UniversityGroupSchema, exclude=('researcher',))
+    academic_position = Nested(AcademicPositionSchema, only=('title',))
     class Meta:
         model = FactResearcher
 
