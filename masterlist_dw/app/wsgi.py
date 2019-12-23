@@ -1,9 +1,10 @@
 from datetime import datetime
-
+from flask_restful import Api
 from flask_admin.contrib.sqla import ModelView
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_admin import Admin
+from flask_marshmallow import Marshmallow
 from flask import Flask
 import pandas as pd
 import os
@@ -24,6 +25,8 @@ else:
 db = SQLAlchemy()
 migrate = Migrate()
 admin = Admin()
+api = Api()
+ma = Marshmallow()
 
 
 def create_app(config):
@@ -32,8 +35,10 @@ def create_app(config):
     db.init_app(app)
     migrate.init_app(app, db)
     admin.init_app(app)
+    ma.init_app(app)
 
     from app.api import api_blueprint
+    api.init_app(api_blueprint)
     app.register_blueprint(api_blueprint, url_prefix='/api')
 
     return app
@@ -41,6 +46,11 @@ def create_app(config):
 
 # Models must be loaded before app creation
 from app.models import *
+from app.api.views import UniversityListResource, UniversityResource, ResearcherResource
+
+api.add_resource(UniversityResource, '/universities/<int:id>')
+api.add_resource(UniversityListResource, '/universities')
+api.add_resource(ResearcherResource, '/researchers/<int:id>')
 
 admin.add_view(ModelView(DimEmail, db.session, category='Dimensions'))
 admin.add_view(ModelView(DimEmailGroup, db.session, category='Dimensions'))
