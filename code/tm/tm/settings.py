@@ -25,7 +25,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.environ.get('SECRET_KEY', '%(&8&y7_5z_wxtj+e=3ecnnhs5*nsqdl!-(m+lvgjjqo0+(28y')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['mysite.com', 'localhost', '127.0.0.1', '209.97.174.132', 'talentmobility.or.th', '178.128.123.16']
 
