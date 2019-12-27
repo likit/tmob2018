@@ -33,15 +33,21 @@ def fetch_author_initial(firstname, lastname, affil='Thailand'):
 
 
 def fetch_author_detail(url):
-    if data and 'author-retrieval-response' in data:
-        if isinstance(data['author-retrieval-response'], list):
-            authdata = data['author-retrieval-response'][0]
-        else:
-            print('Author data not available.')
-            raise ValueError('Author has no data.')
-    else:
-        return data
+    """Fetch author from SCOPUS using the URL.
+    Returned data are supposed to be saved to the database in JSON format.
+    """
+    res = requests.get(
+        url,
+        params={
+            'apiKey': SCOPUS_API_KEY,
+            'view': 'ENHANCED',
+            'httpAccept': 'application/json',
+        }
+    )
+    data = res.json()
+    if data.get('author-retrieval-response'):
+        yield data['author-retrieval-response']
 
 
 if __name__ == '__main__':
-    print(list(fetch_author_initial('', 'Prachayasittikul')))
+    print(list(fetch_author_detail('https://api.elsevier.com/content/author/author_id/54894391300')))
