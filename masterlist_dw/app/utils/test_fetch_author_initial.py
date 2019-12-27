@@ -4,16 +4,16 @@ from . scopus_author_search import fetch_author_initial
 
 def test_no_lastname_input():
     with pytest.raises(ValueError):
-        list(fetch_author_initial('Likit', ''))
+        next(fetch_author_initial('Likit', ''))
 
 def test_no_firstname_input():
     with pytest.raises(ValueError):
-        list(fetch_author_initial('', 'Preeyanon'))
+        next(fetch_author_initial('', 'Preeyanon'))
 
 
 def test_no_firstname_lastname_input():
     with pytest.raises(ValueError):
-        list(fetch_author_initial('', ''))
+        next(fetch_author_initial('', ''))
 
 
 def test_get_author_no_variants():
