@@ -7,7 +7,6 @@ from flask_admin import Admin
 from flask_marshmallow import Marshmallow
 from flask import Flask
 import pandas as pd
-import os
 import click
 from app.config import *
 
@@ -198,3 +197,11 @@ def import_data(jsonfile):
         db.session.commit()
         if num % 1000 == 0:
             print('{}...'.format(num))
+
+
+from app.utils.scopus_field_download import download_scopus_fields
+
+
+@app.cli.command('download-scopus-field')
+def populate_scopus_field():
+    download_scopus_fields(db=db, model=DimScopusField)
