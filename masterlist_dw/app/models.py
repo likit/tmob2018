@@ -226,6 +226,7 @@ class BridgeScopusFieldGroup(db.Model):
     scopus_field_id = db.Column('scopus_field_id',
                                 db.ForeignKey('dim_scopus_fields.id'),
                                 primary_key=True)
+    frequency = db.Column('frequency', db.Integer)
     scopus_field_group = db.relationship('DimScopusFieldGroup',
                                          backref=db.backref('scopus_fields'))
     scopus_field = db.relationship('DimScopusField')
