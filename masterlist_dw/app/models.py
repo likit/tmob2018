@@ -197,9 +197,6 @@ class FactResearcher(db.Model):
                                  db.ForeignKey('dim_eng_name_groups.id'))
     en_name_group = db.relationship('DimEngNameGroup',
                                     backref=db.backref('researcher', uselist=False))
-    sc_field_group_id = db.Column('sc_field_group_id',
-                                  db.ForeignKey('dim_scopus_field_groups.id'))
-    sc_field_group = db.relationship('DimScopusFieldGroup')
     sc_graduated_date = db.Column('sc_graduated_year', db.Date())
     sc_country_id = db.Column('sc_country_id', db.ForeignKey('dim_sc_countries.id'))
     sc_university_id = db.Column('sc_university_id', db.ForeignKey('dim_sc_universities.id'))
@@ -207,6 +204,14 @@ class FactResearcher(db.Model):
     sc_specialty = db.Column('sc_specialty', db.String())
     sc_country = db.relationship('DimSCCountry', backref=db.backref('students'))
     sc_university = db.relationship('DimSCUniversity', backref=db.backref('students'))
+    scopus_author_detail_group_id = db.Column('scopus_author_detail_id',
+                                        db.ForeignKey('dim_scopus_author_detail.id'))
+    scopus_author_detail = db.relationship('DimScopusAuthorDetail',
+                                            backref=db.backref('researcher'))
+    scopus_field_group_id = db.Column('scopus_field_group_id',
+                                      db.ForeignKey('dim_scopus_field_groups.id'))
+    scopus_field_group = db.relationship('DimScopusFieldGroup',
+                                         backref=db.backref('researcher'))
 
 
 class DimScopusField(db.Model):
@@ -244,7 +249,10 @@ class DimScopusFieldGroup(db.Model):
 class DimScopusAuthorDetail(db.Model):
     __tablename__ = 'dim_scopus_author_detail'
     id = db.Column('id', db.Integer, primary_key=True, autoincrement=True)
+    # Author's identifier serves as a key for historical reporting
     identifier = db.Column('identifier', db.String())
+    en_firstname = db.Column('en_firstname', db.String())
+    en_lastname = db.Column('en_lastname', db.String())
     url = db.Column('url', db.String())
     coauthor_count = db.Column('coauthor_count', db.Integer, default=0)
     h_index = db.Column('h_index', db.Integer)
@@ -255,9 +263,24 @@ class DimScopusAuthorDetail(db.Model):
     document_count = db.Column('document_count', db.Integer, default=0)
     affiliation = db.Column('affiliation', db.String())
     department = db.Column('department', db.String())
-    scopus_field_group_id = db.Column('scopus_field_group_id',
-                                      db.ForeignKey('dim_scopus_field_groups.id'))
-    scopus_field_group = db.relationship(DimScopusFieldGroup)
     current = db.Column('current', db.Boolean(), default=True)
     start_date = db.Column('start_date', db.Date())
     end_date = db.Column('end_date', db.Date(), default=datetime(9999,12,31))
+
+
+class BridgeScopusAuthorDetailGroup(db.Model):
+    __tablename__ = 'br_scopus_author_detail_group'
+    scopus_author_detail_group_id = db.Column('scopus_author_detail_group_id',
+                                              db.ForeignKey('dim_scopus_author_detail_groups.id'),
+                                              primary_key=True)
+    scopus_author_detail_id = db.Column('scopus_author_detail_id',
+                                        db.ForeignKey('dim_scopus_author_detail.id'))
+    scopus_author_detail_group = db.relationship('DimScopusAuthorDetailGroup',
+                                                 backref=db.backref('details'))
+    scopus_author_detail = db.relationship('DimScopusAuthorDetail')
+
+
+class DimScopusAuthorDetailGroup(db.Model):
+    __tablename__ = 'dim_scopus_author_detail_groups'
+    id = db.Column('id', db.Integer,
+                   primary_key=True, autoincrement=True)
