@@ -204,9 +204,9 @@ class FactResearcher(db.Model):
     sc_specialty = db.Column('sc_specialty', db.String())
     sc_country = db.relationship('DimSCCountry', backref=db.backref('students'))
     sc_university = db.relationship('DimSCUniversity', backref=db.backref('students'))
-    scopus_author_detail_group_id = db.Column('scopus_author_detail_id',
-                                        db.ForeignKey('dim_scopus_author_detail.id'))
-    scopus_author_detail = db.relationship('DimScopusAuthorDetail',
+    scopus_author_detail_group_id = db.Column('scopus_author_detail_groups_id',
+                                        db.ForeignKey('dim_scopus_author_detail_groups.id'))
+    scopus_author_detail_group = db.relationship('DimScopusAuthorDetailGroup',
                                             backref=db.backref('researcher'))
     scopus_field_group_id = db.Column('scopus_field_group_id',
                                       db.ForeignKey('dim_scopus_field_groups.id'))
