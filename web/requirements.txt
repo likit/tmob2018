@@ -96,7 +96,7 @@ soupsieve==1.9
 SQLAlchemy==1.2.8
 Unidecode==0.4.21
 urllib3==1.23
-wagtail==2.4
+wagtail==2.7.4
 wagtailmenus==2.10
 srsly==0.0.5
 terminado==0.8.2
